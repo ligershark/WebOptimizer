@@ -22,7 +22,7 @@ namespace Bundler.Taghelpers
         {
             if (!string.IsNullOrEmpty(Bundle))
             {
-                if (Exensions.Options.Enabled)
+                if (Extensions.Options.Enabled)
                 {
                     output.Attributes.SetAttribute("href", Bundle);
                 }
@@ -37,7 +37,7 @@ namespace Bundler.Taghelpers
 
         private void WriteIndividualTags(TagHelperOutput output)
         {
-            var transform = Exensions.Options.Transforms.FirstOrDefault(t => t.Path.Equals(Bundle));
+            var transform = Extensions.Options.Transforms.FirstOrDefault(t => t.Path.Equals(Bundle));
             output.SuppressOutput();
 
             var attrs = new List<string>();

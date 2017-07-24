@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using NUglify;
+using NUglify.JavaScript;
 
 namespace Bundler.Transformers
 {
@@ -8,11 +9,19 @@ namespace Bundler.Transformers
         public JavaScriptMinifier(string path) : base(path)
         { }
 
+        public JavaScriptMinifier(string path, CodeSettings settings) : base(path)
+        {
+            Settings = settings;
+        }
+
+        public CodeSettings Settings { get; }
+
         public override string ContentType => "application/javascript";
 
         public override string Transform(HttpContext context, string source)
         {
-            var minified = Uglify.Js(source);
+            var settings = Settings ?? new CodeSettings();
+            var minified = Uglify.Js(source, settings);
 
             if (minified.HasErrors)
                 return null;

@@ -42,9 +42,13 @@ namespace Bundler
 
             app.UseTransforms(options =>
             {
-                options.Enabled = false;// env.IsProduction();
-                options.Transforms.Add(new JavaScriptMinifier("/all.js").Include("js/site.js", "js/b.js"));
-                options.Transforms.Add(new CssMinifier("/all.css").Include("css/site.css", "/lib/bootstrap/dist/css/bootstrap.css"));
+                options.Enabled = true;// env.IsProduction();
+
+                options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" });
+                //options.Transforms.Add(new JavaScriptMinifier("/all.js").Include("js/site.js", "js/b.js"));
+
+                options.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
+                //options.Transforms.Add(new CssMinifier("/all.css").Include("css/site.css", "/lib/bootstrap/dist/css/bootstrap.css"));
             });
 
             app.UseStaticFiles();
