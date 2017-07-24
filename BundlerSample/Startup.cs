@@ -40,7 +40,10 @@ namespace Bundler
                 app.UseExceptionHandler("/Error");
             }
 
-            app.UseTransforms(options =>
+            app.MinifyJavaScript();
+            app.MinifyCss();
+
+            app.UseBundles(options =>
             {
                 options.Enabled = true;// env.IsProduction();
 
