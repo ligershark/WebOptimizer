@@ -23,18 +23,25 @@ namespace Bundler
 
         public async Task Invoke(HttpContext context)
         {
-            var absolutes = _transform.SourceFiles.Select(f => Path.Combine(_env.WebRootPath, f));
+            string source = await GetContent(_transform);
+
+            string transformedBundle = _transform.Transform(context, source);
+
+            context.Response.ContentType = _transform.ContentType;
+            await context.Response.WriteAsync(transformedBundle);
+        }
+
+        public async Task<string> GetContent(ITransform transform)
+        {
+            var absolutes = transform.SourceFiles.Select(f => Path.Combine(_env.WebRootPath, f));
             var sb = new StringBuilder();
 
             foreach (string absolute in absolutes)
             {
-                sb.AppendLine(File.ReadAllText(absolute));
+                sb.AppendLine(await File.ReadAllTextAsync(absolute));
             }
 
-            string transformedBundle = _transform.Transform(context, sb.ToString());
-
-            context.Response.ContentType = _transform.ContentType;
-            await context.Response.WriteAsync(transformedBundle);
+            return sb.ToString();
         }
     }
 }

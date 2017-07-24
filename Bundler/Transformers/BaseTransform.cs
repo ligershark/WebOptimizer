@@ -22,9 +22,9 @@ namespace Bundler.Transformers
 
         public string Path { get; }
 
-        public IEnumerable<string> SourceFiles { get; set; }
+        public IEnumerable<string> SourceFiles { get; protected set; }
 
-        public abstract string ContentType {get;}
+        public abstract string ContentType { get; }
 
         public ITransform Include(params string[] sourceFiles)
         {
