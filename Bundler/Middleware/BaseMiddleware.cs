@@ -30,7 +30,7 @@ namespace Bundler
         /// </summary>
         public async Task InvokeAsync(HttpContext context)
         {
-            if (ConditionalGet(context))
+            if (IsConditionalGet(context))
             {
                 context.Response.StatusCode = 304;
                 await WriteOutputAsync(context, string.Empty);
@@ -58,7 +58,7 @@ namespace Bundler
             }
         }
 
-        private bool ConditionalGet(HttpContext context)
+        private bool IsConditionalGet(HttpContext context)
         {
             if (context.Request.Headers.TryGetValue("If-None-Match", out var inm))
             {
