@@ -2,6 +2,21 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Bundler.xml</DocumentationFile>
+      <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+      <PackageTags>bundle, minify, optimize, asp.net core</PackageTags>
+      <Version>1.0.0-alpha</Version>
+      <Authors>LigerShark</Authors>
+      <Company>LigerShark</Company>
+      <Description>A runtime bundler and minifier for ASP.NET Core</Description>
+      <Copyright>Copyright © LigerShark</Copyright>
+      <PackageId>LigerShark.Bundler</PackageId>
+      <Product>LigerShark.Bundler</Product>
+      <PackageIconUrl>https://aka.ms/vsextensibilityicon</PackageIconUrl>
+      <PackageProjectUrl>https://github.com/ligershark/Bundler</PackageProjectUrl>
+      <PackageLicenseUrl>https://github.com/ligershark/Bundler/blob/master/LICENSE.txt</PackageLicenseUrl>
+      <RepositoryUrl>https://github.com/ligershark/Bundler</RepositoryUrl>
+      <!--<PackageOutputPath>..\..\artifacts\$(Configuration)</PackageOutputPath>-->
   </PropertyGroup>
 
   <ItemGroup>
