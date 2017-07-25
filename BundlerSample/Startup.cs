@@ -45,12 +45,9 @@ namespace Bundler
                 options.Enabled = true;// !env.IsDevelopment();
 
                 options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" })
-                       .Run(config => {
-
-                           if (!config.Transform.CacheKey.Contains("sweet"))
-                           {
-                               config.Transform.CacheKey.Add("sweet");
-                           }
+                       .Run(config =>
+                       {
+                           config.Transform.CacheKeys["culture"] = "sweet";
 
                            return config.Content.Replace("hat", "svin");
                        });

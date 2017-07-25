@@ -60,7 +60,7 @@ namespace Bundler
         /// </summary>
         protected override string GetCacheKey(HttpContext context)
         {
-            return base.GetCacheKey(context) + string.Join("", _transform.CacheKey);
+            return (base.GetCacheKey(context) + string.Join("", _transform.CacheKeys.Select(p => p.Key + p.Value))).GetHashCode().ToString();
         }
     }
 }

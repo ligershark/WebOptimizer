@@ -26,7 +26,7 @@ namespace Bundler.Transformers
 
             Path = path;
             PostProcessors = new List<Func<BundlerConfig, string>>();
-            CacheKey = new List<string>();
+            CacheKeys = new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Bundler.Transformers
         /// Gets or sets the cache key.
         /// Append any additional keys to the string in order to vary the cache result
         /// </summary>
-        public IList<string> CacheKey { get; }
+        public IDictionary<string, string> CacheKeys { get; }
 
         /// <summary>
         /// Gets a list of post processors
