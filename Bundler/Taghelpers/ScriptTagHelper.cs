@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using System.Collections.Generic;
 using System.Linq;
 using Bundler.Transformers;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Bundler.Taghelpers
 {
@@ -15,8 +16,8 @@ namespace Bundler.Taghelpers
         /// <summary>
         /// Initializes a new instance of the <see cref="ScriptTagHelper"/> class.
         /// </summary>
-        public ScriptTagHelper(IHostingEnvironment env)
-            : base(env)
+        public ScriptTagHelper(IHostingEnvironment env, IMemoryCache cache)
+            : base(env, cache)
         { }
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace Bundler.Taghelpers
 
             foreach (string file in transform.SourceFiles)
             {
-                string src = $"{file}?v={GenerateHash(file)}";
+                string src = AddFileVersionToPath(file);
                 output.PostElement.AppendHtml($"<script src=\"{src}\" {string.Join(" ", attrs)}></script>");
             }
         }

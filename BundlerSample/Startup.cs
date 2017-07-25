@@ -40,22 +40,25 @@ namespace Bundler
                 app.UseExceptionHandler("/Error");
             }
 
-            app.MinifyJavaScript();
-            app.MinifyCss();
-
             app.UseBundles(options =>
             {
-                options.Enabled = true;// env.IsProduction();
+                options.Enabled = true;// !env.IsDevelopment();
 
                 options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" })
-                       .Run((content, context) => {
-                           return content.Replace("hat", "svin");
+                       .Run(config =>
+                       {
+                           config.Transform.CacheKeys["culture"] = "sweet";
+
+                           return config.Content.Replace("hat", "svin");
                        });
                 //options.Transforms.Add(new JavaScriptMinifier("/all.js").Include("js/site.js", "js/b.js"));
 
                 options.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
                 //options.Transforms.Add(new CssMinifier("/all.css").Include("css/site.css", "/lib/bootstrap/dist/css/bootstrap.css"));
             });
+
+            app.MinifyJavaScript();
+            app.MinifyCss();
 
             app.UseStaticFiles();
 

@@ -16,16 +16,17 @@ namespace Bundler.Transformers
         {
             if (string.IsNullOrWhiteSpace(path))
             {
-                throw new System.ArgumentException($"The \"{nameof(path)}\" parameter must be specified and not empty", nameof(path));
+                throw new ArgumentException($"The \"{nameof(path)}\" parameter must be specified and not empty", nameof(path));
             }
 
             if (!path.StartsWith('/'))
             {
-                throw new System.ArgumentException("Path must start with a /", nameof(path));
+                throw new ArgumentException("Path must start with a /", nameof(path));
             }
 
             Path = path;
-            PostProcessors = new List<Func<string, HttpContext, string>>();
+            PostProcessors = new List<Func<BundlerConfig, string>>();
+            CacheKeys = new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -44,9 +45,15 @@ namespace Bundler.Transformers
         public abstract string ContentType { get; }
 
         /// <summary>
+        /// Gets or sets the cache key.
+        /// Append any additional keys to the string in order to vary the cache result
+        /// </summary>
+        public IDictionary<string, string> CacheKeys { get; }
+
+        /// <summary>
         /// Gets a list of post processors
         /// </summary>
-        public IList<Func<string, HttpContext, string>> PostProcessors { get; }
+        public IList<Func<BundlerConfig, string>> PostProcessors { get; }
 
         /// <summary>
         /// Includes the specified source files.
@@ -63,14 +70,17 @@ namespace Bundler.Transformers
         /// </summary>
         public string Transform(HttpContext context, string source)
         {
-            string result = Run(context, source);
-
-            foreach (Func<string, HttpContext, string> processor in PostProcessors)
+            var config = new BundlerConfig(context, this)
             {
-                result = processor(result, context);
+                Content = Run(context, source)
+            };
+
+            foreach (Func<BundlerConfig, string> processor in PostProcessors)
+            {
+                config.Content = processor(config);
             }
 
-            return result;
+            return config.Content;
         }
 
         /// <summary>

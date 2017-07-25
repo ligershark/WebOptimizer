@@ -25,6 +25,12 @@ namespace Bundler.Transformers
         string ContentType { get; }
 
         /// <summary>
+        /// Gets or sets the cache key.
+        /// Append any additional keys to the string in order to vary the cache result
+        /// </summary>
+        IDictionary<string, string> CacheKeys { get; }
+
+        /// <summary>
         /// Transforms the specified source.
         /// </summary>
         string Transform(HttpContext context, string source);
@@ -32,7 +38,7 @@ namespace Bundler.Transformers
         /// <summary>
         /// Gets a list of post processors
         /// </summary>
-        IList<Func<string, HttpContext, string>> PostProcessors { get; }
+        IList<Func<BundlerConfig, string>> PostProcessors { get; }
 
         /// <summary>
         /// Includes the specified source files.

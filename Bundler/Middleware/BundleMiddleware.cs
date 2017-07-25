@@ -54,5 +54,13 @@ namespace Bundler
 
             return sb.ToString();
         }
+
+        /// <summary>
+        /// Gets the cache key.
+        /// </summary>
+        protected override string GetCacheKey(HttpContext context)
+        {
+            return (base.GetCacheKey(context) + string.Join("", _transform.CacheKeys.Select(p => p.Key + p.Value))).GetHashCode().ToString();
+        }
     }
 }

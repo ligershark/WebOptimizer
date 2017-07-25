@@ -10,7 +10,7 @@ namespace Bundler
     public abstract class BaseMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly Dictionary<string, string> _cache = new Dictionary<string, string>();
+        private KeyValuePair<string, string> _cache = new KeyValuePair<string, string>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BundleMiddleware"/> class.
@@ -30,9 +30,18 @@ namespace Bundler
         /// </summary>
         public async Task InvokeAsync(HttpContext context)
         {
-            if (context.Request.Query.TryGetValue("v", out var v) && _cache.ContainsKey(v))
+            if (IsConditionalGet(context))
             {
-                await WriteOutputAsync(context, _cache[v]);
+                context.Response.StatusCode = 304;
+                await WriteOutputAsync(context, string.Empty);
+                return;
+            }
+
+            string cacheKey = GetCacheKey(context);
+
+            if (cacheKey == _cache.Key)
+            {
+                await WriteOutputAsync(context, _cache.Value);
             }
             else
             {
@@ -44,13 +53,36 @@ namespace Bundler
                     return;
                 }
 
-                await WriteOutputAsync(context, result);
-
-                if (!string.IsNullOrEmpty(v))
+                if (!string.IsNullOrEmpty(cacheKey))
                 {
-                    _cache[v] = result;
+                    _cache = new KeyValuePair<string, string>(cacheKey, result);
                 }
+
+                await WriteOutputAsync(context, result);
             }
+        }
+
+        /// <summary>
+        /// Gets the cache key.
+        /// </summary>
+        protected virtual string GetCacheKey(HttpContext context)
+        {
+            if (context.Request.Query.TryGetValue("v", out var v))
+            {
+                return v;
+            }
+
+            return string.Empty;
+        }
+
+        private bool IsConditionalGet(HttpContext context)
+        {
+            if (context.Request.Headers.TryGetValue("If-None-Match", out var inm))
+            {
+                return _cache.Key == inm.ToString().Trim('"');
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -62,13 +94,16 @@ namespace Bundler
         {
             context.Response.ContentType = ContentType;
 
-            if (context.Request.Query.ContainsKey("v"))
+            if (!string.IsNullOrEmpty(_cache.Key))
             {
                 context.Response.Headers["Cache-Control"] = $"public,max-age=31536000"; // 1 year
-                context.Response.Headers["Etag"] = $"\"{context.Request.Query["v"]}\"";
+                context.Response.Headers["Etag"] = $"\"{_cache.Key}\"";
             }
 
-            await context.Response.WriteAsync(content);
+            if (!string.IsNullOrEmpty(content))
+            {
+                await context.Response.WriteAsync(content);
+            }
         }
     }
 }
