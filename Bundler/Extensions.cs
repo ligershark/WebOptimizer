@@ -55,7 +55,7 @@ namespace Bundler
         /// <summary>
         /// Adds a processor to the transformation
         /// </summary>
-        public static ITransform Process(this ITransform transform, Func<string, HttpContext, string> func)
+        public static ITransform Run(this ITransform transform, Func<string, HttpContext, string> func)
         {
             transform.PostProcessors.Add(func);
             return transform;

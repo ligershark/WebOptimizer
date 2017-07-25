@@ -48,7 +48,7 @@ namespace Bundler
                 options.Enabled = true;// env.IsProduction();
 
                 options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" })
-                       .Process((content, context) => {
+                       .Run((content, context) => {
                            return content.Replace("hat", "svin");
                        });
                 //options.Transforms.Add(new JavaScriptMinifier("/all.js").Include("js/site.js", "js/b.js"));
