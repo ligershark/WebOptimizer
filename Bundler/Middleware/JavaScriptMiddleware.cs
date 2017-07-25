@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Bundler.Transformers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.FileProviders;
 using NUglify.JavaScript;
 
 namespace Bundler
@@ -42,11 +43,11 @@ namespace Bundler
                 return null;
             }
 
-            string file = Path.Combine(_env.WebRootPath, context.Request.Path.Value.TrimStart('/'));
+            IFileInfo file = _env.WebRootFileProvider.GetFileInfo(context.Request.Path.Value);
 
-            if (File.Exists(file))
+            if (file.Exists)
             {
-                string source = await File.ReadAllTextAsync(file);
+                string source = await File.ReadAllTextAsync(file.PhysicalPath);
                 var transform = new JavaScriptMinifier(context.Request.Path, _settings);
 
                 return transform.Transform(context, source);

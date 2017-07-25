@@ -61,11 +61,6 @@ namespace Bundler.Taghelpers
         {
             EnsureVersionFileProvider();
             return _fileProvider.AddFileVersionToPath(fileName);
-
-            //string absolute = Path.Combine(_env.WebRootPath, fileName.TrimStart('/'));
-            //DateTime lastModified = File.GetLastWriteTime(absolute);
-
-            //return lastModified.GetHashCode().ToString();
         }
 
         /// <summary>

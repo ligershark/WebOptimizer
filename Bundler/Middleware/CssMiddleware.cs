@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using NUglify.Css;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.FileProviders;
 
 namespace Bundler
 {
@@ -42,11 +43,11 @@ namespace Bundler
                 return null;
             }
 
-            string file = Path.Combine(_env.WebRootPath, context.Request.Path.Value.TrimStart('/'));
+            IFileInfo file = _env.WebRootFileProvider.GetFileInfo(context.Request.Path.Value);
 
-            if (File.Exists(file))
+            if (file.Exists)
             {
-                string source = await File.ReadAllTextAsync(file);
+                string source = await File.ReadAllTextAsync(file.PhysicalPath);
                 var transform = new CssMinifier(context.Request.Path, _settings);
 
                 return transform.Transform(context, source);

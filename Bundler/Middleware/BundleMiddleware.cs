@@ -44,7 +44,7 @@ namespace Bundler
 
         private async Task<string> GetContentAsync(ITransform transform)
         {
-            IEnumerable<string> absolutes = transform.SourceFiles.Select(f => Path.Combine(_env.WebRootPath, f));
+            IEnumerable<string> absolutes = transform.SourceFiles.Select(f => _env.WebRootFileProvider.GetFileInfo(f).PhysicalPath);
             var sb = new StringBuilder();
 
             foreach (string absolute in absolutes)
@@ -60,7 +60,15 @@ namespace Bundler
         /// </summary>
         protected override string GetCacheKey(HttpContext context)
         {
-            return (base.GetCacheKey(context) + string.Join("", _transform.CacheKeys.Select(p => p.Key + p.Value))).GetHashCode().ToString();
+            string baseCacheKey = base.GetCacheKey(context);
+
+            if (!string.IsNullOrEmpty(baseCacheKey))
+            {
+                string transformKey = string.Join("", _transform.CacheKeys.Select(p => p.Key + p.Value));
+                return (base.GetCacheKey(context) + transformKey).GetHashCode().ToString();
+            }
+
+            return null;
         }
     }
 }
