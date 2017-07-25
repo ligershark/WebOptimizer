@@ -1,18 +1,17 @@
-﻿using Bundler.Transformers;
+﻿using System.IO;
+using System.Threading.Tasks;
+using Bundler.Transformers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using NUglify.JavaScript;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Bundler
 {
     /// <summary>
     /// Middleware for minifying JavaScript
     /// </summary>
-    public class JavaScriptMiddleware
+    public class JavaScriptMiddleware : BaseMiddleware
     {
-        private readonly RequestDelegate _next;
         private readonly CodeSettings _settings;
         private readonly IHostingEnvironment _env;
 
@@ -20,24 +19,27 @@ namespace Bundler
         /// Initializes a new instance of the <see cref="JavaScriptMiddleware"/> class.
         /// </summary>
         public JavaScriptMiddleware(RequestDelegate next, CodeSettings settings, IHostingEnvironment env)
+            : base(next)
         {
-            _next = next;
             _settings = settings;
             _env = env;
         }
 
+        /// <summary>
+        /// Gets the content type of the response.
+        /// </summary>
+        protected override string ContentType => "application/javascript";
 
         /// <summary>
         /// Invokes the middleware
         /// </summary>
-        public async Task InvokeAsync(HttpContext context)
+        public override async Task<string> ExecuteAsync(HttpContext context)
         {
             string ext = Path.GetExtension(context.Request.Path.Value);
 
             if (ext != ".js")
             {
-                await _next(context);
-                return;
+                return null;
             }
 
             string file = Path.Combine(_env.WebRootPath, context.Request.Path.Value.TrimStart('/'));
@@ -47,15 +49,10 @@ namespace Bundler
                 string source = await File.ReadAllTextAsync(file);
                 var transform = new JavaScriptMinifier(context.Request.Path, _settings);
 
-                string minified = transform.Transform(context, source);
+                return transform.Transform(context, source);
+            }
 
-                context.Response.ContentType = transform.ContentType;
-                await context.Response.WriteAsync(minified);
-            }
-            else
-            {
-                await _next(context);
-            }
+            return null;
         }
     }
 }
