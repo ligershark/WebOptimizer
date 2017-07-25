@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Resources;
 using System.Text;
+using Microsoft.Extensions.Localization;
 
 namespace Bundler.Transformers
 {
@@ -12,14 +13,14 @@ namespace Bundler.Transformers
     public class ScriptLocalizer
     {
         private StringBuilder _sb = new StringBuilder();
-        private ResourceManager _resourceManager;
+        private IStringLocalizer _stringProvider;
 
         /// <summary>
         /// Localizes script files
         /// </summary>
-        public ScriptLocalizer(ResourceManager resourceManager, CultureInfo culture)
+        private ScriptLocalizer(IStringLocalizer stringProvider)
         {
-            _resourceManager = resourceManager;
+            _stringProvider = stringProvider;
         }
 
         private void Append(char c)
@@ -35,7 +36,14 @@ namespace Bundler.Transformers
         /// <summary>
         /// Replaces string keys with values from the resource manager
         /// </summary>
-        public string Localize(string document)
+        public static string Localize(string document, IStringLocalizer stringProvider)
+        {
+            var localizer = new ScriptLocalizer(stringProvider);
+            return localizer.Localize(document);
+        }
+
+
+        private string Localize(string document)
         {
             const char beginArgChar = '{';
             const char endArgChar = '}';
@@ -103,7 +111,12 @@ namespace Bundler.Transformers
                     InvalidDocFormat(param);
                 }
 
-                Append(_resourceManager.GetString(param));
+                var str = _stringProvider.GetString(param);
+                if (str.ResourceNotFound)
+                {
+                    throw new InvalidOperationException($"No value found for \"{str.Name}\"");
+                }
+                Append(str.Value);
             }
 
             return _sb.ToString();

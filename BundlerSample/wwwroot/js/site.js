@@ -3,7 +3,8 @@
     var ostehat = 0;
 
     return {
-        hat: ostehat
+        hat: ostehat,
+        foo: "{{hello}}"
     };
 
 })();

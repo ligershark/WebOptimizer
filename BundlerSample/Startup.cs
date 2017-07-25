@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Bundler.Transformers;
 using System.Globalization;
+using Microsoft.Extensions.Localization;
 
 namespace Bundler
 {
@@ -61,8 +62,9 @@ namespace Bundler
             {
                 options.Enabled = true;// !env.IsDevelopment();
 
+                var localizer = app.ApplicationServices.GetRequiredService<IStringLocalizer<Strings>>();
                 options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" })
-                       .Localize();
+                       .Localize(localizer);
                 //options.Transforms.Add(new JavaScriptMinifier("/all.js").Include("js/site.js", "js/b.js"));
 
                 options.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
@@ -81,5 +83,10 @@ namespace Bundler
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
+    }
+
+    public class Strings
+    {
+
     }
 }
