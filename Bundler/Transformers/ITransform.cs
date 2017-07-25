@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
+using System;
 
 namespace Bundler.Transformers
 {
@@ -27,6 +28,11 @@ namespace Bundler.Transformers
         /// Transforms the specified source.
         /// </summary>
         string Transform(HttpContext context, string source);
+
+        /// <summary>
+        /// Gets a list of post processors
+        /// </summary>
+        IList<Func<string, HttpContext, string>> PostProcessors { get; }
 
         /// <summary>
         /// Includes the specified source files.

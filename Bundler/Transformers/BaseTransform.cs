@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
+using System;
 
 namespace Bundler.Transformers
 {
@@ -24,6 +25,7 @@ namespace Bundler.Transformers
             }
 
             Path = path;
+            PostProcessors = new List<Func<string, HttpContext, string>>();
         }
 
         /// <summary>
@@ -42,6 +44,11 @@ namespace Bundler.Transformers
         public abstract string ContentType { get; }
 
         /// <summary>
+        /// Gets a list of post processors
+        /// </summary>
+        public IList<Func<string, HttpContext, string>> PostProcessors { get; }
+
+        /// <summary>
         /// Includes the specified source files.
         /// </summary>
         public ITransform Include(params string[] sourceFiles)
@@ -54,6 +61,21 @@ namespace Bundler.Transformers
         /// <summary>
         /// Transforms the specified source.
         /// </summary>
-        public abstract string Transform(HttpContext context, string source);
+        public string Transform(HttpContext context, string source)
+        {
+            string result = Run(context, source);
+
+            foreach (Func<string, HttpContext, string> processor in PostProcessors)
+            {
+                result = processor(result, context);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Runs the transform on the source.
+        /// </summary>
+        protected abstract string Run(HttpContext context, string source);
     }
 }

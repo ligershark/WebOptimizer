@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using NUglify.Css;
 using NUglify.JavaScript;
 using System;
+using Microsoft.AspNetCore.Http;
 
 namespace Bundler
 {
@@ -52,14 +53,26 @@ namespace Bundler
         }
 
         /// <summary>
+        /// Adds a processor to the transformation
+        /// </summary>
+        public static ITransform Process(this ITransform transform, Func<string, HttpContext, string> func)
+        {
+            transform.PostProcessors.Add(func);
+            return transform;
+        }
+
+        /// <summary>
         /// Adds a JavaScript bundle.
         /// </summary>
         /// <param name="options">The options.</param>
         /// <param name="route">The route name from where the bundle is served. Example: /my/bundle.js.</param>
         /// <param name="sourceFiles">An array of webroot relative file paths.</param>
-        public static void AddJs(this Options options, string route, params string[] sourceFiles)
+        public static ITransform AddJs(this Options options, string route, params string[] sourceFiles)
         {
-            options.Transforms.Add(new JavaScriptMinifier(route).Include(sourceFiles));
+            ITransform transform = new JavaScriptMinifier(route).Include(sourceFiles);
+            options.Transforms.Add(transform);
+
+            return transform;
         }
 
         /// <summary>
@@ -69,9 +82,12 @@ namespace Bundler
         /// <param name="settings">The JavaScript minification settings.</param>
         /// <param name="route">The route name from where the bundle is served. Example: /my/bundle.js.</param>
         /// <param name="sourceFiles">An array of webroot relative file paths.</param>
-        public static void AddJs(this Options options, CodeSettings settings, string route, params string[] sourceFiles)
+        public static ITransform AddJs(this Options options, CodeSettings settings, string route, params string[] sourceFiles)
         {
-            options.Transforms.Add(new JavaScriptMinifier(route, settings).Include(sourceFiles));
+            ITransform transform = new JavaScriptMinifier(route, settings).Include(sourceFiles);
+            options.Transforms.Add(transform);
+
+            return transform;
         }
 
         /// <summary>
@@ -80,9 +96,12 @@ namespace Bundler
         /// <param name="options">The options.</param>
         /// <param name="route">The route name from where the bundle is served. Example: /my/bundle.css.</param>
         /// <param name="sourceFiles">An array of webroot relative file paths.</param>
-        public static void AddCss(this Options options, string route, params string[] sourceFiles)
+        public static ITransform AddCss(this Options options, string route, params string[] sourceFiles)
         {
-            options.Transforms.Add(new CssMinifier(route).Include(sourceFiles));
+            ITransform transform = new CssMinifier(route).Include(sourceFiles);
+            options.Transforms.Add(transform);
+
+            return transform;
         }
 
         /// <summary>
@@ -92,9 +111,12 @@ namespace Bundler
         /// <param name="settings">The CSS minification settings.</param>
         /// <param name="route">The route name from where the bundle is served. Example: /my/bundle.css.</param>
         /// <param name="sourceFiles">An array of webroot relative file paths.</param>
-        public static void AddCss(this Options options, CssSettings settings, string route, params string[] sourceFiles)
+        public static ITransform AddCss(this Options options, CssSettings settings, string route, params string[] sourceFiles)
         {
-            options.Transforms.Add(new CssMinifier(route, settings).Include(sourceFiles));
+            ITransform transform = new CssMinifier(route, settings).Include(sourceFiles);
+            options.Transforms.Add(transform);
+
+            return transform;
         }
     }
 }

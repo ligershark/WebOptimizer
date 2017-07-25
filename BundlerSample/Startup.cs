@@ -47,7 +47,10 @@ namespace Bundler
             {
                 options.Enabled = true;// env.IsProduction();
 
-                options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" });
+                options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" })
+                       .Process((content, context) => {
+                           return content.Replace("hat", "svin");
+                       });
                 //options.Transforms.Add(new JavaScriptMinifier("/all.js").Include("js/site.js", "js/b.js"));
 
                 options.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
