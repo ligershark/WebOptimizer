@@ -28,7 +28,7 @@ namespace Bundler.Transformers
         /// Gets or sets the cache key.
         /// Append any additional keys to the string in order to vary the cache result
         /// </summary>
-        string CacheKey { get; set; }
+        IList<string> CacheKey { get; }
 
         /// <summary>
         /// Transforms the specified source.

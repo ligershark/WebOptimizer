@@ -46,8 +46,14 @@ namespace Bundler
 
                 options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" })
                        .Run(config => {
+
+                           if (!config.Transform.CacheKey.Contains("sweet"))
+                           {
+                               config.Transform.CacheKey.Add("sweet");
+                           }
+
                            return config.Content.Replace("hat", "svin");
-                       }).CacheKey += "hat";
+                       });
                 //options.Transforms.Add(new JavaScriptMinifier("/all.js").Include("js/site.js", "js/b.js"));
 
                 options.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");

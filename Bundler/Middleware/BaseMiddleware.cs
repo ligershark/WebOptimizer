@@ -53,12 +53,12 @@ namespace Bundler
                     return;
                 }
 
-                await WriteOutputAsync(context, result);
-
                 if (!string.IsNullOrEmpty(cacheKey))
                 {
                     _cache = new KeyValuePair<string, string>(cacheKey, result);
                 }
+
+                await WriteOutputAsync(context, result);
             }
         }
 
@@ -94,13 +94,16 @@ namespace Bundler
         {
             context.Response.ContentType = ContentType;
 
-            if (context.Request.Query.ContainsKey("v"))
+            if (!string.IsNullOrEmpty(_cache.Key))
             {
                 context.Response.Headers["Cache-Control"] = $"public,max-age=31536000"; // 1 year
-                context.Response.Headers["Etag"] = $"\"{context.Request.Query["v"]}\"";
+                context.Response.Headers["Etag"] = $"\"{_cache.Key}\"";
             }
 
-            await context.Response.WriteAsync(content);
+            if (!string.IsNullOrEmpty(content))
+            {
+                await context.Response.WriteAsync(content);
+            }
         }
     }
 }
