@@ -4,6 +4,7 @@ using NUglify.Css;
 using NUglify.JavaScript;
 using System;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 
 namespace Bundler
 {
@@ -34,6 +35,25 @@ namespace Bundler
                     builder.UseMiddleware<BundleMiddleware>(transform);
                 });
             }
+        }
+
+        /// <summary>
+        /// Localizes the files
+        /// </summary>
+        public static ITransform Localize(this ITransform transform)
+        {
+            transform.PostProcessors.Add(config =>
+            {
+                var culture = config.HttpContext.Features.Get<IRequestCultureFeature>();
+                var c = culture.RequestCulture.UICulture;
+
+                config.Transform.CacheKeys["culture"] = c.Name;
+                //var localizer = new ScriptLocalizer(null, c);
+                //config.Content = localizer.Localize(config.Content);
+
+                return c.Name;
+            });
+            return transform;
         }
 
         /// <summary>
