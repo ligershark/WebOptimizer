@@ -7,5 +7,6 @@ namespace Bundler
     {
         public bool Enabled { get; set; } = true;
         public List<ITransform> Transforms { get; } = new List<ITransform>();
+        public string WebRoot { get; internal set; }
     }
 }

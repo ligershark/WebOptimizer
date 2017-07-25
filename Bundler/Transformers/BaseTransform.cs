@@ -22,7 +22,7 @@ namespace Bundler.Transformers
 
         public string Path { get; }
 
-        public IEnumerable<string> SourceFiles { get; protected set; }
+        public IEnumerable<string> SourceFiles { get; internal set; }
 
         public abstract string ContentType { get; }
 

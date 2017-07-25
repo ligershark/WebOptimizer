@@ -6,14 +6,11 @@ using System.Linq;
 namespace Bundler.Taghelpers
 {
     [HtmlTargetElement("link", Attributes = "asp-bundle")]
-    public class LinkTagHelper : TagHelper
+    public class LinkTagHelper : BaseTagHelper
     {
-        private IHostingEnvironment _env;
-
         public LinkTagHelper(IHostingEnvironment env)
-        {
-            _env = env;
-        }
+            : base(env)
+        { }
 
         [HtmlAttributeName("asp-bundle")]
         public string Bundle { get; set; }
@@ -24,7 +21,9 @@ namespace Bundler.Taghelpers
             {
                 if (Extensions.Options.Enabled)
                 {
-                    output.Attributes.SetAttribute("href", Bundle);
+                    var transform = Extensions.Options.Transforms.FirstOrDefault(t => t.Path.Equals(Bundle));
+                    string href = $"{Bundle}?v={GenerateHash(transform)}";
+                    output.Attributes.SetAttribute("href", href);
                 }
                 else
                 {
@@ -57,21 +56,9 @@ namespace Bundler.Taghelpers
 
             foreach (string file in transform.SourceFiles)
             {
-                output.PostElement.AppendHtml($"<link href=\"{file}\" {string.Join(" ", attrs)} />");
+                string href = $"{file}?v={GenerateHash(file)}";
+                output.PostElement.AppendHtml($"<link href=\"{href}\" {string.Join(" ", attrs)} />");
             }
-        }
-
-        private static string GetQuote(HtmlAttributeValueStyle style)
-        {
-            switch (style)
-            {
-                case HtmlAttributeValueStyle.DoubleQuotes:
-                    return "\"";
-                case HtmlAttributeValueStyle.SingleQuotes:
-                    return "'";
-            }
-
-            return string.Empty;
         }
     }
 }
