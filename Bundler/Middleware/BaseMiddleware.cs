@@ -10,7 +10,7 @@ namespace Bundler
     public abstract class BaseMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly Dictionary<string, string> _cache = new Dictionary<string, string>();
+        private KeyValuePair<string, string> _cache = new KeyValuePair<string, string>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BundleMiddleware"/> class.
@@ -30,9 +30,14 @@ namespace Bundler
         /// </summary>
         public async Task InvokeAsync(HttpContext context)
         {
-            if (context.Request.Query.TryGetValue("v", out var v) && _cache.ContainsKey(v))
+            if (ConditionalGet(context))
             {
-                await WriteOutputAsync(context, _cache[v]);
+                context.Response.StatusCode = 304;
+                await WriteOutputAsync(context, string.Empty);
+            }
+            else if (context.Request.Query.TryGetValue("v", out var v) && _cache.Key == v)
+            {
+                await WriteOutputAsync(context, _cache.Value);
             }
             else
             {
@@ -48,9 +53,19 @@ namespace Bundler
 
                 if (!string.IsNullOrEmpty(v))
                 {
-                    _cache[v] = result;
+                    _cache = new KeyValuePair<string, string>(v, result);
                 }
             }
+        }
+
+        private bool ConditionalGet(HttpContext context)
+        {
+            if (context.Request.Headers.TryGetValue("If-None-Match", out var inm))
+            {
+                return _cache.Key == inm.ToString().Trim('"');
+            }
+
+            return false;
         }
 
         /// <summary>
