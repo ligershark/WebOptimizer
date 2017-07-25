@@ -46,13 +46,10 @@ namespace Bundler
             
             transform.PostProcessors.Add(config =>
             {
-            //var localizer = config.HttpContext.RequestServices.GetService()
-                var culture = config.HttpContext.Features.Get<IRequestCultureFeature>();
-                var c = culture.RequestCulture.UICulture;
+                var cf = config.HttpContext.Features.Get<IRequestCultureFeature>();
+                var culture = cf.RequestCulture.UICulture;
 
-                config.Transform.CacheKeys["culture"] = c.Name;
-                //var localizer = new ScriptLocalizer(null, c);
-                //config.Content = localizer.Localize(config.Content);
+                config.Transform.CacheKeys["culture"] = culture.Name;
 
                 return ScriptLocalizer.Localize(config.Content, stringProvider);
             });

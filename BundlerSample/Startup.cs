@@ -27,10 +27,7 @@ namespace Bundler
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc()
-                .AddViewLocalization(options =>
-            {
-                options.ResourcesPath = "Resources";
-            });
+                .AddViewLocalization(options => options.ResourcesPath = "Resources");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,18 +55,20 @@ namespace Bundler
                 SupportedUICultures = cultures
             });
 
+
             app.UseBundles(options =>
-            {
-                options.Enabled = true;// !env.IsDevelopment();
+                {
+                    options.Enabled = true;// !env.IsDevelopment();
 
-                var localizer = app.ApplicationServices.GetRequiredService<IStringLocalizer<Strings>>();
-                options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" })
-                       .Localize(localizer);
-                //options.Transforms.Add(new JavaScriptMinifier("/all.js").Include("js/site.js", "js/b.js"));
+                    var localizer = app.ApplicationServices.GetRequiredService<IStringLocalizer<BundlerSample.Strings>>();
 
-                options.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
-                //options.Transforms.Add(new CssMinifier("/all.css").Include("css/site.css", "/lib/bootstrap/dist/css/bootstrap.css"));
-            });
+                    options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" })
+                           .Localize(localizer);
+                    //options.Transforms.Add(new JavaScriptMinifier("/all.js").Include("js/site.js", "js/b.js"));
+
+                    options.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
+                    //options.Transforms.Add(new CssMinifier("/all.css").Include("css/site.css", "/lib/bootstrap/dist/css/bootstrap.css"));
+                });
 
             app.MinifyJavaScript();
             app.MinifyCss();
@@ -85,6 +84,10 @@ namespace Bundler
         }
     }
 
+}
+
+namespace BundlerSample
+{
     public class Strings
     {
 
