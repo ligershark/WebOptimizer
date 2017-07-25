@@ -8,19 +8,28 @@ using System.Threading.Tasks;
 
 namespace Bundler
 {
-    public class TransformMiddleware
+    /// <summary>
+    /// Middleware for setting up bundles
+    /// </summary>
+    public class BundleMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly IHostingEnvironment _env;
         private readonly ITransform _transform;
 
-        public TransformMiddleware(RequestDelegate next, IHostingEnvironment env, ITransform transform)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BundleMiddleware"/> class.
+        /// </summary>
+        public BundleMiddleware(RequestDelegate next, IHostingEnvironment env, ITransform transform)
         {
             _next = next;
             _env = env;
             _transform = transform;
         }
 
+        /// <summary>
+        /// Invokes the middleware
+        /// </summary>
         public async Task Invoke(HttpContext context)
         {
             string source = await GetContent(_transform);
@@ -31,7 +40,7 @@ namespace Bundler
             await context.Response.WriteAsync(transformedBundle);
         }
 
-        public async Task<string> GetContent(ITransform transform)
+        private async Task<string> GetContent(ITransform transform)
         {
             var absolutes = transform.SourceFiles.Select(f => Path.Combine(_env.WebRootPath, f));
             var sb = new StringBuilder();

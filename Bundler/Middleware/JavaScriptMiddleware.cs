@@ -7,12 +7,18 @@ using System.Threading.Tasks;
 
 namespace Bundler
 {
+    /// <summary>
+    /// Middleware for minifying JavaScript
+    /// </summary>
     public class JavaScriptMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly CodeSettings _settings;
         private readonly IHostingEnvironment _env;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JavaScriptMiddleware"/> class.
+        /// </summary>
         public JavaScriptMiddleware(RequestDelegate next, CodeSettings settings, IHostingEnvironment env)
         {
             _next = next;
@@ -21,6 +27,9 @@ namespace Bundler
         }
 
 
+        /// <summary>
+        /// Invokes the middleware
+        /// </summary>
         public async Task Invoke(HttpContext context)
         {
             string ext = Path.GetExtension(context.Request.Path.Value);

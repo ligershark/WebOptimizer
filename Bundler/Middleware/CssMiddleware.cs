@@ -7,12 +7,18 @@ using System.Threading.Tasks;
 
 namespace Bundler
 {
+    /// <summary>
+    /// Middleware for minifying CSS.
+    /// </summary>
     public class CssMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly CssSettings _settings;
         private readonly IHostingEnvironment _env;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CssMiddleware"/> class.
+        /// </summary>
         public CssMiddleware(RequestDelegate next, CssSettings settings, IHostingEnvironment env)
         {
             _next = next;
@@ -21,6 +27,9 @@ namespace Bundler
         }
 
 
+        /// <summary>
+        /// Invokes the middleware
+        /// </summary>
         public async Task Invoke(HttpContext context)
         {
             string ext = Path.GetExtension(context.Request.Path.Value);

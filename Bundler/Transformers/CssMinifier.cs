@@ -4,23 +4,40 @@ using NUglify.Css;
 
 namespace Bundler.Transformers
 {
+    /// <summary>
+    /// A CSS minifier.
+    /// </summary>
     public class CssMinifier : BaseTransform
     {
-        public CssMinifier(string path) : base(path)
+        private CssSettings _settings;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CssMinifier"/> class.
+        /// </summary>
+        public CssMinifier(string path)
+            : base(path)
         { }
 
-        public CssMinifier(string path, CssSettings settings) : base(path)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CssMinifier"/> class.
+        /// </summary>
+        public CssMinifier(string path, CssSettings settings)
+            : base(path)
         {
-            Settings = settings;
+            _settings = settings;
         }
 
+        /// <summary>
+        /// Gets the content type produced by the transform.
+        /// </summary>
         public override string ContentType => "text/css";
 
-        public CssSettings Settings { get; }
-
+        /// <summary>
+        /// Transforms the specified source.
+        /// </summary>
         public override string Transform(HttpContext context, string source)
         {
-            var settings = Settings ?? new CssSettings();
+            var settings = _settings ?? new CssSettings();
             var minified = Uglify.Css(source, settings);
 
             if (minified.HasErrors)

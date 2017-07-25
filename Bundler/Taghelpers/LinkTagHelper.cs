@@ -5,16 +5,29 @@ using System.Linq;
 
 namespace Bundler.Taghelpers
 {
+    /// <summary>
+    /// A TagHelper for hooking CSS bundles up to the HTML page.
+    /// </summary>
     [HtmlTargetElement("link", Attributes = "asp-bundle")]
     public class LinkTagHelper : BaseTagHelper
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LinkTagHelper"/> class.
+        /// </summary>
         public LinkTagHelper(IHostingEnvironment env)
             : base(env)
         { }
 
+
+        /// <summary>
+        /// The route to the bundle file name.
+        /// </summary>
         [HtmlAttributeName("asp-bundle")]
         public string Bundle { get; set; }
 
+        /// <summary>
+        /// Synchronously executes the TagHelper
+        /// </summary>
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             if (!string.IsNullOrEmpty(Bundle))

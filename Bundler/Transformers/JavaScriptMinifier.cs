@@ -4,23 +4,40 @@ using NUglify.JavaScript;
 
 namespace Bundler.Transformers
 {
+    /// <summary>
+    /// A JavaScript minifier
+    /// </summary>
     public class JavaScriptMinifier : BaseTransform
     {
-        public JavaScriptMinifier(string path) : base(path)
+        private CodeSettings _settings;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JavaScriptMinifier"/> class.
+        /// </summary>
+        public JavaScriptMinifier(string path)
+            : base(path)
         { }
 
-        public JavaScriptMinifier(string path, CodeSettings settings) : base(path)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JavaScriptMinifier"/> class.
+        /// </summary>
+        public JavaScriptMinifier(string path, CodeSettings settings)
+            : base(path)
         {
-            Settings = settings;
+            _settings = settings;
         }
 
-        public CodeSettings Settings { get; }
-
+        /// <summary>
+        /// Gets the content type produced by the transform.
+        /// </summary>
         public override string ContentType => "application/javascript";
 
+        /// <summary>
+        /// Transforms the specified source.
+        /// </summary>
         public override string Transform(HttpContext context, string source)
         {
-            var settings = Settings ?? new CodeSettings();
+            var settings = _settings ?? new CodeSettings();
             var minified = Uglify.Js(source, settings);
 
             if (minified.HasErrors)

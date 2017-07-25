@@ -5,16 +5,28 @@ using System.Linq;
 
 namespace Bundler.Taghelpers
 {
+    /// <summary>
+    /// A TagHelper for hooking JavaScript bundles up to the HTML page.
+    /// </summary>
     [HtmlTargetElement("script", Attributes = "asp-bundle")]
     public class ScriptTagHelper : BaseTagHelper
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScriptTagHelper"/> class.
+        /// </summary>
         public ScriptTagHelper(IHostingEnvironment env)
             : base(env)
         { }
 
+        /// <summary>
+        /// The route to the bundle file name.
+        /// </summary>
         [HtmlAttributeName("asp-bundle")]
         public string Bundle { get; set; }
 
+        /// <summary>
+        /// Synchronously executes the TagHelper
+        /// </summary>
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             if (!string.IsNullOrEmpty(Bundle))
