@@ -30,7 +30,7 @@ namespace Bundler
         /// <summary>
         /// Invokes the middleware
         /// </summary>
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
             string ext = Path.GetExtension(context.Request.Path.Value);
 

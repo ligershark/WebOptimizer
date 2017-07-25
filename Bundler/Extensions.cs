@@ -26,7 +26,7 @@ namespace Bundler
         {
             transformOptions(Options);
 
-            foreach (var transform in Options.Transforms)
+            foreach (ITransform transform in Options.Transforms)
             {
                 app.Map(transform.Path, builder =>
                 {

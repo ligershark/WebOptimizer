@@ -30,9 +30,9 @@ namespace Bundler
         /// <summary>
         /// Invokes the middleware
         /// </summary>
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
-            string source = await GetContent(_transform);
+            string source = await GetContentAsync(_transform);
 
             string transformedBundle = _transform.Transform(context, source);
 
@@ -40,9 +40,9 @@ namespace Bundler
             await context.Response.WriteAsync(transformedBundle);
         }
 
-        private async Task<string> GetContent(ITransform transform)
+        private async Task<string> GetContentAsync(ITransform transform)
         {
-            var absolutes = transform.SourceFiles.Select(f => Path.Combine(_env.WebRootPath, f));
+            System.Collections.Generic.IEnumerable<string> absolutes = transform.SourceFiles.Select(f => Path.Combine(_env.WebRootPath, f));
             var sb = new StringBuilder();
 
             foreach (string absolute in absolutes)

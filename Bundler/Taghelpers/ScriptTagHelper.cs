@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using System.Collections.Generic;
 using System.Linq;
+using Bundler.Transformers;
 
 namespace Bundler.Taghelpers
 {
@@ -33,7 +34,7 @@ namespace Bundler.Taghelpers
             {
                 if (Extensions.Options.Enabled)
                 {
-                    var transform = Extensions.Options.Transforms.FirstOrDefault(t => t.Path.Equals(Bundle));
+                    ITransform transform = Extensions.Options.Transforms.FirstOrDefault(t => t.Path.Equals(Bundle));
                     string href = $"{Bundle}?v={GenerateHash(transform)}";
                     output.Attributes.SetAttribute("src", href);
                 }
@@ -48,18 +49,18 @@ namespace Bundler.Taghelpers
 
         private void WriteIndividualTags(TagHelperOutput output)
         {
-            var transform = Extensions.Options.Transforms.FirstOrDefault(t => t.Path.Equals(Bundle));
+            ITransform transform = Extensions.Options.Transforms.FirstOrDefault(t => t.Path.Equals(Bundle));
             output.SuppressOutput();
 
             var attrs = new List<string>();
 
-            foreach (var item in output.Attributes)
+            foreach (TagHelperAttribute item in output.Attributes)
             {
                 string attr = item.Name;
 
                 if (item.ValueStyle != HtmlAttributeValueStyle.Minimized)
                 {
-                    var quote = GetQuote(item.ValueStyle);
+                    string quote = GetQuote(item.ValueStyle);
                     attr += "=" + quote + item.Value + quote;
                 }
 

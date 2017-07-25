@@ -37,8 +37,8 @@ namespace Bundler.Transformers
         /// </summary>
         public override string Transform(HttpContext context, string source)
         {
-            var settings = _settings ?? new CodeSettings();
-            var minified = Uglify.Js(source, settings);
+            CodeSettings settings = _settings ?? new CodeSettings();
+            UglifyResult minified = Uglify.Js(source, settings);
 
             if (minified.HasErrors)
                 return null;

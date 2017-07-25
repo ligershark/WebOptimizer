@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using System;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Bundler.Taghelpers
 {
@@ -55,7 +56,7 @@ namespace Bundler.Taghelpers
         /// </summary>
         protected string GenerateHash(ITransform transform)
         {
-            var hashes = transform.SourceFiles.Select(f => GenerateHash(f));
+            IEnumerable<string> hashes = transform.SourceFiles.Select(f => GenerateHash(f));
 
             return string.Join(string.Empty, hashes).GetHashCode().ToString();
         }
