@@ -39,7 +39,7 @@ namespace Bundler
 
             string cacheKey = GetCacheKey(context);
 
-            if (cacheKey == _cache.Key)
+            if (!string.IsNullOrEmpty(cacheKey) && cacheKey == _cache.Key)
             {
                 await WriteOutputAsync(context, _cache.Value);
             }
@@ -72,7 +72,7 @@ namespace Bundler
                 return v;
             }
 
-            return string.Empty;
+            return null;
         }
 
         private bool IsConditionalGet(HttpContext context)
