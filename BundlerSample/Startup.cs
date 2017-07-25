@@ -45,7 +45,7 @@ namespace Bundler
 
             app.UseBundles(options =>
             {
-                options.Enabled = true;// env.IsProduction();
+                options.Enabled = true;// !env.IsDevelopment();
 
                 options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" })
                        .Run((content, context) => {

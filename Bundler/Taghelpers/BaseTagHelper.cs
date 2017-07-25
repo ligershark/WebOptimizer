@@ -5,6 +5,10 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.TagHelpers.Internal;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Bundler.Taghelpers
 {
@@ -15,14 +19,24 @@ namespace Bundler.Taghelpers
     public class BaseTagHelper : TagHelper
     {
         private IHostingEnvironment _env;
+        private IMemoryCache _cache;
+        private FileVersionProvider _fileProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTagHelper"/> class.
         /// </summary>
-        public BaseTagHelper(IHostingEnvironment env)
+        public BaseTagHelper(IHostingEnvironment env, IMemoryCache cache)
         {
             _env = env;
+            _cache = cache;
         }
+
+        /// <summary>
+        /// Gets or sets the view context.
+        /// </summary>
+        [ViewContext]
+        [HtmlAttributeNotBound]
+        public ViewContext ViewContext { get; set; }
 
         /// <summary>
         /// Gets the quote character.
@@ -43,12 +57,15 @@ namespace Bundler.Taghelpers
         /// <summary>
         /// Generates a has of the file.
         /// </summary>
-        protected string GenerateHash(string fileName)
+        protected string AddFileVersionToPath(string fileName)
         {
-            string absolute = Path.Combine(_env.WebRootPath, fileName.TrimStart('/'));
-            DateTime lastModified = File.GetLastWriteTime(absolute);
+            EnsureVersionFileProvider();
+            return _fileProvider.AddFileVersionToPath(fileName);
 
-            return lastModified.GetHashCode().ToString();
+            //string absolute = Path.Combine(_env.WebRootPath, fileName.TrimStart('/'));
+            //DateTime lastModified = File.GetLastWriteTime(absolute);
+
+            //return lastModified.GetHashCode().ToString();
         }
 
         /// <summary>
@@ -56,9 +73,19 @@ namespace Bundler.Taghelpers
         /// </summary>
         protected string GenerateHash(ITransform transform)
         {
-            IEnumerable<string> hashes = transform.SourceFiles.Select(f => GenerateHash(f));
+            IEnumerable<string> hashes = transform.SourceFiles.Select(f => AddFileVersionToPath(f));
 
             return string.Join(string.Empty, hashes).GetHashCode().ToString();
+        }
+
+        private void EnsureVersionFileProvider()
+        {
+            if (_fileProvider == null)
+            {
+                _fileProvider = new FileVersionProvider(_env.WebRootFileProvider,
+                                                        _cache,
+                                                        ViewContext.HttpContext.Request.PathBase);
+            }
         }
     }
 }

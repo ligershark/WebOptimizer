@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using System.Collections.Generic;
 using System.Linq;
 using Bundler.Transformers;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Bundler.Taghelpers
 {
@@ -15,8 +16,8 @@ namespace Bundler.Taghelpers
         /// <summary>
         /// Initializes a new instance of the <see cref="LinkTagHelper"/> class.
         /// </summary>
-        public LinkTagHelper(IHostingEnvironment env)
-            : base(env)
+        public LinkTagHelper(IHostingEnvironment env, IMemoryCache cache)
+            : base(env, cache)
         { }
 
 
@@ -70,7 +71,7 @@ namespace Bundler.Taghelpers
 
             foreach (string file in transform.SourceFiles)
             {
-                string href = $"{file}?v={GenerateHash(file)}";
+                string href = AddFileVersionToPath(file);
                 output.PostElement.AppendHtml($"<link href=\"{href}\" {string.Join(" ", attrs)} />");
             }
         }
