@@ -34,8 +34,12 @@ namespace Bundler
             {
                 context.Response.StatusCode = 304;
                 await WriteOutputAsync(context, string.Empty);
+                return;
             }
-            else if (context.Request.Query.TryGetValue("v", out var v) && _cache.Key == v)
+
+            string cacheKey = GetCacheKey(context);
+
+            if (cacheKey == _cache.Key)
             {
                 await WriteOutputAsync(context, _cache.Value);
             }
@@ -51,11 +55,24 @@ namespace Bundler
 
                 await WriteOutputAsync(context, result);
 
-                if (!string.IsNullOrEmpty(v))
+                if (!string.IsNullOrEmpty(cacheKey))
                 {
-                    _cache = new KeyValuePair<string, string>(v, result);
+                    _cache = new KeyValuePair<string, string>(cacheKey, result);
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the cache key.
+        /// </summary>
+        protected virtual string GetCacheKey(HttpContext context)
+        {
+            if (context.Request.Query.TryGetValue("v", out var v))
+            {
+                return v;
+            }
+
+            return string.Empty;
         }
 
         private bool IsConditionalGet(HttpContext context)
