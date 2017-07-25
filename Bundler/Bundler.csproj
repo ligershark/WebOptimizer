@@ -22,6 +22,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Localization" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Runtime" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.ResponseCaching.Abstractions" Version="1.1.2" />
     <PackageReference Include="NUglify" Version="1.5.8" />
