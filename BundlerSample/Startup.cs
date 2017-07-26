@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Bundler.Transformers;
 using System.Globalization;
 using Microsoft.Extensions.Localization;
+using BundlerSample;
 
 namespace Bundler
 {
@@ -61,7 +62,7 @@ namespace Bundler
                     options.Enabled = true;// !env.IsDevelopment();
 
                     options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" })
-                           .Localize<BundlerSample.Strings>(app);
+                           .Localize<Strings>(app);
 
                     options.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
                 });
