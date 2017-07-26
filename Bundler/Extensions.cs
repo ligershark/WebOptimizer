@@ -1,14 +1,11 @@
-﻿using Bundler.Transformers;
+﻿using System;
+using System.Globalization;
+using Bundler.Processors;
+using Bundler.Utilities;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Localization;
 using NUglify.Css;
 using NUglify.JavaScript;
-using System;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.DependencyInjection;
-using System.Globalization;
-using Bundler.Utilities;
 
 namespace Bundler
 {
@@ -27,16 +24,16 @@ namespace Bundler
         /// Adds Bundler to the <see cref="IApplicationBuilder"/> request execution pipeline
         /// </summary>
         /// <param name="app">The application object.</param>
-        /// <param name="transformOptions">The transform options.</param>
-        public static void UseBundles(this IApplicationBuilder app, Action<Options> transformOptions)
+        /// <param name="bundleOptions">The transform options.</param>
+        public static void UseBundler(this IApplicationBuilder app, Action<Options> bundleOptions)
         {
-            transformOptions(Options);
+            bundleOptions(Options);
 
-            foreach (ITransform transform in Options.Transforms)
+            foreach (Bundle bundle in Options.Bundles)
             {
-                app.Map(transform.Path, builder =>
+                app.Map(bundle.Route, builder =>
                 {
-                    builder.UseMiddleware<BundleMiddleware>(transform);
+                    builder.UseMiddleware<BundleMiddleware>(bundle);
                 });
             }
         }
@@ -44,44 +41,45 @@ namespace Bundler
         /// <summary>
         /// Extension method to localizes the files in a bundle
         /// </summary>
-        public static ITransform Localize<T>(this ITransform transform, IApplicationBuilder app)
+        public static Bundle Localize<T>(this Bundle bundle, IApplicationBuilder app)
         {
-            transform.PostProcessors.Add(config =>
+            IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(app);
+
+            bundle.PostProcessors.Add(config =>
             {
                 CultureInfo culture = LocalizationUtilities.GetRequestUICulture(config);
-                IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(app);
 
-                config.Transform.CacheKeys["culture"] = culture.Name;
-
-                return ScriptLocalizer.Localize(config.Content, stringProvider);
+                config.Bundle.CacheKeys["culture"] = culture.Name;
+                config.Content = ScriptLocalizer.Localize(config.Content, stringProvider);
             });
-            return transform;
+
+            return bundle;
         }
 
-        /// <summary>
-        /// Minifies JavaScript files (.js).
-        /// </summary>
-        public static void MinifyJavaScript(this IApplicationBuilder app, CodeSettings settings = null)
-        {
-            app.UseMiddleware<JavaScriptMiddleware>(settings ?? new CodeSettings());
-        }
+        ///// <summary>
+        ///// Minifies JavaScript files (.js).
+        ///// </summary>
+        //public static void MinifyJavaScript(this IApplicationBuilder app, CodeSettings settings = null)
+        //{
+        //    app.UseMiddleware<JavaScriptMiddleware>(settings ?? new CodeSettings());
+        //}
 
-        /// <summary>
-        /// Minifies CSS files (.css).
-        /// </summary>
-        public static void MinifyCss(this IApplicationBuilder app, CssSettings settings = null)
-        {
-            app.UseMiddleware<CssMiddleware>(settings ?? new CssSettings());
-        }
+        ///// <summary>
+        ///// Minifies CSS files (.css).
+        ///// </summary>
+        //public static void MinifyCss(this IApplicationBuilder app, CssSettings settings = null)
+        //{
+        //    app.UseMiddleware<CssMiddleware>(settings ?? new CssSettings());
+        //}
 
-        /// <summary>
-        /// Adds a processor to the transformation
-        /// </summary>
-        public static ITransform Run(this ITransform transform, Func<BundlerConfig, string> func)
-        {
-            transform.PostProcessors.Add(func);
-            return transform;
-        }
+        ///// <summary>
+        ///// Adds a processor to the transformation
+        ///// </summary>
+        //public static ITransform Run(this ITransform transform, Func<BundlerConfig, string> func)
+        //{
+        //    transform.PostProcessors.Add(func);
+        //    return transform;
+        //}
 
         /// <summary>
         /// Adds a JavaScript bundle.
@@ -89,12 +87,9 @@ namespace Bundler
         /// <param name="options">The options.</param>
         /// <param name="route">The route name from where the bundle is served. Example: /my/bundle.js.</param>
         /// <param name="sourceFiles">An array of webroot relative file paths.</param>
-        public static ITransform AddJs(this Options options, string route, params string[] sourceFiles)
+        public static Bundle AddJs(this Options options, string route, params string[] sourceFiles)
         {
-            ITransform transform = new JavaScriptMinifier(route).Include(sourceFiles);
-            options.Transforms.Add(transform);
-
-            return transform;
+            return options.AddJs(new CodeSettings(), route, sourceFiles);
         }
 
         /// <summary>
@@ -104,12 +99,14 @@ namespace Bundler
         /// <param name="settings">The JavaScript minification settings.</param>
         /// <param name="route">The route name from where the bundle is served. Example: /my/bundle.js.</param>
         /// <param name="sourceFiles">An array of webroot relative file paths.</param>
-        public static ITransform AddJs(this Options options, CodeSettings settings, string route, params string[] sourceFiles)
+        public static Bundle AddJs(this Options options, CodeSettings settings, string route, params string[] sourceFiles)
         {
-            ITransform transform = new JavaScriptMinifier(route, settings).Include(sourceFiles);
-            options.Transforms.Add(transform);
+            var bundle = new Bundle(route, "application/javascript", sourceFiles);
+            var minifier = new JavaScriptMinifier(settings);
+            bundle.PostProcessors.Add(config => minifier.Execute(config));
+            options.Bundles.Add(bundle);
 
-            return transform;
+            return bundle;
         }
 
         /// <summary>
@@ -118,12 +115,9 @@ namespace Bundler
         /// <param name="options">The options.</param>
         /// <param name="route">The route name from where the bundle is served. Example: /my/bundle.css.</param>
         /// <param name="sourceFiles">An array of webroot relative file paths.</param>
-        public static ITransform AddCss(this Options options, string route, params string[] sourceFiles)
+        public static Bundle AddCss(this Options options, string route, params string[] sourceFiles)
         {
-            ITransform transform = new CssMinifier(route).Include(sourceFiles);
-            options.Transforms.Add(transform);
-
-            return transform;
+            return options.AddCss(new CssSettings(), route, sourceFiles);
         }
 
         /// <summary>
@@ -133,12 +127,14 @@ namespace Bundler
         /// <param name="settings">The CSS minification settings.</param>
         /// <param name="route">The route name from where the bundle is served. Example: /my/bundle.css.</param>
         /// <param name="sourceFiles">An array of webroot relative file paths.</param>
-        public static ITransform AddCss(this Options options, CssSettings settings, string route, params string[] sourceFiles)
+        public static Bundle AddCss(this Options options, CssSettings settings, string route, params string[] sourceFiles)
         {
-            ITransform transform = new CssMinifier(route, settings).Include(sourceFiles);
-            options.Transforms.Add(transform);
+            var bundle = new Bundle(route, "text/css", sourceFiles);
+            var minifier = new CssMinifier(settings);
+            bundle.PostProcessors.Add(config => minifier.Execute(config));
+            options.Bundles.Add(bundle);
 
-            return transform;
+            return bundle;
         }
     }
 }

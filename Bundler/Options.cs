@@ -1,5 +1,4 @@
-﻿using Bundler.Transformers;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Bundler
 {
@@ -16,6 +15,6 @@ namespace Bundler
         /// <summary>
         /// Gets a list of transforms added.
         /// </summary>
-        public List<ITransform> Transforms { get; } = new List<ITransform>();
+        public List<Bundle> Bundles { get; } = new List<Bundle>();
     }
 }

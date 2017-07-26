@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bundler.Transformers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -15,29 +14,40 @@ namespace Bundler
     /// </summary>
     public class BundleMiddleware : BaseMiddleware
     {
-        private readonly ITransform _transform;
+        private readonly Bundle _bundle;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BundleMiddleware"/> class.
         /// </summary>
-        public BundleMiddleware(RequestDelegate next, IHostingEnvironment env, ITransform transform, IMemoryCache cache)
+        public BundleMiddleware(RequestDelegate next, IHostingEnvironment env, Bundle bundle, IMemoryCache cache)
             : base(next, cache, env)
         {
-            _transform = transform;
+            _bundle = bundle;
         }
 
         /// <summary>
         /// Gets the content type of the response.
         /// </summary>
-        protected override string ContentType => _transform.ContentType;
+        protected override string ContentType => _bundle.ContentType;
 
         /// <summary>
         /// Invokes the middleware
         /// </summary>
         public override async Task<string> ExecuteAsync(HttpContext context)
         {
-            string source = await GetContentAsync(_transform);
-            return _transform.Transform(context, source);
+            string source = await GetContentAsync(_bundle);
+
+            var config = new BundlerProcess(context, _bundle)
+            {
+                Content = source
+            };
+
+            foreach (System.Action<BundlerProcess> processor in _bundle.PostProcessors)
+            {
+                processor(config);
+            }
+
+            return config.Content;
         }
 
         /// <summary>
@@ -45,12 +55,12 @@ namespace Bundler
         /// </summary>
         protected override IEnumerable<string> GetFiles(HttpContext context)
         {
-            return _transform.SourceFiles;
+            return _bundle.SourceFiles;
         }
 
-        private async Task<string> GetContentAsync(ITransform transform)
+        private async Task<string> GetContentAsync(Bundle bundle)
         {
-            IEnumerable<string> absolutes = transform.SourceFiles.Select(f => FileProvider.GetFileInfo(f).PhysicalPath);
+            IEnumerable<string> absolutes = bundle.SourceFiles.Select(f => FileProvider.GetFileInfo(f).PhysicalPath);
             var sb = new StringBuilder();
 
             foreach (string absolute in absolutes)
@@ -68,7 +78,7 @@ namespace Bundler
         {
             string baseCacheKey = base.GetCacheKey(context);
 
-            string transformKey = string.Join("", _transform.CacheKeys.Select(p => p.Key + p.Value));
+            string transformKey = string.Join("", _bundle.CacheKeys.Select(p => p.Key + p.Value));
             return (baseCacheKey + transformKey).GetHashCode().ToString();
         }
     }

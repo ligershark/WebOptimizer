@@ -1,20 +1,19 @@
-﻿using Bundler.Transformers;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace Bundler
 {
     /// <summary>
     /// A configuration object for Bundler.
     /// </summary>
-    public class BundlerConfig
+    public class BundlerProcess
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BundlerConfig"/> class.
+        /// Initializes a new instance of the <see cref="BundlerProcess"/> class.
         /// </summary>
-        public BundlerConfig(HttpContext httpContext, ITransform transform)
+        public BundlerProcess(HttpContext httpContext, Bundle bundle)
         {
             HttpContext = httpContext;
-            Transform = transform;
+            Bundle = bundle;
         }
 
         /// <summary>
@@ -30,6 +29,6 @@ namespace Bundler
         /// <summary>
         /// Gets the transform.
         /// </summary>
-        public ITransform Transform { get; }
+        public Bundle Bundle { get; }
     }
 }

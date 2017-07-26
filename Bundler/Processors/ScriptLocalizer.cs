@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Resources;
 using System.Text;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 
-namespace Bundler.Transformers
+namespace Bundler.Processors
 {
     /// <summary>
     /// Localizes script files by replacing specified tokens with the value from the resource file
@@ -51,8 +45,8 @@ namespace Bundler.Transformers
             const char beginArgChar = '{';
             const char endArgChar = '}';
 
-            var pos = 0;
-            var len = document.Length;
+            int pos = 0;
+            int len = document.Length;
             char ch = '\x0';
 
             while (true)
@@ -107,14 +101,14 @@ namespace Bundler.Transformers
                 //Advance past the closing char of the argument hole
                 pos++;
 
-                var param = document.Substring(beg, paramLen);
+                string param = document.Substring(beg, paramLen);
 
                 if (!argHoleClosed)
                 {
                     InvalidDocFormat(param);
                 }
 
-                var str = _stringProvider.GetString(param);
+                LocalizedString str = _stringProvider.GetString(param);
                 if (str.ResourceNotFound)
                 {
                     throw new InvalidOperationException($"No value found for \"{str.Name}\"");
