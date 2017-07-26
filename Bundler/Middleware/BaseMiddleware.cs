@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -13,7 +14,8 @@ namespace Bundler
     public abstract class BaseMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IMemoryCache _cache;
+        //private readonly IMemoryCache _cache;
+        protected readonly FileCacheHelper _fileCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BundleMiddleware"/> class.
@@ -21,14 +23,15 @@ namespace Bundler
         public BaseMiddleware(RequestDelegate next, IMemoryCache cache, IHostingEnvironment env)
         {
             _next = next;
-            _cache = cache;
-            FileProvider = env.WebRootFileProvider;
+            //_cache = cache;
+            //FileProvider = env.WebRootFileProvider;
+            _fileCache = new FileCacheHelper(env.WebRootFileProvider, cache);
         }
 
         /// <summary>
         /// Gets the file provider.
         /// </summary>
-        protected IFileProvider FileProvider { get; }
+        //protected IFileProvider FileProvider { get; }
 
         /// <summary>
         /// Gets the content type of the response.
@@ -55,7 +58,7 @@ namespace Bundler
                 context.Response.StatusCode = 304;
                 await WriteOutputAsync(context, string.Empty, cacheKey);
             }
-            else if (_cache.TryGetValue(cacheKey, out string value))
+            else if (_fileCache.TryGetValue(cacheKey, out string value))
             {
                 await WriteOutputAsync(context, value, cacheKey);
             }
@@ -69,7 +72,8 @@ namespace Bundler
                     return;
                 }
 
-                PopulateCache(cacheKey, result, context);
+                _fileCache.AddFileBundleToCache(cacheKey, result, GetFiles(context));
+                //PopulateCache(cacheKey, result, context);
 
                 await WriteOutputAsync(context, result, cacheKey);
             }
@@ -80,17 +84,17 @@ namespace Bundler
         /// </summary>
         public abstract Task<string> ExecuteAsync(HttpContext context);
 
-        private void PopulateCache(string cacheKey, string result, HttpContext context)
-        {
-            var cacheEntryOptions = new MemoryCacheEntryOptions();
+        //private void PopulateCache(string cacheKey, string result, HttpContext context)
+        //{
+        //    var cacheEntryOptions = new MemoryCacheEntryOptions();
 
-            foreach (string file in GetFiles(context))
-            {
-                cacheEntryOptions.AddExpirationToken(FileProvider.Watch(file));
-            }
+        //    foreach (string file in GetFiles(context))
+        //    {
+        //        cacheEntryOptions.AddExpirationToken(FileProvider.Watch(file));
+        //    }
 
-            _cache.Set(cacheKey, result, cacheEntryOptions);
-        }
+        //    _cache.Set(cacheKey, result, cacheEntryOptions);
+        //}
 
         /// <summary>
         /// Gets the cache key.

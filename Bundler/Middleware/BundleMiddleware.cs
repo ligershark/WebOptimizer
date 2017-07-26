@@ -60,7 +60,7 @@ namespace Bundler
 
         private async Task<string> GetContentAsync(IBundle bundle)
         {
-            IEnumerable<string> absolutes = bundle.SourceFiles.Select(f => FileProvider.GetFileInfo(f).PhysicalPath);
+            IEnumerable<string> absolutes = bundle.SourceFiles.Select(f => _fileCache.FileProvider.GetFileInfo(f).PhysicalPath);
             var sb = new StringBuilder();
 
             foreach (string absolute in absolutes)
