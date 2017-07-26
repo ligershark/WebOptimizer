@@ -60,14 +60,10 @@ namespace Bundler
                 {
                     options.Enabled = true;// !env.IsDevelopment();
 
-                    var localizer = app.ApplicationServices.GetRequiredService<IStringLocalizer<BundlerSample.Strings>>();
-
                     options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" })
-                           .Localize(localizer);
-                    //options.Transforms.Add(new JavaScriptMinifier("/all.js").Include("js/site.js", "js/b.js"));
+                           .Localize<BundlerSample.Strings>(app);
 
                     options.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
-                    //options.Transforms.Add(new CssMinifier("/all.css").Include("css/site.css", "/lib/bootstrap/dist/css/bootstrap.css"));
                 });
 
             app.MinifyJavaScript();

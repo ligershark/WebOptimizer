@@ -6,6 +6,7 @@ using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Bundler
 {
@@ -41,13 +42,14 @@ namespace Bundler
         /// <summary>
         /// Localizes the files
         /// </summary>
-        public static ITransform Localize(this ITransform transform, IStringLocalizer stringProvider)
+        public static ITransform Localize<T>(this ITransform transform, IApplicationBuilder app)
         {
             
             transform.PostProcessors.Add(config =>
             {
                 var cf = config.HttpContext.Features.Get<IRequestCultureFeature>();
                 var culture = cf.RequestCulture.UICulture;
+                var stringProvider = app.ApplicationServices.GetRequiredService<IStringLocalizer<T>>();
 
                 config.Transform.CacheKeys["culture"] = culture.Name;
 
