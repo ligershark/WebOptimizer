@@ -21,7 +21,6 @@ namespace Bundler.Taghelpers
     {
         private readonly FileCache _fileCache;
         private string _route;
-        private string _query;
 
         /// <summary>
         /// Tag helper for inlining content
@@ -58,7 +57,7 @@ namespace Bundler.Taghelpers
                 ParseRoute(output.Attributes["src"].Value.ToString());
             }
 
-            string content = await GetFileContentAsync(_route, _query);
+            string content = await GetFileContentAsync(_route);
 
             output.Content.SetHtmlContent(content);
             output.TagMode = TagMode.StartTagAndEndTag;
@@ -67,24 +66,22 @@ namespace Bundler.Taghelpers
 
         private void ParseRoute(string route)
         {
-            int index = route.IndexOf('?');
+            int index = route.IndexOfAny(new[] { '?', '#' });
 
             if (index > -1)
             {
                 _route = route.Substring(0, index);
-                _query = route.Substring(index + 1);
             }
             else
             {
                 _route = route;
-                _query = "";
             }
         }
 
-        private async Task<string> GetFileContentAsync(string route, string queryString)
+        private async Task<string> GetFileContentAsync(string route)
         {
             IBundle bundle = GetBundle(route);
-            string cacheKey = bundle == null ? route : BundleMiddleware.GetCacheKey(queryString, bundle);
+            string cacheKey = bundle == null ? route : BundleMiddleware.GetCacheKey(ViewContext.HttpContext, bundle);
 
             if (_fileCache.TryGetValue(cacheKey, out string value))
             {
@@ -93,7 +90,7 @@ namespace Bundler.Taghelpers
 
             if (bundle != null)
             {
-                string contents = await BundleMiddleware.ExecuteAsync(bundle, _fileCache.FileProvider).ConfigureAwait(false);
+                string contents = await BundleMiddleware.ExecuteAsync(ViewContext.HttpContext, bundle, _fileCache.FileProvider).ConfigureAwait(false);
 
                 _fileCache.Add(cacheKey, contents, bundle.SourceFiles);
                 return contents;

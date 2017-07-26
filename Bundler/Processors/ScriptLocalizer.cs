@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Text;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Localization;
 
 namespace Bundler.Processors
@@ -7,15 +9,30 @@ namespace Bundler.Processors
     /// <summary>
     /// Localizes script files by replacing specified tokens with the value from the resource file
     /// </summary>
-    public class ScriptLocalizer
+    public class ScriptLocalizer : IProcessor
     {
         private StringBuilder _sb = new StringBuilder();
         private IStringLocalizer _stringProvider;
 
         /// <summary>
+        /// Gets the custom key that should be used when calculating the memory cache key.
+        /// </summary>
+        public string CacheKey(HttpContext context)
+        {
+            IRequestCultureFeature cf = context.Features.Get<IRequestCultureFeature>();
+
+            if (cf == null)
+            {
+                throw new InvalidOperationException("No UI culture found.  Did you forget to add UseRequestLocalization?");
+            }
+
+            return cf.RequestCulture.UICulture.TwoLetterISOLanguageName;
+        }
+
+        /// <summary>
         /// Localizes script files
         /// </summary>
-        private ScriptLocalizer(IStringLocalizer stringProvider)
+        public ScriptLocalizer(IStringLocalizer stringProvider)
         {
             _stringProvider = stringProvider;
         }
@@ -30,15 +47,23 @@ namespace Bundler.Processors
             _sb.Append(s);
         }
 
-        /// <summary>
-        /// Replaces string keys with values from the resource manager
-        /// </summary>
-        public static string Localize(string document, IStringLocalizer stringProvider)
-        {
-            var localizer = new ScriptLocalizer(stringProvider);
-            return localizer.Localize(document);
-        }
+        ///// <summary>
+        ///// Replaces string keys with values from the resource manager
+        ///// </summary>
+        //public string Localize(string document, IStringLocalizer stringProvider)
+        //{
+        //    var localizer = new ScriptLocalizer(stringProvider);
+        //    return localizer.Localize(document);
+        //}
 
+        /// <summary>
+        /// Executes the processor on the specified configuration.
+        /// </summary>
+        /// <param name="config"></param>
+        public void Execute(BundleContext config)
+        {
+            config.Content = Localize(config.Content);
+        }
 
         private string Localize(string document)
         {
@@ -128,6 +153,5 @@ namespace Bundler.Processors
         {
             throw new InvalidOperationException($"{param} argument not correctly terminated (did you forget a '}}'?)");
         }
-
     }
 }

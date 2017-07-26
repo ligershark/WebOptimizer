@@ -1,4 +1,5 @@
-﻿using NUglify;
+﻿using Microsoft.AspNetCore.Http;
+using NUglify;
 using NUglify.JavaScript;
 
 namespace Bundler.Processors
@@ -6,7 +7,7 @@ namespace Bundler.Processors
     /// <summary>
     /// A processor that minifies JavaScript
     /// </summary>
-    public class JavaScriptMinifier 
+    public class JavaScriptMinifier : IProcessor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="JavaScriptMinifier"/> class.
@@ -15,6 +16,11 @@ namespace Bundler.Processors
         {
             Settings = settings;
         }
+
+        /// <summary>
+        /// Gets the custom key that should be used when calculating the memory cache key.
+        /// </summary>
+        public string CacheKey(HttpContext context) => string.Empty;
 
         /// <summary>
         /// Gets or sets the settings.

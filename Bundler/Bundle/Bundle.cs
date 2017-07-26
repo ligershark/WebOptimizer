@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Bundler.Processors;
 
 namespace Bundler
 {
@@ -21,8 +22,7 @@ namespace Bundler
             Route = route;
             ContentType = contentType;
             SourceFiles = sourceFiles;
-            PostProcessors = new List<Action<BundleContext>>();
-            QueryKeys = new List<string>();
+            PostProcessors = new List<IProcessor>();
         }
 
         /// <summary>
@@ -41,14 +41,8 @@ namespace Bundler
         public string ContentType { get; }
 
         /// <summary>
-        /// Gets or sets the cache key.
-        /// Append any additional keys to the string in order to vary the cache result
-        /// </summary>
-        public IList<string> QueryKeys { get; }
-
-        /// <summary>
         /// Gets a list of post processors
         /// </summary>
-        public IList<Action<BundleContext>> PostProcessors { get; }
+        public IList<IProcessor> PostProcessors { get; }
     }
 }

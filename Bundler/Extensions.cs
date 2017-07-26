@@ -44,12 +44,10 @@ namespace Bundler
         public static IBundle Localize<T>(this IBundle bundle, IApplicationBuilder app)
         {
             IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(app);
-            bundle.QueryKeys.Add("culture");
+            //bundle.QueryKeys.Add("culture");
+            var localizer = new ScriptLocalizer(stringProvider);
 
-            bundle.PostProcessors.Add(config =>
-            {
-                config.Content = ScriptLocalizer.Localize(config.Content, stringProvider);
-            });
+            bundle.PostProcessors.Add(localizer);
 
             return bundle;
         }
@@ -68,7 +66,7 @@ namespace Bundler
         public static IBundle MinifyJavaScript(this IBundle bundle, CodeSettings settings)
         {
             var minifier = new JavaScriptMinifier(settings);
-            bundle.PostProcessors.Add(config => minifier.Execute(config));
+            bundle.PostProcessors.Add(minifier);
 
             return bundle;
         }
@@ -87,7 +85,7 @@ namespace Bundler
         public static IBundle MinifyCss(this IBundle bundle, CssSettings settings)
         {
             var minifier = new CssMinifier(settings);
-            bundle.PostProcessors.Add(config => minifier.Execute(config));
+            bundle.PostProcessors.Add(minifier);
 
             return bundle;
         }

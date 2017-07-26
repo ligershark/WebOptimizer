@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Bundler.Processors;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -43,7 +44,7 @@ namespace Bundler
         /// </summary>
         public async Task InvokeAsync(HttpContext context)
         {
-            string cacheKey = GetCacheKey(context.Request.QueryString.Value, _bundle);
+            string cacheKey = GetCacheKey(context, _bundle);
 
             if (IsConditionalGet(context, cacheKey))
             {
@@ -56,7 +57,7 @@ namespace Bundler
             }
             else
             {
-                string result = await ExecuteAsync(_bundle, _fileCache.FileProvider);
+                string result = await ExecuteAsync(context, _bundle, _fileCache.FileProvider);
 
                 if (string.IsNullOrEmpty(result))
                 {
@@ -73,18 +74,18 @@ namespace Bundler
         /// <summary>
         /// Executes the bundle and returns the processed output.
         /// </summary>
-        public static async Task<string> ExecuteAsync(IBundle bundle, IFileProvider fileProvider)
+        public static async Task<string> ExecuteAsync(HttpContext context, IBundle bundle, IFileProvider fileProvider)
         {
             string source = await GetContentAsync(bundle, fileProvider).ConfigureAwait(false);
 
-            var config = new BundleContext(bundle)
+            var config = new BundleContext(context, bundle)
             {
                 Content = source
             };
 
-            foreach (Action<BundleContext> processor in bundle.PostProcessors)
+            foreach (IProcessor processor in bundle.PostProcessors)
             {
-                processor(config);
+                processor.Execute(config);
             }
 
             return config.Content;
@@ -106,17 +107,13 @@ namespace Bundler
         /// <summary>
         /// Gets the cache key.
         /// </summary>
-        public static string GetCacheKey(string rawQueryString, IBundle bundle)
+        public static string GetCacheKey(HttpContext context, IBundle bundle)
         {
             string cacheKey = bundle.Route;
-            Dictionary<string, StringValues> query = QueryHelpers.ParseQuery(rawQueryString);
 
-            foreach (string key in bundle.QueryKeys)
+            foreach (IProcessor processors in bundle.PostProcessors)
             {
-                if (query.TryGetValue(key, out var value))
-                {
-                    cacheKey += value;
-                }
+                cacheKey += processors.CacheKey(context);
             }
 
             return cacheKey.GetHashCode().ToString();
