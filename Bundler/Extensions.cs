@@ -29,7 +29,7 @@ namespace Bundler
         {
             bundleOptions(Options);
 
-            foreach (Bundle bundle in Options.Bundles)
+            foreach (IBundle bundle in Options.Bundles)
             {
                 app.Map(bundle.Route, builder =>
                 {
@@ -41,7 +41,7 @@ namespace Bundler
         /// <summary>
         /// Extension method to localizes the files in a bundle
         /// </summary>
-        public static Bundle Localize<T>(this Bundle bundle, IApplicationBuilder app)
+        public static IBundle Localize<T>(this IBundle bundle, IApplicationBuilder app)
         {
             IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(app);
 
@@ -56,83 +56,40 @@ namespace Bundler
             return bundle;
         }
 
-        ///// <summary>
-        ///// Minifies JavaScript files (.js).
-        ///// </summary>
-        //public static void MinifyJavaScript(this IApplicationBuilder app, CodeSettings settings = null)
-        //{
-        //    app.UseMiddleware<JavaScriptMiddleware>(settings ?? new CodeSettings());
-        //}
-
-        ///// <summary>
-        ///// Minifies CSS files (.css).
-        ///// </summary>
-        //public static void MinifyCss(this IApplicationBuilder app, CssSettings settings = null)
-        //{
-        //    app.UseMiddleware<CssMiddleware>(settings ?? new CssSettings());
-        //}
-
-        ///// <summary>
-        ///// Adds a processor to the transformation
-        ///// </summary>
-        //public static ITransform Run(this ITransform transform, Func<BundlerConfig, string> func)
-        //{
-        //    transform.PostProcessors.Add(func);
-        //    return transform;
-        //}
-
         /// <summary>
-        /// Adds a JavaScript bundle.
+        /// Runs the JavaScript minifier on the content.
         /// </summary>
-        /// <param name="options">The options.</param>
-        /// <param name="route">The route name from where the bundle is served. Example: /my/bundle.js.</param>
-        /// <param name="sourceFiles">An array of webroot relative file paths.</param>
-        public static Bundle AddJs(this Options options, string route, params string[] sourceFiles)
+        public static IBundle MinifyJavaScript(this IBundle bundle)
         {
-            return options.AddJs(new CodeSettings(), route, sourceFiles);
+            return bundle.MinifyJavaScript(new CodeSettings());
         }
 
         /// <summary>
-        /// Adds a JavaScript bundle.
+        /// Runs the JavaScript minifier on the content.
         /// </summary>
-        /// <param name="options">The options.</param>
-        /// <param name="settings">The JavaScript minification settings.</param>
-        /// <param name="route">The route name from where the bundle is served. Example: /my/bundle.js.</param>
-        /// <param name="sourceFiles">An array of webroot relative file paths.</param>
-        public static Bundle AddJs(this Options options, CodeSettings settings, string route, params string[] sourceFiles)
+        public static IBundle MinifyJavaScript(this IBundle bundle, CodeSettings settings)
         {
-            var bundle = new Bundle(route, "application/javascript", sourceFiles);
             var minifier = new JavaScriptMinifier(settings);
             bundle.PostProcessors.Add(config => minifier.Execute(config));
-            options.Bundles.Add(bundle);
 
             return bundle;
         }
 
         /// <summary>
-        /// Adds a CSS bundle.
+        /// Runs the JavaScript minifier on the content.
         /// </summary>
-        /// <param name="options">The options.</param>
-        /// <param name="route">The route name from where the bundle is served. Example: /my/bundle.css.</param>
-        /// <param name="sourceFiles">An array of webroot relative file paths.</param>
-        public static Bundle AddCss(this Options options, string route, params string[] sourceFiles)
+        public static IBundle MinifyCss(this IBundle bundle)
         {
-            return options.AddCss(new CssSettings(), route, sourceFiles);
+            return bundle.MinifyCss(new CssSettings());
         }
 
         /// <summary>
-        /// Adds a CSS bundle.
+        /// Runs the JavaScript minifier on the content.
         /// </summary>
-        /// <param name="options">The options.</param>
-        /// <param name="settings">The CSS minification settings.</param>
-        /// <param name="route">The route name from where the bundle is served. Example: /my/bundle.css.</param>
-        /// <param name="sourceFiles">An array of webroot relative file paths.</param>
-        public static Bundle AddCss(this Options options, CssSettings settings, string route, params string[] sourceFiles)
+        public static IBundle MinifyCss(this IBundle bundle, CssSettings settings)
         {
-            var bundle = new Bundle(route, "text/css", sourceFiles);
             var minifier = new CssMinifier(settings);
             bundle.PostProcessors.Add(config => minifier.Execute(config));
-            options.Bundles.Add(bundle);
 
             return bundle;
         }

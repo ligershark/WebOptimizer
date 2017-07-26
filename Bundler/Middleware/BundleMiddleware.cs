@@ -14,12 +14,12 @@ namespace Bundler
     /// </summary>
     public class BundleMiddleware : BaseMiddleware
     {
-        private readonly Bundle _bundle;
+        private readonly IBundle _bundle;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BundleMiddleware"/> class.
         /// </summary>
-        public BundleMiddleware(RequestDelegate next, IHostingEnvironment env, Bundle bundle, IMemoryCache cache)
+        public BundleMiddleware(RequestDelegate next, IHostingEnvironment env, IBundle bundle, IMemoryCache cache)
             : base(next, cache, env)
         {
             _bundle = bundle;
@@ -58,7 +58,7 @@ namespace Bundler
             return _bundle.SourceFiles;
         }
 
-        private async Task<string> GetContentAsync(Bundle bundle)
+        private async Task<string> GetContentAsync(IBundle bundle)
         {
             IEnumerable<string> absolutes = bundle.SourceFiles.Select(f => _fileCache.FileProvider.GetFileInfo(f).PhysicalPath);
             var sb = new StringBuilder();

@@ -10,7 +10,7 @@ namespace Bundler
         /// <summary>
         /// Initializes a new instance of the <see cref="BundlerProcess"/> class.
         /// </summary>
-        public BundlerProcess(HttpContext httpContext, Bundle bundle)
+        public BundlerProcess(HttpContext httpContext, IBundle bundle)
         {
             HttpContext = httpContext;
             Bundle = bundle;
@@ -29,6 +29,6 @@ namespace Bundler
         /// <summary>
         /// Gets the transform.
         /// </summary>
-        public Bundle Bundle { get; }
+        public IBundle Bundle { get; }
     }
 }

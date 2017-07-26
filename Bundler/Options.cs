@@ -15,6 +15,27 @@ namespace Bundler
         /// <summary>
         /// Gets a list of transforms added.
         /// </summary>
-        public List<Bundle> Bundles { get; } = new List<Bundle>();
+        internal List<IBundle> Bundles { get; } = new List<IBundle>();
+
+        /// <summary>
+        /// Adds a bundle to the middleware pipeline.
+        /// </summary>
+        public IBundle Add(IBundle bundle)
+        {
+            Bundles.Add(bundle);
+
+            return bundle;
+        }
+
+        /// <summary>
+        /// Adds a bundle to the middleware pipeline.
+        /// </summary>
+        public IBundle Add(string route, string contentType, params string[] sourceFiles)
+        {
+            var bundle = new Bundle(route, contentType, sourceFiles);
+            Bundles.Add(bundle);
+
+            return bundle;
+        }
     }
 }
