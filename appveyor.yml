@@ -1,0 +1,9 @@
+image: Visual Studio 2017
+
+build_script:
+  - dotnet restore Bundler.sln -v quiet
+  - msbuild /p:configuration=Release
+
+artifacts:
+  - path: src\**\*.nupkg
+    name: NuGet package
