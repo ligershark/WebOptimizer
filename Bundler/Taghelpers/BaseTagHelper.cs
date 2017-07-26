@@ -1,14 +1,11 @@
-﻿using Bundler.Transformers;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Razor.TagHelpers;
-using System;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc.TagHelpers.Internal;
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.TagHelpers.Internal;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Bundler.Taghelpers
 {
@@ -66,9 +63,9 @@ namespace Bundler.Taghelpers
         /// <summary>
         /// Generates a has of the files in the bundle.
         /// </summary>
-        protected string GenerateHash(ITransform transform)
+        protected string GenerateHash(Bundle bundle)
         {
-            IEnumerable<string> hashes = transform.SourceFiles.Select(f => AddFileVersionToPath(f));
+            IEnumerable<string> hashes = bundle.SourceFiles.Select(f => AddFileVersionToPath(f));
 
             return string.Join(string.Empty, hashes).GetHashCode().ToString();
         }

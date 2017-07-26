@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Globalization;
+using BundlerSample;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Bundler.Transformers;
-using System.Globalization;
-using Microsoft.Extensions.Localization;
-using BundlerSample;
 
 namespace Bundler
 {
@@ -56,19 +49,13 @@ namespace Bundler
                 SupportedUICultures = cultures
             });
 
+            app.UseBundler(options =>
+            {
+                options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" })
+                       .Localize<Strings>(app);
 
-            app.UseBundles(options =>
-                {
-                    options.Enabled = true;// !env.IsDevelopment();
-
-                    options.AddJs("/all.js", new[] { "js/site.js", "js/b.js" })
-                           .Localize<Strings>(app);
-
-                    options.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
-                });
-
-            app.MinifyJavaScript();
-            app.MinifyCss();
+                options.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
+            });
 
             app.UseStaticFiles();
 

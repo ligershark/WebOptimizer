@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,9 +36,9 @@ namespace Bundler.Utilities
         /// </summary>
         /// <param name="config"></param>
         /// <returns>UI Culture of the request</returns>
-        public static CultureInfo GetRequestUICulture(BundlerConfig config)
+        public static CultureInfo GetRequestUICulture(BundlerProcess config)
         {
-            var cf = config.HttpContext.Features.Get<IRequestCultureFeature>();
+            IRequestCultureFeature cf = config.HttpContext.Features.Get<IRequestCultureFeature>();
 
             if (cf == null)
             {

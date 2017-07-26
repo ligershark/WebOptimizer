@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Razor.TagHelpers;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Bundler.Transformers;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Bundler.Taghelpers
@@ -36,8 +35,8 @@ namespace Bundler.Taghelpers
             {
                 if (Extensions.Options.Enabled)
                 {
-                    ITransform transform = Extensions.Options.Transforms.FirstOrDefault(t => t.Path.Equals(Bundle));
-                    string href = $"{Bundle}?v={GenerateHash(transform)}";
+                    Bundle bundle = Extensions.Options.Bundles.FirstOrDefault(t => t.Route.Equals(Bundle));
+                    string href = $"{Bundle}?v={GenerateHash(bundle)}";
                     output.Attributes.SetAttribute("href", href);
                 }
                 else
@@ -51,7 +50,7 @@ namespace Bundler.Taghelpers
 
         private void WriteIndividualTags(TagHelperOutput output)
         {
-            ITransform transform = Extensions.Options.Transforms.FirstOrDefault(t => t.Path.Equals(Bundle));
+            Bundle bundle = Extensions.Options.Bundles.FirstOrDefault(t => t.Route.Equals(Bundle));
             output.SuppressOutput();
 
             var attrs = new List<string>();
@@ -69,7 +68,7 @@ namespace Bundler.Taghelpers
                 attrs.Add(attr);
             }
 
-            foreach (string file in transform.SourceFiles)
+            foreach (string file in bundle.SourceFiles)
             {
                 string href = AddFileVersionToPath(file);
                 output.PostElement.AppendHtml($"<link href=\"{href}\" {string.Join(" ", attrs)} />");
