@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.DependencyInjection;
+using System.Globalization;
 
 namespace Bundler
 {
@@ -47,9 +48,8 @@ namespace Bundler
             
             transform.PostProcessors.Add(config =>
             {
-                var cf = config.HttpContext.Features.Get<IRequestCultureFeature>();
-                var culture = cf.RequestCulture.UICulture;
-                var stringProvider = app.ApplicationServices.GetRequiredService<IStringLocalizer<T>>();
+                CultureInfo culture = LocalizationUtilities.GetRequestUICulture(config);
+                IStringLocalizer<T> stringProvider = LocalizationUtilities<T>.GetStringLocalizer(app);
 
                 config.Transform.CacheKeys["culture"] = culture.Name;
 

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Resources;
 using System.Text;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 
 namespace Bundler.Transformers
@@ -131,5 +134,6 @@ namespace Bundler.Transformers
         {
             throw new InvalidOperationException($"{param} argument not correctly terminated (did you forget a '}}'?)");
         }
+
     }
 }
