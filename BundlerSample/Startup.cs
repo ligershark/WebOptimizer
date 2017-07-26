@@ -55,7 +55,6 @@ namespace Bundler
                   .Localize<Strings>(app);
 
                 bundles.Add(new CssBundle("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css"));
-                bundles.Add("/foo.js", "text/javascript", "file.js");
             });
 
             app.UseStaticFiles();

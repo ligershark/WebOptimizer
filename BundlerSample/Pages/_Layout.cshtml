@@ -56,8 +56,8 @@
         </script>
     </environment>
 
-    <script bundle="/all.js" async defer language="en"></script>
-    <script inline src="/all.js"></script>
+    <script bundle="/all.js?culture=@System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName" async defer language="en"></script>
+    <script inline src="/all.js?culture=@System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName"></script>
 
     @RenderSection("Scripts", required: false)
 </body>

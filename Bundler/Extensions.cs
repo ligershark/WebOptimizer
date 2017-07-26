@@ -44,12 +44,10 @@ namespace Bundler
         public static IBundle Localize<T>(this IBundle bundle, IApplicationBuilder app)
         {
             IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(app);
+            bundle.QueryKeys.Add("culture");
 
             bundle.PostProcessors.Add(config =>
             {
-                CultureInfo culture = LocalizationUtilities.GetRequestUICulture(config);
-
-                config.Bundle.CacheKeys["culture"] = culture.Name;
                 config.Content = ScriptLocalizer.Localize(config.Content, stringProvider);
             });
 

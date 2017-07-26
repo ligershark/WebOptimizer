@@ -1,18 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace Bundler
+﻿namespace Bundler
 {
     /// <summary>
     /// A configuration object for Bundler.
     /// </summary>
-    public class BundlerContext
+    public class BundleContext
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BundlerContext"/> class.
+        /// Initializes a new instance of the <see cref="BundleContext"/> class.
         /// </summary>
-        public BundlerContext(HttpContext httpContext, IBundle bundle)
+        public BundleContext(IBundle bundle)
         {
-            HttpContext = httpContext;
             Bundle = bundle;
         }
 
@@ -20,11 +17,6 @@ namespace Bundler
         /// Gets or sets the content of the response.
         /// </summary>
         public string Content { get; set; }
-
-        /// <summary>
-        /// Gets the HTTP context.
-        /// </summary>
-        public HttpContext HttpContext { get; }
 
         /// <summary>
         /// Gets the transform.

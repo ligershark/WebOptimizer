@@ -24,7 +24,7 @@ namespace Bundler.Processors
         /// <summary>
         /// Executes the processor on the specified configuration.
         /// </summary>
-        public void Execute(BundlerContext config)
+        public void Execute(BundleContext config)
         {
             UglifyResult minified = Uglify.Css(config.Content, Settings);
 

@@ -21,8 +21,8 @@ namespace Bundler
             Route = route;
             ContentType = contentType;
             SourceFiles = sourceFiles;
-            PostProcessors = new List<Action<BundlerContext>>();
-            CacheKeys = new Dictionary<string, string>();
+            PostProcessors = new List<Action<BundleContext>>();
+            QueryKeys = new List<string>();
         }
 
         /// <summary>
@@ -44,11 +44,11 @@ namespace Bundler
         /// Gets or sets the cache key.
         /// Append any additional keys to the string in order to vary the cache result
         /// </summary>
-        public IDictionary<string, string> CacheKeys { get; }
+        public IList<string> QueryKeys { get; }
 
         /// <summary>
         /// Gets a list of post processors
         /// </summary>
-        public IList<Action<BundlerContext>> PostProcessors { get; }
+        public IList<Action<BundleContext>> PostProcessors { get; }
     }
 }

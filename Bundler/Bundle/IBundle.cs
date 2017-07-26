@@ -12,7 +12,7 @@ namespace Bundler
         /// Gets or sets the cache key.
         /// Append any additional keys to the string in order to vary the cache result
         /// </summary>
-        IDictionary<string, string> CacheKeys { get; }
+        IList<string> QueryKeys { get; }
 
         /// <summary>
         /// Gets the content type produced by the transform.
@@ -22,7 +22,7 @@ namespace Bundler
         /// <summary>
         /// Gets a list of post processors
         /// </summary>
-        IList<Action<BundlerContext>> PostProcessors { get; }
+        IList<Action<BundleContext>> PostProcessors { get; }
 
         /// <summary>
         /// Gets the route to the bundle output.

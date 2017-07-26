@@ -20,6 +20,8 @@ namespace Bundler.Taghelpers
     public class InlineContentTagHelper : TagHelper
     {
         private readonly FileCache _fileCache;
+        private string _route;
+        private string _query;
 
         /// <summary>
         /// Tag helper for inlining content
@@ -46,38 +48,51 @@ namespace Bundler.Taghelpers
         /// </summary>
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
-            string path = string.Empty;
-
             if (output.TagName.Equals("link", StringComparison.OrdinalIgnoreCase))
             {
                 output.TagName = "style";
-                path = output.Attributes["href"].Value.ToString();
+                ParseRoute(output.Attributes["href"].Value.ToString());
             }
             else if (output.TagName.Equals("script", StringComparison.OrdinalIgnoreCase))
             {
-                path = output.Attributes["src"].Value.ToString();
+                ParseRoute(output.Attributes["src"].Value.ToString());
             }
 
-            string content = await GetFileContentAsync(path);
+            string content = await GetFileContentAsync(_route, _query);
 
             output.Content.SetHtmlContent(content);
             output.TagMode = TagMode.StartTagAndEndTag;
             output.Attributes.Clear();
         }
 
-        private async Task<string> GetFileContentAsync(string route)
+        private void ParseRoute(string route)
+        {
+            _route = route;
+            _query = "";
+            char sep = '?';
+            int token = route.IndexOf(sep);
+
+            if (token > -1)
+            {
+                _route = route.Substring(0, token);
+                _query = route.Substring(token + 1);
+                sep = '&';
+            }
+        }
+
+        private async Task<string> GetFileContentAsync(string route, string queryString)
         {
             IBundle bundle = GetBundle(route);
-            string cacheKey = bundle == null ? route : BundleMiddleware.GetCacheKey(ViewContext.HttpContext, bundle);
+            string cacheKey = bundle == null ? route : BundleMiddleware.GetCacheKey(queryString, bundle);
 
             if (_fileCache.TryGetValue(cacheKey, out string value))
             {
-                //return value;
+                return value;
             }
 
             if (bundle != null)
             {
-                string contents = await BundleMiddleware.ExecuteAsync(ViewContext.HttpContext, bundle, _fileCache.FileProvider).ConfigureAwait(false);
+                string contents = await BundleMiddleware.ExecuteAsync(bundle, _fileCache.FileProvider).ConfigureAwait(false);
 
                 _fileCache.AddFileBundleToCache(cacheKey, contents, bundle.SourceFiles);
                 return contents;

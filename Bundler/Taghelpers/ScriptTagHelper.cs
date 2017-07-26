@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Bundler.Taghelpers
@@ -34,8 +35,18 @@ namespace Bundler.Taghelpers
             {
                 if (Extensions.Options.Enabled)
                 {
-                    IBundle bundle = Extensions.Options.Bundles.FirstOrDefault(t => t.Route.Equals(Bundle));
-                    string href = $"{Bundle}?v={GenerateHash(bundle)}";
+                    string route = Bundle;
+                    char sep = '?';
+                    int token = Bundle.IndexOf(sep);
+
+                    if (token > -1)
+                    {
+                        route = Bundle.Substring(0, token);
+                        sep = '&';
+                    }
+
+                    IBundle bundle = Extensions.Options.Bundles.FirstOrDefault(t => t.Route.Equals(route));
+                    string href = $"{Bundle}{sep}v={GenerateHash(bundle)}";
                     output.Attributes.SetAttribute("src", href);
                 }
                 else
