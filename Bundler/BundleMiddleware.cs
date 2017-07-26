@@ -64,7 +64,7 @@ namespace Bundler
                     return;
                 }
 
-                _fileCache.AddFileBundleToCache(cacheKey, result, _bundle.SourceFiles);
+                _fileCache.Add(cacheKey, result, _bundle.SourceFiles);
 
                 await WriteOutputAsync(context, result, cacheKey);
             }

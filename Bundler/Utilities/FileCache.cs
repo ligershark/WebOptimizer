@@ -1,51 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Http;
+﻿using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
 
 namespace Bundler.Utilities
 {
+    /// <summary>
+    /// A helper class for working with the memory cache.
+    /// </summary>
     public class FileCache
     {
-        private MemoryCacheEntryOptions _cacheOptions = new MemoryCacheEntryOptions();
         private IMemoryCache _cache;
-        public IFileProvider FileProvider { get; private set; }
-        
 
+        /// <summary>
+        /// Instantiates a new instance of the class.
+        /// </summary>
         public FileCache(IFileProvider fileProvider, IMemoryCache cache)
         {
             _cache = cache;
             FileProvider = fileProvider;
         }
 
-        private void AddExpirationToken(string file)
+        /// <summary>
+        /// The FileProvider used for cache invalidations
+        /// </summary>
+        public IFileProvider FileProvider { get; }
+
+        private void AddExpirationToken(MemoryCacheEntryOptions cacheOptions, string file)
         {
-            _cacheOptions.AddExpirationToken(FileProvider.Watch(file));
+            cacheOptions.AddExpirationToken(FileProvider.Watch(file));
         }
 
-        public void AddStringToCache(string cacheKey, string value)
+        /// <summary>
+        /// Adds a value to the cache and invalidates it based on the specified files
+        /// </summary>
+        public void Add(string cacheKey, string value, params string[] files)
         {
-            _cache.Set(cacheKey, value);
+            Add(cacheKey, value, files);
         }
 
-        public void AddFileToCache(string cacheKey, string value, string file)
+        /// <summary>
+        /// Adds a value to the cache and invalidates it based on the specified files
+        /// </summary>
+        public void Add(string cacheKey, string value, IEnumerable<string> files)
         {
-            AddExpirationToken(file);
-            _cache.Set(cacheKey, value, _cacheOptions);
-        }
+            var cacheOptions = new MemoryCacheEntryOptions();
 
-        public void AddFileBundleToCache(string cacheKey, string value, IEnumerable<string> files)
-        {
             foreach (string file in files)
             {
-                AddExpirationToken(file);
+                AddExpirationToken(cacheOptions, file);
             }
 
-            _cache.Set(cacheKey, value, _cacheOptions);
+            _cache.Set(cacheKey, value, cacheOptions);
         }
 
+        /// <summary>
+        /// Tries to get the value from the cache.
+        /// </summary>
         public bool TryGetValue(string cacheKey, out string value)
         {
             return _cache.TryGetValue(cacheKey, out value);

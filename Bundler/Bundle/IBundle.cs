@@ -9,12 +9,6 @@ namespace Bundler
     public interface IBundle
     {
         /// <summary>
-        /// Gets or sets the cache key.
-        /// Append any additional keys to the string in order to vary the cache result
-        /// </summary>
-        IList<string> QueryKeys { get; }
-
-        /// <summary>
         /// Gets the content type produced by the transform.
         /// </summary>
         string ContentType { get; }
@@ -23,6 +17,12 @@ namespace Bundler
         /// Gets a list of post processors
         /// </summary>
         IList<Action<BundleContext>> PostProcessors { get; }
+
+        /// <summary>
+        /// Gets or sets the cache key.
+        /// Append any additional keys to the string in order to vary the cache result
+        /// </summary>
+        IList<string> QueryKeys { get; }
 
         /// <summary>
         /// Gets the route to the bundle output.

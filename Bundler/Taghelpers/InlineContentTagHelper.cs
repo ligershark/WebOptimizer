@@ -94,7 +94,7 @@ namespace Bundler.Taghelpers
             {
                 string contents = await BundleMiddleware.ExecuteAsync(bundle, _fileCache.FileProvider).ConfigureAwait(false);
 
-                _fileCache.AddFileBundleToCache(cacheKey, contents, bundle.SourceFiles);
+                _fileCache.Add(cacheKey, contents, bundle.SourceFiles);
                 return contents;
             }
             else
@@ -104,7 +104,7 @@ namespace Bundler.Taghelpers
                 if (File.Exists(file))
                 {
                     string contents = await File.ReadAllTextAsync(file).ConfigureAwait(false);
-                    _fileCache.AddFileToCache(cacheKey, contents, file);
+                    _fileCache.Add(cacheKey, contents, file);
 
                     return contents;
                 }
