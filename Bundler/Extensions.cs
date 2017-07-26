@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
+using Bundler.Utilities;
 
 namespace Bundler
 {
@@ -41,15 +42,14 @@ namespace Bundler
         }
 
         /// <summary>
-        /// Localizes the files
+        /// Extension method to localizes the files in a bundle
         /// </summary>
         public static ITransform Localize<T>(this ITransform transform, IApplicationBuilder app)
         {
-            
             transform.PostProcessors.Add(config =>
             {
                 CultureInfo culture = LocalizationUtilities.GetRequestUICulture(config);
-                IStringLocalizer<T> stringProvider = LocalizationUtilities<T>.GetStringLocalizer(app);
+                IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(app);
 
                 config.Transform.CacheKeys["culture"] = culture.Name;
 

@@ -7,16 +7,16 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 
-namespace Bundler
+namespace Bundler.Utilities
 {
-    internal partial class LocalizationUtilities<T>
+    internal class LocalizationUtilities
     {
         /// <summary>
         /// Gets the string localizer of type 'T' from the app builder
         /// </summary>
         /// <param name="app"></param>
         /// <returns></returns>
-        public static IStringLocalizer<T> GetStringLocalizer(IApplicationBuilder app)
+        public static IStringLocalizer<T> GetStringLocalizer<T>(IApplicationBuilder app)
         {
             try
             {
@@ -32,10 +32,7 @@ namespace Bundler
                 throw;
             }
         }
-    }
 
-    internal partial class LocalizationUtilities
-    {
         /// <summary>
         /// Gets the UI culture of the incoming request
         /// </summary>
