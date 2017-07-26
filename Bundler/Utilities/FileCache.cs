@@ -25,6 +25,11 @@ namespace Bundler.Utilities
             _cacheOptions.AddExpirationToken(FileProvider.Watch(file));
         }
 
+        public void AddStringToCache(string cacheKey, string value)
+        {
+            _cache.Set(cacheKey, value);
+        }
+
         public void AddFileToCache(string cacheKey, string value, string file)
         {
             AddExpirationToken(file);

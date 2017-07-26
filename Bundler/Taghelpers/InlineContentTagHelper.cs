@@ -5,6 +5,9 @@ using System.Linq;
 using System.Text;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -30,6 +33,10 @@ namespace Bundler.Taghelpers
         {
             _fileCache = new FileCache(env.WebRootFileProvider, cache);
         }
+
+        [ViewContext]
+        [HtmlAttributeNotBound]
+        public ViewContext ViewContext { get; set; }
 
         /// <summary>
         /// Creates a tag helper for inlining content
@@ -62,13 +69,20 @@ namespace Bundler.Taghelpers
 
                 if (bundle == null)
                 {
-                    var file = _fileCache.FileProvider.GetFileInfo(route).PhysicalPath;
+                    string file = _fileCache.FileProvider.GetFileInfo(route).PhysicalPath;
                     if (file != null && File.Exists(file))
                     {
                         var contents = await File.ReadAllTextAsync(file);
                         _fileCache.AddFileToCache(route, contents, file);
                         return contents;
                     }
+                }
+                else
+                {
+                    string contents = await BundleMiddleware.ExecuteAsync(ViewContext.HttpContext, bundle, _fileCache.FileProvider);
+                    string key = BundleMiddleware.GetCacheKey(ViewContext.HttpContext, bundle);
+                    _fileCache.AddStringToCache(key, contents);
+                    return contents;
                 }
             }
 
