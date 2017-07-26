@@ -6,7 +6,7 @@ namespace Bundler
     /// <summary>
     /// A bundle of text based files
     /// </summary>
-    public class Bundle
+    public class Bundle : IBundle
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Bundle"/> class.

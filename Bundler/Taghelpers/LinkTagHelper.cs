@@ -35,7 +35,7 @@ namespace Bundler.Taghelpers
             {
                 if (Extensions.Options.Enabled)
                 {
-                    Bundle bundle = Extensions.Options.Bundles.FirstOrDefault(t => t.Route.Equals(Bundle));
+                    IBundle bundle = Extensions.Options.Bundles.FirstOrDefault(t => t.Route.Equals(Bundle));
                     string href = $"{Bundle}?v={GenerateHash(bundle)}";
                     output.Attributes.SetAttribute("href", href);
                 }
@@ -50,7 +50,7 @@ namespace Bundler.Taghelpers
 
         private void WriteIndividualTags(TagHelperOutput output)
         {
-            Bundle bundle = Extensions.Options.Bundles.FirstOrDefault(t => t.Route.Equals(Bundle));
+            IBundle bundle = Extensions.Options.Bundles.FirstOrDefault(t => t.Route.Equals(Bundle));
             output.SuppressOutput();
 
             var attrs = new List<string>();
