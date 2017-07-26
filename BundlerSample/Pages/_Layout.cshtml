@@ -6,7 +6,7 @@
     <title>@ViewData["Title"] - Bundler</title>
 
     <link rel="stylesheet" asp-bundle="/all.css" />
-    <style inline="/site.css"></style>
+    <style inline="/css/site.css"></style>
 </head>
 <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -57,7 +57,7 @@
     </environment>
 
     <script asp-bundle="/all.js" async defer language="en"></script>
-    <script inline="test.js"></script>
+    <script inline="/js/site.js"></script>
 
     @RenderSection("Scripts", required: false)
 </body>

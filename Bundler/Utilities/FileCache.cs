@@ -7,14 +7,14 @@ using Microsoft.Extensions.FileProviders;
 
 namespace Bundler.Utilities
 {
-    public class FileCacheHelper
+    public class FileCache
     {
         private MemoryCacheEntryOptions _cacheOptions = new MemoryCacheEntryOptions();
         private IMemoryCache _cache;
         public IFileProvider FileProvider { get; private set; }
         
 
-        public FileCacheHelper(IFileProvider fileProvider, IMemoryCache cache)
+        public FileCache(IFileProvider fileProvider, IMemoryCache cache)
         {
             _cache = cache;
             FileProvider = fileProvider;
@@ -23,13 +23,6 @@ namespace Bundler.Utilities
         private void AddExpirationToken(string file)
         {
             _cacheOptions.AddExpirationToken(FileProvider.Watch(file));
-        }
-
-        public void AddItemToCache(string cacheKey, string result, string file)
-        {
-            _cacheOptions.AddExpirationToken(FileProvider.Watch(file));
-
-            _cache.Set(cacheKey, result, _cacheOptions);
         }
 
         public void AddFileToCache(string cacheKey, string value, string file)

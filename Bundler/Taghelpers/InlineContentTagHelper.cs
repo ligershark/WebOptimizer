@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
@@ -17,7 +19,7 @@ namespace Bundler.Taghelpers
     public class InlineContentTagHelper : TagHelper
     {
         internal const string InlineAttribute = "inline";
-        private readonly FileCacheHelper _fileCache;
+        private readonly FileCache _fileCache;
 
         /// <summary>
         /// Tag helper for inlining content
@@ -26,7 +28,7 @@ namespace Bundler.Taghelpers
         /// <param name="cache"></param>
         public InlineContentTagHelper(IHostingEnvironment env, IMemoryCache cache)
         {
-            _fileCache = new FileCacheHelper(env.WebRootFileProvider, cache);
+            _fileCache = new FileCache(env.WebRootFileProvider, cache);
         }
 
         /// <summary>
@@ -34,21 +36,48 @@ namespace Bundler.Taghelpers
         /// </summary>
         /// <param name="context"></param>
         /// <param name="output"></param>
-        public override void Process(TagHelperContext context, TagHelperOutput output)
+        public override async void Process(TagHelperContext context, TagHelperOutput output)
         {
-            TagHelperAttribute attribute = context.AllAttributes[InlineAttribute];
-            string route = attribute.Value.ToString();
-            string css = GetFileContent(route);
-            output.Content.SetContent(css);
-            output.Attributes.Remove(attribute);
+            if(context.AllAttributes.TryGetAttribute(InlineAttribute, out TagHelperAttribute attribute))
+            {
+                string route = attribute.Value.ToString();
+                string css = await GetFileContentAsync(route);
+                output.Content.SetHtmlContent(css);
+                if (output.Attributes.Contains(attribute))
+                {
+                    output.Attributes.Remove(attribute);
+                }
+            }
         }
 
-        private string GetFileContent(string route)
+        private async System.Threading.Tasks.Task<string> GetFileContentAsync(string route)
         {
-            if (route.EndsWith(".css"))
-                return "div.test{color: blue;}";
+            if(_fileCache.TryGetValue(route, out string value))
+            {
+                return value;
+            }
             else
-                return "function foo(){alert(\"inserted content\");}";
+            {
+                IBundle bundle = GetBundle(route);
+
+                if (bundle == null)
+                {
+                    var file = _fileCache.FileProvider.GetFileInfo(route).PhysicalPath;
+                    if (file != null && File.Exists(file))
+                    {
+                        var contents = await File.ReadAllTextAsync(file);
+                        _fileCache.AddFileToCache(route, contents, file);
+                        return contents;
+                    }
+                }
+            }
+
+            throw new NotImplementedException();
+        }
+
+        private IBundle GetBundle(string route)
+        {
+            return Extensions.Options.Bundles.FirstOrDefault(t => t.Route.Equals(route));
         }
     }
 }

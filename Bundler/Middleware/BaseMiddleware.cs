@@ -15,7 +15,7 @@ namespace Bundler
     {
         private readonly RequestDelegate _next;
         //private readonly IMemoryCache _cache;
-        protected readonly FileCacheHelper _fileCache;
+        protected readonly FileCache _fileCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BundleMiddleware"/> class.
@@ -25,7 +25,7 @@ namespace Bundler
             _next = next;
             //_cache = cache;
             //FileProvider = env.WebRootFileProvider;
-            _fileCache = new FileCacheHelper(env.WebRootFileProvider, cache);
+            _fileCache = new FileCache(env.WebRootFileProvider, cache);
         }
 
         /// <summary>
