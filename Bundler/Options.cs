@@ -20,7 +20,7 @@ namespace Bundler
         /// <summary>
         /// Adds a bundle to the middleware pipeline.
         /// </summary>
-        public Bundle Add(Bundle bundle)
+        public IBundle Add(IBundle bundle)
         {
             Bundles.Add(bundle);
 
@@ -30,7 +30,7 @@ namespace Bundler
         /// <summary>
         /// Adds a bundle to the middleware pipeline.
         /// </summary>
-        public Bundle Add(string route, string contentType, params string[] sourceFiles)
+        public IBundle Add(string route, string contentType, params string[] sourceFiles)
         {
             var bundle = new Bundle(route, contentType, sourceFiles);
             Bundles.Add(bundle);
