@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
@@ -9,49 +13,35 @@ using Microsoft.Extensions.FileProviders;
 namespace Bundler
 {
     /// <summary>
-    /// A base class for response caching middleware.
+    /// Middleware for setting up bundles
     /// </summary>
-    public abstract class BaseMiddleware
+    public class BundleMiddleware
     {
+        private readonly IBundle _bundle;
         private readonly RequestDelegate _next;
-        //private readonly IMemoryCache _cache;
-        protected readonly FileCache _fileCache;
+        private readonly FileCacheHelper _fileCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BundleMiddleware"/> class.
         /// </summary>
-        public BaseMiddleware(RequestDelegate next, IMemoryCache cache, IHostingEnvironment env)
+        public BundleMiddleware(RequestDelegate next, IHostingEnvironment env, IBundle bundle, IMemoryCache cache)
         {
             _next = next;
-            //_cache = cache;
-            //FileProvider = env.WebRootFileProvider;
-            _fileCache = new FileCache(env.WebRootFileProvider, cache);
+            _bundle = bundle;
+            _fileCache = new FileCacheHelper(env.WebRootFileProvider, cache);
         }
-
-        /// <summary>
-        /// Gets the file provider.
-        /// </summary>
-        //protected IFileProvider FileProvider { get; }
 
         /// <summary>
         /// Gets the content type of the response.
         /// </summary>
-        protected abstract string ContentType { get; }
-
-        /// <summary>
-        /// A list of files used for cache invalidation.
-        /// </summary>
-        protected virtual IEnumerable<string> GetFiles(HttpContext context)
-        {
-            yield return context.Request.Path.Value;
-        }
+        private string ContentType => _bundle.ContentType;
 
         /// <summary>
         /// Invokes the middleware
         /// </summary>
         public async Task InvokeAsync(HttpContext context)
         {
-            string cacheKey = GetCacheKey(context);
+            string cacheKey = GetCacheKey(context, _bundle);
 
             if (IsConditionalGet(context, cacheKey))
             {
@@ -64,7 +54,7 @@ namespace Bundler
             }
             else
             {
-                string result = await ExecuteAsync(context);
+                string result = await ExecuteAsync(context, _bundle, _fileCache.FileProvider);
 
                 if (string.IsNullOrEmpty(result))
                 {
@@ -72,43 +62,54 @@ namespace Bundler
                     return;
                 }
 
-                _fileCache.AddFileBundleToCache(cacheKey, result, GetFiles(context));
-                //PopulateCache(cacheKey, result, context);
+                _fileCache.AddFileBundleToCache(cacheKey, result, _bundle.SourceFiles);
 
                 await WriteOutputAsync(context, result, cacheKey);
             }
         }
 
         /// <summary>
-        /// Executes the middleware and handles response caching.
+        /// Executes the bundle and returns the processed output.
         /// </summary>
-        public abstract Task<string> ExecuteAsync(HttpContext context);
+        public static async Task<string> ExecuteAsync(HttpContext context, IBundle bundle, IFileProvider fileProvider)
+        {
+            string source = await GetContentAsync(bundle, fileProvider);
 
-        //private void PopulateCache(string cacheKey, string result, HttpContext context)
-        //{
-        //    var cacheEntryOptions = new MemoryCacheEntryOptions();
+            var config = new BundlerProcess(context, bundle)
+            {
+                Content = source
+            };
 
-        //    foreach (string file in GetFiles(context))
-        //    {
-        //        cacheEntryOptions.AddExpirationToken(FileProvider.Watch(file));
-        //    }
+            foreach (Action<BundlerProcess> processor in bundle.PostProcessors)
+            {
+                processor(config);
+            }
 
-        //    _cache.Set(cacheKey, result, cacheEntryOptions);
-        //}
+            return config.Content;
+        }
+
+        private static async Task<string> GetContentAsync(IBundle bundle, IFileProvider fileProvider)
+        {
+            IEnumerable<string> absolutes = bundle.SourceFiles.Select(f => fileProvider.GetFileInfo(f).PhysicalPath);
+            var sb = new StringBuilder();
+
+            foreach (string absolute in absolutes)
+            {
+                sb.AppendLine(await File.ReadAllTextAsync(absolute));
+            }
+
+            return sb.ToString();
+        }
 
         /// <summary>
         /// Gets the cache key.
         /// </summary>
-        protected virtual string GetCacheKey(HttpContext context)
+        public static string GetCacheKey(HttpContext context, IBundle bundle)
         {
-            string key = context.Request.PathBase + context.Request.Path;
+            string baseCacheKey = context.Request.PathBase + context.Request.Path;
 
-            if (context.Request.Query.TryGetValue("v", out var v))
-            {
-                key += v;
-            }
-
-            return key.GetHashCode().ToString();
+            string transformKey = string.Join("", bundle.CacheKeys.Select(p => p.Key + p.Value));
+            return (baseCacheKey + transformKey).GetHashCode().ToString();
         }
 
         private bool IsConditionalGet(HttpContext context, string cacheKey)
