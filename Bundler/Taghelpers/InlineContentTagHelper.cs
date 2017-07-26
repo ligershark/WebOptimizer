@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Bundler.Utilities;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Bundler.Taghelpers
 {
@@ -14,6 +17,17 @@ namespace Bundler.Taghelpers
     public class InlineContentTagHelper : TagHelper
     {
         internal const string InlineAttribute = "inline";
+        private readonly FileCacheHelper _fileCache;
+
+        /// <summary>
+        /// Tag helper for inlining content
+        /// </summary>
+        /// <param name="env"></param>
+        /// <param name="cache"></param>
+        public InlineContentTagHelper(IHostingEnvironment env, IMemoryCache cache)
+        {
+            _fileCache = new FileCacheHelper(env.WebRootFileProvider, cache);
+        }
 
         /// <summary>
         /// Creates a tag helper for inlining content
