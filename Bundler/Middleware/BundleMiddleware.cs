@@ -68,13 +68,8 @@ namespace Bundler
         {
             string baseCacheKey = base.GetCacheKey(context);
 
-            if (!string.IsNullOrEmpty(baseCacheKey))
-            {
-                string transformKey = string.Join("", _transform.CacheKeys.Select(p => p.Key + p.Value));
-                return (base.GetCacheKey(context) + transformKey).GetHashCode().ToString();
-            }
-
-            return null;
+            string transformKey = string.Join("", _transform.CacheKeys.Select(p => p.Key + p.Value));
+            return (baseCacheKey + transformKey).GetHashCode().ToString();
         }
     }
 }

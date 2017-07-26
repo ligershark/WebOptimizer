@@ -40,7 +40,7 @@ namespace Bundler
         /// </summary>
         protected virtual IEnumerable<string> GetFiles(HttpContext context)
         {
-            return new[] { context.Request.Path.Value };
+            yield return context.Request.Path.Value;
         }
 
         /// <summary>
