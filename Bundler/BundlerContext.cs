@@ -5,12 +5,12 @@ namespace Bundler
     /// <summary>
     /// A configuration object for Bundler.
     /// </summary>
-    public class BundlerProcess
+    public class BundlerContext
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BundlerProcess"/> class.
+        /// Initializes a new instance of the <see cref="BundlerContext"/> class.
         /// </summary>
-        public BundlerProcess(HttpContext httpContext, IBundle bundle)
+        public BundlerContext(HttpContext httpContext, IBundle bundle)
         {
             HttpContext = httpContext;
             Bundle = bundle;

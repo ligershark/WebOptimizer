@@ -9,7 +9,7 @@ namespace Bundler.Taghelpers
     /// <summary>
     /// A TagHelper for hooking CSS bundles up to the HTML page.
     /// </summary>
-    [HtmlTargetElement("link", Attributes = "asp-bundle")]
+    [HtmlTargetElement("link", Attributes = "bundle")]
     public class LinkTagHelper : BaseTagHelper
     {
         /// <summary>
@@ -23,7 +23,7 @@ namespace Bundler.Taghelpers
         /// <summary>
         /// The route to the bundle file name.
         /// </summary>
-        [HtmlAttributeName("asp-bundle")]
+        [HtmlAttributeName("bundle")]
         public string Bundle { get; set; }
 
         /// <summary>

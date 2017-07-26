@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -17,76 +15,87 @@ namespace Bundler.Taghelpers
     /// <summary>
     /// Tag helper for inlining CSS
     /// </summary>
-    [HtmlTargetElement("style", Attributes = InlineAttribute)]
-    [HtmlTargetElement("script", Attributes = InlineAttribute)]
+    [HtmlTargetElement("link", Attributes = "inline, href")]
+    [HtmlTargetElement("script", Attributes = "inline, src")]
     public class InlineContentTagHelper : TagHelper
     {
-        internal const string InlineAttribute = "inline";
         private readonly FileCache _fileCache;
 
         /// <summary>
         /// Tag helper for inlining content
         /// </summary>
-        /// <param name="env"></param>
-        /// <param name="cache"></param>
         public InlineContentTagHelper(IHostingEnvironment env, IMemoryCache cache)
         {
             _fileCache = new FileCache(env.WebRootFileProvider, cache);
         }
 
+        /// <summary>
+        /// Gets or sets the view context.
+        /// </summary>
         [ViewContext]
         [HtmlAttributeNotBound]
         public ViewContext ViewContext { get; set; }
 
         /// <summary>
+        /// Orders before any built-in TagHelpers run.
+        /// </summary>
+        public override int Order => -2000;
+
+        /// <summary>
         /// Creates a tag helper for inlining content
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="output"></param>
-        public override async void Process(TagHelperContext context, TagHelperOutput output)
+        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
-            if(context.AllAttributes.TryGetAttribute(InlineAttribute, out TagHelperAttribute attribute))
+            string path = string.Empty;
+
+            if (output.TagName.Equals("link", StringComparison.OrdinalIgnoreCase))
             {
-                string route = attribute.Value.ToString();
-                string css = await GetFileContentAsync(route);
-                output.Content.SetHtmlContent(css);
-                if (output.Attributes.Contains(attribute))
-                {
-                    output.Attributes.Remove(attribute);
-                }
+                output.TagName = "style";
+                path = output.Attributes["href"].Value.ToString();
             }
+            else if (output.TagName.Equals("script", StringComparison.OrdinalIgnoreCase))
+            {
+                path = output.Attributes["src"].Value.ToString();
+            }
+
+            string content = await GetFileContentAsync(path);
+
+            output.Content.SetHtmlContent(content);
+            output.TagMode = TagMode.StartTagAndEndTag;
+            output.Attributes.Clear();
         }
 
-        private async System.Threading.Tasks.Task<string> GetFileContentAsync(string route)
+        private async Task<string> GetFileContentAsync(string route)
         {
-            if(_fileCache.TryGetValue(route, out string value))
+            IBundle bundle = GetBundle(route);
+            string cacheKey = bundle == null ? route : BundleMiddleware.GetCacheKey(ViewContext.HttpContext, bundle);
+
+            if (_fileCache.TryGetValue(cacheKey, out string value))
             {
-                return value;
+                //return value;
+            }
+
+            if (bundle != null)
+            {
+                string contents = await BundleMiddleware.ExecuteAsync(ViewContext.HttpContext, bundle, _fileCache.FileProvider).ConfigureAwait(false);
+
+                _fileCache.AddFileBundleToCache(cacheKey, contents, bundle.SourceFiles);
+                return contents;
             }
             else
             {
-                IBundle bundle = GetBundle(route);
+                string file = _fileCache.FileProvider.GetFileInfo(route).PhysicalPath;
 
-                if (bundle == null)
+                if (File.Exists(file))
                 {
-                    string file = _fileCache.FileProvider.GetFileInfo(route).PhysicalPath;
-                    if (file != null && File.Exists(file))
-                    {
-                        var contents = await File.ReadAllTextAsync(file);
-                        _fileCache.AddFileToCache(route, contents, file);
-                        return contents;
-                    }
-                }
-                else
-                {
-                    string contents = await BundleMiddleware.ExecuteAsync(ViewContext.HttpContext, bundle, _fileCache.FileProvider);
-                    string key = BundleMiddleware.GetCacheKey(ViewContext.HttpContext, bundle);
-                    _fileCache.AddStringToCache(key, contents);
+                    string contents = await File.ReadAllTextAsync(file).ConfigureAwait(false);
+                    _fileCache.AddFileToCache(cacheKey, contents, file);
+
                     return contents;
                 }
             }
 
-            throw new NotImplementedException();
+            throw new FileNotFoundException("File or bundle doesn't exist", route);
         }
 
         private IBundle GetBundle(string route)

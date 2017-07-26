@@ -73,14 +73,14 @@ namespace Bundler
         /// </summary>
         public static async Task<string> ExecuteAsync(HttpContext context, IBundle bundle, IFileProvider fileProvider)
         {
-            string source = await GetContentAsync(bundle, fileProvider);
+            string source = await GetContentAsync(bundle, fileProvider).ConfigureAwait(false);
 
-            var config = new BundlerProcess(context, bundle)
+            var config = new BundlerContext(context, bundle)
             {
                 Content = source
             };
 
-            foreach (Action<BundlerProcess> processor in bundle.PostProcessors)
+            foreach (Action<BundlerContext> processor in bundle.PostProcessors)
             {
                 processor(config);
             }
@@ -95,7 +95,7 @@ namespace Bundler
 
             foreach (string absolute in absolutes)
             {
-                sb.AppendLine(await File.ReadAllTextAsync(absolute));
+                sb.AppendLine(await File.ReadAllTextAsync(absolute).ConfigureAwait(false));
             }
 
             return sb.ToString();
@@ -106,10 +106,8 @@ namespace Bundler
         /// </summary>
         public static string GetCacheKey(HttpContext context, IBundle bundle)
         {
-            string baseCacheKey = context.Request.PathBase + context.Request.Path;
-
             string transformKey = string.Join("", bundle.CacheKeys.Select(p => p.Key + p.Value));
-            return (baseCacheKey + transformKey).GetHashCode().ToString();
+            return (bundle.Route + transformKey).GetHashCode().ToString();
         }
 
         private bool IsConditionalGet(HttpContext context, string cacheKey)

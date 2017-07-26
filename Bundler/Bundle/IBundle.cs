@@ -22,7 +22,7 @@ namespace Bundler
         /// <summary>
         /// Gets a list of post processors
         /// </summary>
-        IList<Action<BundlerProcess>> PostProcessors { get; }
+        IList<Action<BundlerContext>> PostProcessors { get; }
 
         /// <summary>
         /// Gets the route to the bundle output.

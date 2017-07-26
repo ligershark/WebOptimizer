@@ -36,7 +36,7 @@ namespace Bundler.Utilities
         /// </summary>
         /// <param name="config"></param>
         /// <returns>UI Culture of the request</returns>
-        public static CultureInfo GetRequestUICulture(BundlerProcess config)
+        public static CultureInfo GetRequestUICulture(BundlerContext config)
         {
             IRequestCultureFeature cf = config.HttpContext.Features.Get<IRequestCultureFeature>();
 

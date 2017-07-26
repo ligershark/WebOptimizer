@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Bundler</title>
 
-    <link rel="stylesheet" asp-bundle="/all.css" />
-    <style inline="/css/site.css"></style>
+    <link rel="stylesheet" bundle="/all.css" />
+    <link rel="stylesheet" href="/all.css" inline />
 </head>
 <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -56,8 +56,8 @@
         </script>
     </environment>
 
-    <script asp-bundle="/all.js" async defer language="en"></script>
-    <script inline="/all.js"></script>
+    <script bundle="/all.js" async defer language="en"></script>
+    <script inline src="/all.js"></script>
 
     @RenderSection("Scripts", required: false)
 </body>

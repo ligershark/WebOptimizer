@@ -21,7 +21,7 @@ namespace Bundler
             Route = route;
             ContentType = contentType;
             SourceFiles = sourceFiles;
-            PostProcessors = new List<Action<BundlerProcess>>();
+            PostProcessors = new List<Action<BundlerContext>>();
             CacheKeys = new Dictionary<string, string>();
         }
 
@@ -49,6 +49,6 @@ namespace Bundler
         /// <summary>
         /// Gets a list of post processors
         /// </summary>
-        public IList<Action<BundlerProcess>> PostProcessors { get; }
+        public IList<Action<BundlerContext>> PostProcessors { get; }
     }
 }
