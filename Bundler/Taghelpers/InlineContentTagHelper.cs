@@ -67,16 +67,17 @@ namespace Bundler.Taghelpers
 
         private void ParseRoute(string route)
         {
-            _route = route;
-            _query = "";
-            char sep = '?';
-            int token = route.IndexOf(sep);
+            int index = route.IndexOf('?');
 
-            if (token > -1)
+            if (index > -1)
             {
-                _route = route.Substring(0, token);
-                _query = route.Substring(token + 1);
-                sep = '&';
+                _route = route.Substring(0, index);
+                _query = route.Substring(index + 1);
+            }
+            else
+            {
+                _route = route;
+                _query = "";
             }
         }
 
