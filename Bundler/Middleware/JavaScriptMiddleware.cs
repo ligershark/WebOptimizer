@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Bundler.Transformers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
 using NUglify.JavaScript;
 
@@ -14,16 +15,14 @@ namespace Bundler
     public class JavaScriptMiddleware : BaseMiddleware
     {
         private readonly CodeSettings _settings;
-        private readonly IHostingEnvironment _env;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JavaScriptMiddleware"/> class.
         /// </summary>
-        public JavaScriptMiddleware(RequestDelegate next, CodeSettings settings, IHostingEnvironment env)
-            : base(next)
+        public JavaScriptMiddleware(RequestDelegate next, CodeSettings settings, IHostingEnvironment env, IMemoryCache cache)
+            : base(next, cache, env)
         {
             _settings = settings;
-            _env = env;
         }
 
         /// <summary>
@@ -43,7 +42,7 @@ namespace Bundler
                 return null;
             }
 
-            IFileInfo file = _env.WebRootFileProvider.GetFileInfo(context.Request.Path.Value);
+            IFileInfo file = FileProvider.GetFileInfo(context.Request.Path.Value);
 
             if (file.Exists)
             {

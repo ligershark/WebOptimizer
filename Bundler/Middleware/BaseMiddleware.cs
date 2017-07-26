@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.FileProviders;
 
 namespace Bundler
 {
@@ -10,15 +13,22 @@ namespace Bundler
     public abstract class BaseMiddleware
     {
         private readonly RequestDelegate _next;
-        private KeyValuePair<string, string> _cache = new KeyValuePair<string, string>();
+        private readonly IMemoryCache _cache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BundleMiddleware"/> class.
         /// </summary>
-        public BaseMiddleware(RequestDelegate next)
+        public BaseMiddleware(RequestDelegate next, IMemoryCache cache, IHostingEnvironment env)
         {
             _next = next;
+            _cache = cache;
+            FileProvider = env.WebRootFileProvider;
         }
+
+        /// <summary>
+        /// Gets the file provider.
+        /// </summary>
+        protected IFileProvider FileProvider { get; }
 
         /// <summary>
         /// Gets the content type of the response.
@@ -26,22 +36,28 @@ namespace Bundler
         protected abstract string ContentType { get; }
 
         /// <summary>
+        /// A list of files used for cache invalidation.
+        /// </summary>
+        protected virtual IEnumerable<string> GetFiles(HttpContext context)
+        {
+            return new[] { context.Request.Path.Value };
+        }
+
+        /// <summary>
         /// Invokes the middleware
         /// </summary>
         public async Task InvokeAsync(HttpContext context)
         {
-            if (IsConditionalGet(context))
-            {
-                context.Response.StatusCode = 304;
-                await WriteOutputAsync(context, string.Empty);
-                return;
-            }
-
             string cacheKey = GetCacheKey(context);
 
-            if (!string.IsNullOrEmpty(cacheKey) && cacheKey == _cache.Key)
+            if (IsConditionalGet(context, cacheKey))
             {
-                await WriteOutputAsync(context, _cache.Value);
+                context.Response.StatusCode = 304;
+                await WriteOutputAsync(context, string.Empty, cacheKey);
+            }
+            else if (_cache.TryGetValue(cacheKey, out string value))
+            {
+                await WriteOutputAsync(context, value, cacheKey);
             }
             else
             {
@@ -53,36 +69,10 @@ namespace Bundler
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(cacheKey))
-                {
-                    _cache = new KeyValuePair<string, string>(cacheKey, result);
-                }
+                PopulateCache(cacheKey, result, context);
 
-                await WriteOutputAsync(context, result);
+                await WriteOutputAsync(context, result, cacheKey);
             }
-        }
-
-        /// <summary>
-        /// Gets the cache key.
-        /// </summary>
-        protected virtual string GetCacheKey(HttpContext context)
-        {
-            if (context.Request.Query.TryGetValue("v", out var v))
-            {
-                return v;
-            }
-
-            return null;
-        }
-
-        private bool IsConditionalGet(HttpContext context)
-        {
-            if (context.Request.Headers.TryGetValue("If-None-Match", out var inm))
-            {
-                return _cache.Key == inm.ToString().Trim('"');
-            }
-
-            return false;
         }
 
         /// <summary>
@@ -90,14 +80,51 @@ namespace Bundler
         /// </summary>
         public abstract Task<string> ExecuteAsync(HttpContext context);
 
-        private async Task WriteOutputAsync(HttpContext context, string content)
+        private void PopulateCache(string cacheKey, string result, HttpContext context)
+        {
+            var cacheEntryOptions = new MemoryCacheEntryOptions();
+
+            foreach (string file in GetFiles(context))
+            {
+                cacheEntryOptions.AddExpirationToken(FileProvider.Watch(file));
+            }
+
+            _cache.Set(cacheKey, result, cacheEntryOptions);
+        }
+
+        /// <summary>
+        /// Gets the cache key.
+        /// </summary>
+        protected virtual string GetCacheKey(HttpContext context)
+        {
+            string key = context.Request.PathBase + context.Request.Path;
+
+            if (context.Request.Query.TryGetValue("v", out var v))
+            {
+                key += v;
+            }
+
+            return key.GetHashCode().ToString();
+        }
+
+        private bool IsConditionalGet(HttpContext context, string cacheKey)
+        {
+            if (context.Request.Headers.TryGetValue("If-None-Match", out var inm))
+            {
+                return cacheKey == inm.ToString().Trim('"');
+            }
+
+            return false;
+        }
+
+        private async Task WriteOutputAsync(HttpContext context, string content, string cacheKey)
         {
             context.Response.ContentType = ContentType;
 
-            if (!string.IsNullOrEmpty(_cache.Key))
+            if (!string.IsNullOrEmpty(cacheKey))
             {
                 context.Response.Headers["Cache-Control"] = $"public,max-age=31536000"; // 1 year
-                context.Response.Headers["Etag"] = $"\"{_cache.Key}\"";
+                context.Response.Headers["Etag"] = $"\"{cacheKey}\"";
             }
 
             if (!string.IsNullOrEmpty(content))

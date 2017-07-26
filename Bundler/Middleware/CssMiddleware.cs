@@ -5,6 +5,7 @@ using NUglify.Css;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Bundler
 {
@@ -14,16 +15,14 @@ namespace Bundler
     public class CssMiddleware : BaseMiddleware
     {
         private readonly CssSettings _settings;
-        private readonly IHostingEnvironment _env;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CssMiddleware"/> class.
         /// </summary>
-        public CssMiddleware(RequestDelegate next, CssSettings settings, IHostingEnvironment env)
-          : base(next)
+        public CssMiddleware(RequestDelegate next, CssSettings settings, IMemoryCache cache, IHostingEnvironment env)
+          : base(next, cache, env)
         {
             _settings = settings;
-            _env = env;
         }
 
         /// <summary>
@@ -43,7 +42,7 @@ namespace Bundler
                 return null;
             }
 
-            IFileInfo file = _env.WebRootFileProvider.GetFileInfo(context.Request.Path.Value);
+            IFileInfo file = FileProvider.GetFileInfo(context.Request.Path.Value);
 
             if (file.Exists)
             {

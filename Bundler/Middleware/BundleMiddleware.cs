@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Bundler.Transformers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Bundler
 {
@@ -14,17 +15,14 @@ namespace Bundler
     /// </summary>
     public class BundleMiddleware : BaseMiddleware
     {
-        private readonly IHostingEnvironment _env;
         private readonly ITransform _transform;
-        private readonly Dictionary<string, string> _cache = new Dictionary<string, string>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BundleMiddleware"/> class.
         /// </summary>
-        public BundleMiddleware(RequestDelegate next, IHostingEnvironment env, ITransform transform)
-            : base(next)
+        public BundleMiddleware(RequestDelegate next, IHostingEnvironment env, ITransform transform, IMemoryCache cache)
+            : base(next, cache, env)
         {
-            _env = env;
             _transform = transform;
         }
 
@@ -42,9 +40,17 @@ namespace Bundler
             return _transform.Transform(context, source);
         }
 
+        /// <summary>
+        /// A list of files used for cache invalidation.
+        /// </summary>
+        protected override IEnumerable<string> GetFiles(HttpContext context)
+        {
+            return _transform.SourceFiles;
+        }
+
         private async Task<string> GetContentAsync(ITransform transform)
         {
-            IEnumerable<string> absolutes = transform.SourceFiles.Select(f => _env.WebRootFileProvider.GetFileInfo(f).PhysicalPath);
+            IEnumerable<string> absolutes = transform.SourceFiles.Select(f => FileProvider.GetFileInfo(f).PhysicalPath);
             var sb = new StringBuilder();
 
             foreach (string absolute in absolutes)
