@@ -11,7 +11,6 @@ namespace Bundler.Processors
     /// </summary>
     public class ScriptLocalizer : IProcessor
     {
-        private StringBuilder _sb = new StringBuilder();
         private IStringLocalizer _stringProvider;
 
         /// <summary>
@@ -37,16 +36,6 @@ namespace Bundler.Processors
             _stringProvider = stringProvider;
         }
 
-        private void Append(char c)
-        {
-            _sb.Append(c);
-        }
-
-        private void Append(string s)
-        {
-            _sb.Append(s);
-        }
-
         ///// <summary>
         ///// Replaces string keys with values from the resource manager
         ///// </summary>
@@ -67,6 +56,7 @@ namespace Bundler.Processors
 
         private string Localize(string document)
         {
+            var sb = new StringBuilder();
             const char beginArgChar = '{';
             const char endArgChar = '}';
 
@@ -94,7 +84,7 @@ namespace Bundler.Processors
                         }
                     }
 
-                    Append(ch);
+                    sb.Append(ch);
                 }
 
                 //End of the doc string
@@ -138,10 +128,10 @@ namespace Bundler.Processors
                 {
                     throw new InvalidOperationException($"No value found for \"{str.Name}\"");
                 }
-                Append(str.Value);
+                sb.Append(str.Value);
             }
 
-            return _sb.ToString();
+            return sb.ToString();
         }
 
         private void InvalidDocFormat()
