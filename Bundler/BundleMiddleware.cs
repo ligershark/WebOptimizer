@@ -8,6 +8,7 @@ using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.FileProviders;
 
 namespace Bundler
 {
@@ -40,7 +41,7 @@ namespace Bundler
         /// </summary>
         public async Task InvokeAsync(HttpContext context)
         {
-            string cacheKey = GetCacheKey(context);
+            string cacheKey = GetCacheKey(context, _bundle);
 
             if (IsConditionalGet(context, cacheKey))
             {
@@ -53,7 +54,7 @@ namespace Bundler
             }
             else
             {
-                string result = await ExecuteAsync(context);
+                string result = await ExecuteAsync(context, _bundle, _fileCache.FileProvider);
 
                 if (string.IsNullOrEmpty(result))
                 {
@@ -67,16 +68,19 @@ namespace Bundler
             }
         }
 
-        private async Task<string> ExecuteAsync(HttpContext context)
+        /// <summary>
+        /// Executes the bundle and returns the processed output.
+        /// </summary>
+        public static async Task<string> ExecuteAsync(HttpContext context, IBundle bundle, IFileProvider fileProvider)
         {
-            string source = await GetContentAsync(_bundle);
+            string source = await GetContentAsync(bundle, fileProvider);
 
-            var config = new BundlerProcess(context, _bundle)
+            var config = new BundlerProcess(context, bundle)
             {
                 Content = source
             };
 
-            foreach (Action<BundlerProcess> processor in _bundle.PostProcessors)
+            foreach (Action<BundlerProcess> processor in bundle.PostProcessors)
             {
                 processor(config);
             }
@@ -84,9 +88,9 @@ namespace Bundler
             return config.Content;
         }
 
-        private async Task<string> GetContentAsync(IBundle bundle)
+        private static async Task<string> GetContentAsync(IBundle bundle, IFileProvider fileProvider)
         {
-            IEnumerable<string> absolutes = bundle.SourceFiles.Select(f => _fileCache.FileProvider.GetFileInfo(f).PhysicalPath);
+            IEnumerable<string> absolutes = bundle.SourceFiles.Select(f => fileProvider.GetFileInfo(f).PhysicalPath);
             var sb = new StringBuilder();
 
             foreach (string absolute in absolutes)
@@ -100,11 +104,11 @@ namespace Bundler
         /// <summary>
         /// Gets the cache key.
         /// </summary>
-        private string GetCacheKey(HttpContext context)
+        public static string GetCacheKey(HttpContext context, IBundle bundle)
         {
             string baseCacheKey = context.Request.PathBase + context.Request.Path;
 
-            string transformKey = string.Join("", _bundle.CacheKeys.Select(p => p.Key + p.Value));
+            string transformKey = string.Join("", bundle.CacheKeys.Select(p => p.Key + p.Value));
             return (baseCacheKey + transformKey).GetHashCode().ToString();
         }
 
