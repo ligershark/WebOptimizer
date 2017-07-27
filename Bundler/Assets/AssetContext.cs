@@ -3,9 +3,9 @@
 namespace Bundler
 {
     /// <summary>
-    /// A configuration object for Bundler.
+    /// The context used to perform processing to <see cref="IAsset"/> instances.
     /// </summary>
-    public class AssetContext
+    internal class AssetContext : IAssetContext
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AssetContext"/> class.

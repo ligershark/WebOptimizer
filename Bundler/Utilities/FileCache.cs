@@ -7,7 +7,7 @@ namespace Bundler.Utilities
     /// <summary>
     /// A helper class for working with the memory cache.
     /// </summary>
-    public class FileCache
+    internal class FileCache
     {
         private IMemoryCache _cache;
 

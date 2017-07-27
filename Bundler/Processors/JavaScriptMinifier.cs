@@ -30,7 +30,7 @@ namespace Bundler.Processors
         /// <summary>
         /// Executes the processor on the specified configuration.
         /// </summary>
-        public void Execute(AssetContext config)
+        public void Execute(IAssetContext config)
         {
             UglifyResult minified = Uglify.Js(config.Content, Settings);
 

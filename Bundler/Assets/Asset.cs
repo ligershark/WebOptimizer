@@ -7,12 +7,12 @@ namespace Bundler
     /// <summary>
     /// A bundle of text based files
     /// </summary>
-    public class Bundle : IAsset
+    internal class Asset : IAsset
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="Bundle"/> class.
+        /// Creates a new instance of the <see cref="Asset"/> class.
         /// </summary>
-        protected Bundle()
+        protected Asset()
         { }
 
         /// <summary>
@@ -36,15 +36,11 @@ namespace Bundler
         public IList<IProcessor> PostProcessors { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Bundle"/> class.
+        /// Initializes a new instance of the <see cref="Asset"/> class.
         /// </summary>
         public static IAsset Create(string route, string contentType, IEnumerable<string> sourceFiles)
         {
-            if (string.IsNullOrEmpty(route) || !route.StartsWith('/'))
-            {
-                throw new ArgumentException("Path must start with a /", nameof(route));
-            }
-            var bundle = new Bundle
+            var bundle = new Asset
             {
                 Route = route,
                 ContentType = contentType,

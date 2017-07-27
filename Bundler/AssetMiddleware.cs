@@ -14,56 +14,47 @@ namespace Bundler
     /// <summary>
     /// Middleware for setting up bundles
     /// </summary>
-    public class AssetMiddleware
+    internal class AssetMiddleware
     {
-        private readonly IAsset _asset;
-        private readonly RequestDelegate _next;
         private readonly FileCache _fileCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AssetMiddleware"/> class.
         /// </summary>
-        public AssetMiddleware(RequestDelegate next, IHostingEnvironment env, IAsset asset, IMemoryCache cache)
+        public AssetMiddleware(IHostingEnvironment env, IMemoryCache cache)
         {
-            _next = next;
-            _asset = asset;
             _fileCache = new FileCache(env.WebRootFileProvider, cache);
         }
 
         /// <summary>
-        /// Gets the content type of the response.
-        /// </summary>
-        private string ContentType => _asset.ContentType;
-
-        /// <summary>
         /// Invokes the middleware
         /// </summary>
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, IAsset asset)
         {
-            string cacheKey = GetCacheKey(context, _asset);
+            string cacheKey = GetCacheKey(context, asset);
 
             if (IsConditionalGet(context, cacheKey))
             {
                 context.Response.StatusCode = 304;
-                await WriteOutputAsync(context, string.Empty, cacheKey);
+                await WriteOutputAsync(context, asset, string.Empty, cacheKey);
             }
             else if (_fileCache.TryGetValue(cacheKey, out string value))
             {
-                await WriteOutputAsync(context, value, cacheKey);
+                await WriteOutputAsync(context, asset, value, cacheKey);
             }
             else
             {
-                string result = await ExecuteAsync(context, _asset, _fileCache.FileProvider);
+                string result = await ExecuteAsync(context, asset, _fileCache.FileProvider);
 
                 if (string.IsNullOrEmpty(result))
                 {
-                    await _next(context);
+                    // TODO: Do some clever error handling
                     return;
                 }
 
-                _fileCache.Add(cacheKey, result, _asset.SourceFiles);
+                _fileCache.Add(cacheKey, result, asset.SourceFiles);
 
-                await WriteOutputAsync(context, result, cacheKey);
+                await WriteOutputAsync(context, asset, result, cacheKey);
             }
         }
 
@@ -125,9 +116,9 @@ namespace Bundler
             return false;
         }
 
-        private async Task WriteOutputAsync(HttpContext context, string content, string cacheKey)
+        private async Task WriteOutputAsync(HttpContext context, IAsset asset, string content, string cacheKey)
         {
-            context.Response.ContentType = ContentType;
+            context.Response.ContentType = asset.ContentType;
 
             if (!string.IsNullOrEmpty(cacheKey))
             {

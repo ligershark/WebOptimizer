@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Bundler.Processors;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using NUglify.Css;
 using NUglify.JavaScript;
@@ -29,13 +31,53 @@ namespace Bundler
         {
             assetPipeline(Pipeline);
 
-            foreach (IAsset asset in Pipeline.Assets)
+            AssetMiddleware mw = ActivatorUtilities.CreateInstance<AssetMiddleware>(app.ApplicationServices);
+
+            app.UseRouter(routes =>
             {
-                app.Map(asset.Route, builder =>
+                foreach (IAsset asset in Pipeline.Assets)
                 {
-                    builder.UseMiddleware<AssetMiddleware>(asset);
-                });
-            }
+                    routes.MapGet(asset.Route, context => mw.InvokeAsync(context, asset));
+                }
+            });
+        }
+
+        /// <summary>
+        /// Adds a JavaScript asset to the pipeline.
+        /// </summary>
+        public static IAsset AddJs(this Pipeline pipeline, string route, params string[] sourceFiles)
+        {
+            return pipeline.AddJs(route, new CodeSettings(), sourceFiles);
+        }
+
+        /// <summary>
+        /// Adds a JavaScript asset to the pipeline.
+        /// </summary>
+        public static IAsset AddJs(this Pipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
+        {
+            IAsset asset = pipeline.Add(route, "application/javascript", sourceFiles);
+            asset.MinifyJavaScript(settings);
+
+            return asset;
+        }
+
+        /// <summary>
+        /// Adds a CSS asset to the pipeline.
+        /// </summary>
+        public static IAsset AddCss(this Pipeline pipeline, string route, params string[] sourceFiles)
+        {
+            return pipeline.AddCss(route, new CssSettings(), sourceFiles);
+        }
+
+        /// <summary>
+        /// Adds a CSS asset to the pipeline.
+        /// </summary>
+        public static IAsset AddCss(this Pipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
+        {
+            IAsset asset = pipeline.Add(route, "text/css", sourceFiles);
+            asset.MinifyCss(settings);
+
+            return asset;
         }
 
         /// <summary>
@@ -70,16 +112,16 @@ namespace Bundler
             return bundle.MinifyJavaScript(new CodeSettings());
         }
 
-        /// <summary>
-        /// Runs the JavaScript minifier on the content.
-        /// </summary>
-        public static IEnumerable<IAsset> MinifyJavaScript(this IEnumerable<IAsset> bundle, CodeSettings settings)
-        {
-            foreach (IAsset asset in bundle)
-            {
-                yield return asset.MinifyJavaScript(settings);
-            }
-        }
+        ///// <summary>
+        ///// Runs the JavaScript minifier on the content.
+        ///// </summary>
+        //public static IEnumerable<IAsset> MinifyJavaScript(this IEnumerable<IAsset> bundle, CodeSettings settings)
+        //{
+        //    foreach (IAsset asset in bundle)
+        //    {
+        //        yield return asset.MinifyJavaScript(settings);
+        //    }
+        //}
 
         /// <summary>
         /// Runs the JavaScript minifier on the content.
@@ -100,16 +142,16 @@ namespace Bundler
             return bundle.MinifyCss(new CssSettings());
         }
 
-        /// <summary>
-        /// Runs the CSS minifier on the content.
-        /// </summary>
-        public static IEnumerable<IAsset> MinifyCss(this IEnumerable<IAsset> bundle, CssSettings settings)
-        {
-            foreach (IAsset asset in bundle)
-            {
-                yield return asset.MinifyCss(settings);
-            }
-        }
+        ///// <summary>
+        ///// Runs the CSS minifier on the content.
+        ///// </summary>
+        //public static IEnumerable<IAsset> MinifyCss(this IEnumerable<IAsset> bundle, CssSettings settings)
+        //{
+        //    foreach (IAsset asset in bundle)
+        //    {
+        //        yield return asset.MinifyCss(settings);
+        //    }
+        //}
 
         /// <summary>
         /// Runs the CSS minifier on the content.

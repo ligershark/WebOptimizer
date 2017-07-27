@@ -20,29 +20,36 @@ namespace Bundler
         /// <summary>
         /// Adds a bundle to the middleware pipeline.
         /// </summary>
-        public IAsset Add(IAsset asset)
+        public Pipeline Add(IAsset asset)
         {
             Assets.Add(asset);
 
-            return asset;
+            return this;
         }
 
         /// <summary>
         /// Adds a list of assets to the pipeline.
         /// </summary>
-        public IEnumerable<IAsset> Add(IEnumerable<IAsset> asset)
+        public Pipeline Add(IEnumerable<IAsset> asset)
         {
             Assets.AddRange(asset);
 
-            return asset;
+            return this;
         }
 
         /// <summary>
         /// Adds a bundle to the middleware pipeline.
         /// </summary>
-        public IAsset Add(string route, string contentType, IEnumerable<string> sourceFiles)
+        public IAsset Add(string route, string contentType, params string[] sourceFiles)
         {
-            IAsset asset = Bundle.Create(route, contentType, sourceFiles);
+            string[] sources = sourceFiles;
+
+            if (sourceFiles.Length == 0)
+            {
+                sources = new[] { route };
+            }
+
+            IAsset asset = Asset.Create(route, contentType, sourceFiles);
             Assets.Add(asset);
 
             return asset;

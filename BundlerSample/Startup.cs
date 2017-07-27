@@ -51,12 +51,15 @@ namespace Bundler
 
             app.UseAssetPipeline(assets =>
             {
-                assets.Add(CssBundle.Create("/all.css", new[] { "css/site.css", "lib/bootstrap/dist/css/bootstrap.css" }));
-                assets.Add(JsBundle.Create("/all.js", new[] { "js/site.js", "js/b.js" }))
-                      .Localize<Strings>(app);
+                assets.AddCss("all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css")
+                      .MinifyCss();
 
-                assets.Add(JsFile.FromRoute("/js/site.js", "/js/b.js")).Localize<Strings>(app);
-                assets.Add(CssFile.FromRoute("/css/site.css"));
+                assets.AddJs("all.js", "js/site.js", "js/b.js")
+                      .Localize<Strings>(app)
+                      .MinifyJavaScript();
+
+                // This file exist on disk and will now be minified
+                assets.AddJs("js/site.js");
             });
 
             app.UseStaticFiles();
