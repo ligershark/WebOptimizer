@@ -49,7 +49,7 @@ namespace Bundler.Processors
         /// Executes the processor on the specified configuration.
         /// </summary>
         /// <param name="config"></param>
-        public void Execute(BundleContext config)
+        public void Execute(AssetContext config)
         {
             config.Content = Localize(config.Content);
         }

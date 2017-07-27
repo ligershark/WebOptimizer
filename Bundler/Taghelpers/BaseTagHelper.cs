@@ -63,9 +63,9 @@ namespace Bundler.Taghelpers
         /// <summary>
         /// Generates a has of the files in the bundle.
         /// </summary>
-        protected string GenerateHash(IBundle bundle)
+        protected string GenerateHash(IAsset asset)
         {
-            IEnumerable<string> hashes = bundle.SourceFiles.Select(f => AddFileVersionToPath(f));
+            IEnumerable<string> hashes = asset.SourceFiles.Select(f => AddFileVersionToPath(f));
 
             return string.Join(string.Empty, hashes).GetHashCode().ToString();
         }

@@ -80,19 +80,19 @@ namespace Bundler.Taghelpers
 
         private async Task<string> GetFileContentAsync(string route)
         {
-            IBundle bundle = GetBundle(route);
-            string cacheKey = bundle == null ? route : BundleMiddleware.GetCacheKey(ViewContext.HttpContext, bundle);
+            IAsset asset = GetBundle(route);
+            string cacheKey = asset == null ? route : AssetMiddleware.GetCacheKey(ViewContext.HttpContext, asset);
 
             if (_fileCache.TryGetValue(cacheKey, out string value))
             {
                 return value;
             }
 
-            if (bundle != null)
+            if (asset != null)
             {
-                string contents = await BundleMiddleware.ExecuteAsync(ViewContext.HttpContext, bundle, _fileCache.FileProvider).ConfigureAwait(false);
+                string contents = await AssetMiddleware.ExecuteAsync(ViewContext.HttpContext, asset, _fileCache.FileProvider).ConfigureAwait(false);
 
-                _fileCache.Add(cacheKey, contents, bundle.SourceFiles);
+                _fileCache.Add(cacheKey, contents, asset.SourceFiles);
                 return contents;
             }
             else
@@ -111,9 +111,9 @@ namespace Bundler.Taghelpers
             throw new FileNotFoundException("File or bundle doesn't exist", route);
         }
 
-        private IBundle GetBundle(string route)
+        private IAsset GetBundle(string route)
         {
-            return Extensions.Options.Bundles.FirstOrDefault(t => t.Route.Equals(route));
+            return Extensions.Pipeline.Assets.FirstOrDefault(t => t.Route.Equals(route));
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Bundler.Taghelpers
@@ -33,7 +32,7 @@ namespace Bundler.Taghelpers
         {
             if (!string.IsNullOrEmpty(Bundle))
             {
-                if (Extensions.Options.Enabled)
+                if (Extensions.Pipeline.Enabled)
                 {
                     string route = Bundle;
                     char sep = '?';
@@ -45,8 +44,8 @@ namespace Bundler.Taghelpers
                         sep = '&';
                     }
 
-                    IBundle bundle = Extensions.Options.Bundles.FirstOrDefault(t => t.Route.Equals(route));
-                    string href = $"{Bundle}{sep}v={GenerateHash(bundle)}";
+                    IAsset asset = Extensions.Pipeline.Assets.FirstOrDefault(t => t.Route.Equals(route));
+                    string href = $"{Bundle}{sep}v={GenerateHash(asset)}";
                     output.Attributes.SetAttribute("src", href);
                 }
                 else
@@ -60,7 +59,7 @@ namespace Bundler.Taghelpers
 
         private void WriteIndividualTags(TagHelperOutput output)
         {
-            IBundle bundle = Extensions.Options.Bundles.FirstOrDefault(t => t.Route.Equals(Bundle));
+            IAsset asset = Extensions.Pipeline.Assets.FirstOrDefault(t => t.Route.Equals(Bundle));
             output.SuppressOutput();
 
             var attrs = new List<string>();
@@ -78,7 +77,7 @@ namespace Bundler.Taghelpers
                 attrs.Add(attr);
             }
 
-            foreach (string file in bundle.SourceFiles)
+            foreach (string file in asset.SourceFiles)
             {
                 string src = AddFileVersionToPath(file);
                 output.PostElement.AppendHtml($"<script src=\"{src}\" {string.Join(" ", attrs)}></script>");

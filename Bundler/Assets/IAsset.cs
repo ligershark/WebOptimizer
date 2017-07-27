@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Bundler.Processors;
 
 namespace Bundler
@@ -7,7 +6,7 @@ namespace Bundler
     /// <summary>
     /// An interface for describing a bundle.
     /// </summary>
-    public interface IBundle
+    public interface IAsset
     {
         /// <summary>
         /// Gets the content type produced by the transform.

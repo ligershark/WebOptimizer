@@ -5,15 +5,15 @@ namespace Bundler
     /// <summary>
     /// A configuration object for Bundler.
     /// </summary>
-    public class BundleContext
+    public class AssetContext
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BundleContext"/> class.
+        /// Initializes a new instance of the <see cref="AssetContext"/> class.
         /// </summary>
-        public BundleContext(HttpContext httpContext, IBundle bundle)
+        public AssetContext(HttpContext httpContext, IAsset asset)
         {
             HttpContext = httpContext;
-            Bundle = bundle;
+            Asset = asset;
         }
 
         /// <summary>
@@ -29,6 +29,6 @@ namespace Bundler
         /// <summary>
         /// Gets the transform.
         /// </summary>
-        public IBundle Bundle { get; }
+        public IAsset Asset { get; }
     }
 }

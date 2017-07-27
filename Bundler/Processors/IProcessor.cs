@@ -10,7 +10,7 @@ namespace Bundler.Processors
         /// <summary>
         /// Executes the processor on the specified configuration.
         /// </summary>
-        void Execute(BundleContext config);
+        void Execute(AssetContext context);
 
         /// <summary>
         /// Gets the custom key that should be used when calculating the memory cache key.

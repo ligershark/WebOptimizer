@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,43 +6,41 @@ using Bundler.Processors;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Primitives;
 
 namespace Bundler
 {
     /// <summary>
     /// Middleware for setting up bundles
     /// </summary>
-    public class BundleMiddleware
+    public class AssetMiddleware
     {
-        private readonly IBundle _bundle;
+        private readonly IAsset _asset;
         private readonly RequestDelegate _next;
         private readonly FileCache _fileCache;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BundleMiddleware"/> class.
+        /// Initializes a new instance of the <see cref="AssetMiddleware"/> class.
         /// </summary>
-        public BundleMiddleware(RequestDelegate next, IHostingEnvironment env, IBundle bundle, IMemoryCache cache)
+        public AssetMiddleware(RequestDelegate next, IHostingEnvironment env, IAsset asset, IMemoryCache cache)
         {
             _next = next;
-            _bundle = bundle;
+            _asset = asset;
             _fileCache = new FileCache(env.WebRootFileProvider, cache);
         }
 
         /// <summary>
         /// Gets the content type of the response.
         /// </summary>
-        private string ContentType => _bundle.ContentType;
+        private string ContentType => _asset.ContentType;
 
         /// <summary>
         /// Invokes the middleware
         /// </summary>
         public async Task InvokeAsync(HttpContext context)
         {
-            string cacheKey = GetCacheKey(context, _bundle);
+            string cacheKey = GetCacheKey(context, _asset);
 
             if (IsConditionalGet(context, cacheKey))
             {
@@ -57,7 +53,7 @@ namespace Bundler
             }
             else
             {
-                string result = await ExecuteAsync(context, _bundle, _fileCache.FileProvider);
+                string result = await ExecuteAsync(context, _asset, _fileCache.FileProvider);
 
                 if (string.IsNullOrEmpty(result))
                 {
@@ -65,7 +61,7 @@ namespace Bundler
                     return;
                 }
 
-                _fileCache.Add(cacheKey, result, _bundle.SourceFiles);
+                _fileCache.Add(cacheKey, result, _asset.SourceFiles);
 
                 await WriteOutputAsync(context, result, cacheKey);
             }
@@ -74,16 +70,16 @@ namespace Bundler
         /// <summary>
         /// Executes the bundle and returns the processed output.
         /// </summary>
-        public static async Task<string> ExecuteAsync(HttpContext context, IBundle bundle, IFileProvider fileProvider)
+        public static async Task<string> ExecuteAsync(HttpContext context, IAsset asset, IFileProvider fileProvider)
         {
-            string source = await GetContentAsync(bundle, fileProvider).ConfigureAwait(false);
+            string source = await GetContentAsync(asset, fileProvider).ConfigureAwait(false);
 
-            var config = new BundleContext(context, bundle)
+            var config = new AssetContext(context, asset)
             {
                 Content = source
             };
 
-            foreach (IProcessor processor in bundle.PostProcessors)
+            foreach (IProcessor processor in asset.PostProcessors)
             {
                 processor.Execute(config);
             }
@@ -91,14 +87,14 @@ namespace Bundler
             return config.Content;
         }
 
-        private static async Task<string> GetContentAsync(IBundle bundle, IFileProvider fileProvider)
+        private static async Task<string> GetContentAsync(IAsset asset, IFileProvider fileProvider)
         {
-            IEnumerable<string> absolutes = bundle.SourceFiles.Select(f => fileProvider.GetFileInfo(f).PhysicalPath);
+            IEnumerable<string> absolutes = asset.SourceFiles.Select(f => fileProvider.GetFileInfo(f).PhysicalPath);
             var sb = new StringBuilder();
 
             foreach (string absolute in absolutes)
             {
-                sb.AppendLine(await File.ReadAllTextAsync(absolute).ConfigureAwait(false));
+                sb.AppendLine(await System.IO.File.ReadAllTextAsync(absolute).ConfigureAwait(false));
             }
 
             return sb.ToString();
@@ -107,11 +103,11 @@ namespace Bundler
         /// <summary>
         /// Gets the cache key.
         /// </summary>
-        public static string GetCacheKey(HttpContext context, IBundle bundle)
+        public static string GetCacheKey(HttpContext context, IAsset asset)
         {
-            string cacheKey = bundle.Route;
+            string cacheKey = asset.Route;
 
-            foreach (IProcessor processors in bundle.PostProcessors)
+            foreach (IProcessor processors in asset.PostProcessors)
             {
                 cacheKey += processors.CacheKey(context);
             }

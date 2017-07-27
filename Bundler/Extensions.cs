@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Globalization;
+using System.Collections.Generic;
 using Bundler.Processors;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Builder;
@@ -16,24 +16,24 @@ namespace Bundler
     {
         // TODO: Add this to DI
         /// <summary>
-        /// Gets the bundle options.
+        /// Gets the asset pipeline configuration
         /// </summary>
-        public static Options Options { get; } = new Options();
+        public static Pipeline Pipeline { get; } = new Pipeline();
 
         /// <summary>
         /// Adds Bundler to the <see cref="IApplicationBuilder"/> request execution pipeline
         /// </summary>
         /// <param name="app">The application object.</param>
-        /// <param name="bundleOptions">The transform options.</param>
-        public static void UseBundler(this IApplicationBuilder app, Action<Options> bundleOptions)
+        /// <param name="assetPipeline">The transform options.</param>
+        public static void UseAssetPipeline(this IApplicationBuilder app, Action<Pipeline> assetPipeline)
         {
-            bundleOptions(Options);
+            assetPipeline(Pipeline);
 
-            foreach (IBundle bundle in Options.Bundles)
+            foreach (IAsset asset in Pipeline.Assets)
             {
-                app.Map(bundle.Route, builder =>
+                app.Map(asset.Route, builder =>
                 {
-                    builder.UseMiddleware<BundleMiddleware>(bundle);
+                    builder.UseMiddleware<AssetMiddleware>(asset);
                 });
             }
         }
@@ -41,21 +41,31 @@ namespace Bundler
         /// <summary>
         /// Extension method to localizes the files in a bundle
         /// </summary>
-        public static IBundle Localize<T>(this IBundle bundle, IApplicationBuilder app)
+        public static IEnumerable<IAsset> Localize<T>(this IEnumerable<IAsset> assets, IApplicationBuilder app)
+        {
+            foreach (IAsset asset in assets)
+            {
+                yield return asset.Localize<T>(app);
+            }
+        }
+
+        /// <summary>
+        /// Extension method to localizes the files in a bundle
+        /// </summary>
+        public static IAsset Localize<T>(this IAsset asset, IApplicationBuilder app)
         {
             IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(app);
-            //bundle.QueryKeys.Add("culture");
             var localizer = new ScriptLocalizer(stringProvider);
 
-            bundle.PostProcessors.Add(localizer);
+            asset.PostProcessors.Add(localizer);
 
-            return bundle;
+            return asset;
         }
 
         /// <summary>
         /// Runs the JavaScript minifier on the content.
         /// </summary>
-        public static IBundle MinifyJavaScript(this IBundle bundle)
+        public static IAsset MinifyJavaScript(this IAsset bundle)
         {
             return bundle.MinifyJavaScript(new CodeSettings());
         }
@@ -63,7 +73,18 @@ namespace Bundler
         /// <summary>
         /// Runs the JavaScript minifier on the content.
         /// </summary>
-        public static IBundle MinifyJavaScript(this IBundle bundle, CodeSettings settings)
+        public static IEnumerable<IAsset> MinifyJavaScript(this IEnumerable<IAsset> bundle, CodeSettings settings)
+        {
+            foreach (IAsset asset in bundle)
+            {
+                yield return asset.MinifyJavaScript(settings);
+            }
+        }
+
+        /// <summary>
+        /// Runs the JavaScript minifier on the content.
+        /// </summary>
+        public static IAsset MinifyJavaScript(this IAsset bundle, CodeSettings settings)
         {
             var minifier = new JavaScriptMinifier(settings);
             bundle.PostProcessors.Add(minifier);
@@ -72,17 +93,28 @@ namespace Bundler
         }
 
         /// <summary>
-        /// Runs the JavaScript minifier on the content.
+        /// Runs the CSS minifier on the content.
         /// </summary>
-        public static IBundle MinifyCss(this IBundle bundle)
+        public static IAsset MinifyCss(this IAsset bundle)
         {
             return bundle.MinifyCss(new CssSettings());
         }
 
         /// <summary>
-        /// Runs the JavaScript minifier on the content.
+        /// Runs the CSS minifier on the content.
         /// </summary>
-        public static IBundle MinifyCss(this IBundle bundle, CssSettings settings)
+        public static IEnumerable<IAsset> MinifyCss(this IEnumerable<IAsset> bundle, CssSettings settings)
+        {
+            foreach (IAsset asset in bundle)
+            {
+                yield return asset.MinifyCss(settings);
+            }
+        }
+
+        /// <summary>
+        /// Runs the CSS minifier on the content.
+        /// </summary>
+        public static IAsset MinifyCss(this IAsset bundle, CssSettings settings)
         {
             var minifier = new CssMinifier(settings);
             bundle.PostProcessors.Add(minifier);

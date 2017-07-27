@@ -49,12 +49,14 @@ namespace Bundler
                 SupportedUICultures = cultures
             });
 
-            app.UseBundler(bundles =>
+            app.UseAssetPipeline(assets =>
             {
-                bundles.Add(new JsBundle("/all.js", new[] { "js/site.js", "js/b.js" }))
-                  .Localize<Strings>(app);
+                assets.Add(CssBundle.Create("/all.css", new[] { "css/site.css", "lib/bootstrap/dist/css/bootstrap.css" }));
+                assets.Add(JsBundle.Create("/all.js", new[] { "js/site.js", "js/b.js" }))
+                      .Localize<Strings>(app);
 
-                bundles.Add(new CssBundle("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css"));
+                assets.Add(JsFile.FromRoute("/js/site.js", "/js/b.js")).Localize<Strings>(app);
+                assets.Add(CssFile.FromRoute("/css/site.css"));
             });
 
             app.UseStaticFiles();
