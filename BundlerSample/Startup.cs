@@ -57,12 +57,13 @@ namespace Bundler
                 assets.AddJs("all.js", "js/site.js", "js/b.js")
                       .Localize<Strings>();
 
-                // This file exist on disk and will now be localized and minified
+                // These files exist on disk and will now be localized and minified
                 assets.AddFiles("application/javascript", "js/site.js", "js/b.js")
                       .Localize<Strings>()
                       .MinifyJavaScript();
 
                 assets.AddScss("scss.css", "css/test.scss", "css/test2.scss")
+                      .Localize<Strings>()
                       .MinifyCss();
             });
 
