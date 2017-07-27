@@ -25,7 +25,7 @@ namespace BundlerSample
 
             foreach (string route in _routes)
             {
-                IFileInfo file = Extensions.Environment.WebRootFileProvider.GetFileInfo(route);
+                IFileInfo file = AssetManager.Environment.WebRootFileProvider.GetFileInfo(route);
                 string dir = Path.GetDirectoryName(file.PhysicalPath);
 
                 if (!options.IncludePaths.Contains(dir))

@@ -38,7 +38,7 @@ namespace Bundler
                 context.Response.StatusCode = 304;
                 await WriteOutputAsync(context, asset, string.Empty, cacheKey);
             }
-            else if (Extensions.Pipeline.EnableCaching && _fileCache.TryGetValue(cacheKey, out string value))
+            else if (AssetManager.Pipeline.EnableCaching && _fileCache.TryGetValue(cacheKey, out string value))
             {
                 await WriteOutputAsync(context, asset, value, cacheKey);
             }
@@ -120,7 +120,7 @@ namespace Bundler
         {
             context.Response.ContentType = asset.ContentType;
 
-            if (!string.IsNullOrEmpty(cacheKey))
+            if (AssetManager.Pipeline.EnableCaching && !string.IsNullOrEmpty(cacheKey))
             {
                 context.Response.Headers["Cache-Control"] = $"public,max-age=31536000"; // 1 year
                 context.Response.Headers["Etag"] = $"\"{cacheKey}\"";

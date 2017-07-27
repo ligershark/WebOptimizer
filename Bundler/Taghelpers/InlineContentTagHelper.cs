@@ -113,7 +113,7 @@ namespace Bundler.Taghelpers
 
         private IAsset GetBundle(string route)
         {
-            return Extensions.Pipeline.Assets.FirstOrDefault(t => t.Route.Equals(route));
+            return AssetManager.Assets.FirstOrDefault(t => t.Route.Equals(route));
         }
     }
 }

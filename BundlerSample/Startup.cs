@@ -49,8 +49,9 @@ namespace Bundler
                 SupportedUICultures = cultures
             });
 
-            app.UseAssetPipeline(env, assets =>
+            app.UseAssetManager(env, assets =>
             {
+                assets.EnableCaching = true;
                 assets.AddCss("all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
 
                 assets.AddJs("all.js", "js/site.js", "js/b.js")

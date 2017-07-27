@@ -29,16 +29,11 @@ namespace Bundler
         public bool EnableCaching { get; set; }
 
         /// <summary>
-        /// Gets a list of transforms added.
-        /// </summary>
-        internal List<IAsset> Assets { get; } = new List<IAsset>();
-
-        /// <summary>
         /// Adds a bundle to the middleware pipeline.
         /// </summary>
         public Pipeline Add(IAsset asset)
         {
-            Assets.Add(asset);
+            AssetManager.Assets.Add(asset);
 
             return this;
         }
@@ -48,7 +43,7 @@ namespace Bundler
         /// </summary>
         public Pipeline Add(IEnumerable<IAsset> asset)
         {
-            Assets.AddRange(asset);
+            AssetManager.Assets.AddRange(asset);
 
             return this;
         }
@@ -66,7 +61,7 @@ namespace Bundler
             }
 
             IAsset asset = Asset.Create(route, contentType, sources);
-            Assets.Add(asset);
+            AssetManager.Assets.Add(asset);
 
             return asset;
         }

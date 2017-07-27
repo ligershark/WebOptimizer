@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Bundler.Processors;
 using Bundler.Utilities;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using NUglify.Css;
 using NUglify.JavaScript;
@@ -18,43 +13,6 @@ namespace Bundler
     /// </summary>
     public static class Extensions
     {
-        /// <summary>
-        /// Gets the asset pipeline configuration
-        /// </summary>
-        internal static Pipeline Pipeline { get; private set; }
-
-        /// <summary>
-        /// Gets the builder associated with the pipeline.
-        /// </summary>
-        internal static IApplicationBuilder Builder { get; private set; }
-
-        /// <summary>
-        /// Gets the environment.
-        /// </summary>
-        public static IHostingEnvironment Environment { get; private set; }
-
-        /// <summary>
-        /// Adds Bundler to the <see cref="IApplicationBuilder"/> request execution pipeline
-        /// </summary>
-        public static void UseAssetPipeline(this IApplicationBuilder app, IHostingEnvironment env, Action<Pipeline> assetPipeline)
-        {
-            Environment = env;
-            Builder = app;
-            Pipeline = new Pipeline(env);
-
-            assetPipeline(Pipeline);
-
-            AssetMiddleware mw = ActivatorUtilities.CreateInstance<AssetMiddleware>(app.ApplicationServices);
-
-            app.UseRouter(routes =>
-            {
-                foreach (IAsset asset in Pipeline.Assets)
-                {
-                    routes.MapGet(asset.Route, context => mw.InvokeAsync(context, asset));
-                }
-            });
-        }
-
         /// <summary>
         /// Adds a JavaScript with minification asset to the pipeline.
         /// </summary>
@@ -98,7 +56,7 @@ namespace Bundler
         /// </summary>
         public static IEnumerable<IAsset> Localize<T>(this IEnumerable<IAsset> assets)
         {
-            IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(Builder);
+            IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(AssetManager.Builder);
             var localizer = new ScriptLocalizer(stringProvider);
 
             foreach (IAsset asset in assets)
@@ -114,7 +72,7 @@ namespace Bundler
         /// </summary>
         public static IAsset Localize<T>(this IAsset asset)
         {
-            IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(Builder);
+            IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(AssetManager.Builder);
             var localizer = new ScriptLocalizer(stringProvider);
 
             asset.PostProcessors.Add(localizer);
