@@ -49,11 +49,8 @@ namespace Bundler
                 SupportedUICultures = cultures
             });
 
-            app.UseAssetPipeline(assets =>
+            app.UseAssetPipeline(env, assets =>
             {
-                assets.EnableCaching = !env.IsDevelopment();
-                assets.EnabledBundling = true;
-
                 assets.AddCss("all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
 
                 assets.AddJs("all.js", "js/site.js", "js/b.js")
@@ -64,7 +61,7 @@ namespace Bundler
                       .Localize<Strings>()
                       .MinifyJavaScript();
 
-                assets.AddScss("scss.css", "css/test.scss")
+                assets.AddScss("scss.css", "css/test.scss", "css/test2.scss")
                       .MinifyCss();
             });
 

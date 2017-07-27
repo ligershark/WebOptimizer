@@ -4,6 +4,7 @@ using System.Linq;
 using Bundler.Processors;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
@@ -20,21 +21,27 @@ namespace Bundler
         /// <summary>
         /// Gets the asset pipeline configuration
         /// </summary>
-        public static Pipeline Pipeline { get; } = new Pipeline();
+        internal static Pipeline Pipeline { get; private set; }
 
         /// <summary>
         /// Gets the builder associated with the pipeline.
         /// </summary>
-        public static IApplicationBuilder Builder { get; private set; }
+        internal static IApplicationBuilder Builder { get; private set; }
+
+        /// <summary>
+        /// Gets the environment.
+        /// </summary>
+        public static IHostingEnvironment Environment { get; private set; }
 
         /// <summary>
         /// Adds Bundler to the <see cref="IApplicationBuilder"/> request execution pipeline
         /// </summary>
-        /// <param name="app">The application object.</param>
-        /// <param name="assetPipeline">The transform options.</param>
-        public static void UseAssetPipeline(this IApplicationBuilder app, Action<Pipeline> assetPipeline)
+        public static void UseAssetPipeline(this IApplicationBuilder app, IHostingEnvironment env, Action<Pipeline> assetPipeline)
         {
+            Environment = env;
             Builder = app;
+            Pipeline = new Pipeline(env);
+
             assetPipeline(Pipeline);
 
             AssetMiddleware mw = ActivatorUtilities.CreateInstance<AssetMiddleware>(app.ApplicationServices);
