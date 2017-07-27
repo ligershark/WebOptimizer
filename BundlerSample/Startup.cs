@@ -51,6 +51,9 @@ namespace Bundler
 
             app.UseAssetPipeline(assets =>
             {
+                assets.EnableCaching = !env.IsDevelopment();
+                assets.EnabledBundling = true;
+
                 assets.AddCss("all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
 
                 assets.AddJs("all.js", "js/site.js", "js/b.js")

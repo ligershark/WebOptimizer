@@ -33,7 +33,7 @@ namespace Bundler.Taghelpers
         {
             if (!string.IsNullOrEmpty(Bundle))
             {
-                if (Extensions.Pipeline.Enabled)
+                if (Extensions.Pipeline.EnabledBundling)
                 {
                     IAsset asset = Extensions.Pipeline.Assets.FirstOrDefault(t => t.Route.Equals(Bundle));
                     string href = $"{Bundle}?v={GenerateHash(asset)}";

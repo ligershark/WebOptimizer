@@ -38,7 +38,7 @@ namespace Bundler
                 context.Response.StatusCode = 304;
                 await WriteOutputAsync(context, asset, string.Empty, cacheKey);
             }
-            else if (_fileCache.TryGetValue(cacheKey, out string value))
+            else if (Extensions.Pipeline.EnableCaching && _fileCache.TryGetValue(cacheKey, out string value))
             {
                 await WriteOutputAsync(context, asset, value, cacheKey);
             }

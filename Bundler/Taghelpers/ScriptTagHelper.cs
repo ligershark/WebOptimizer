@@ -32,7 +32,7 @@ namespace Bundler.Taghelpers
         {
             if (!string.IsNullOrEmpty(Bundle))
             {
-                if (Extensions.Pipeline.Enabled)
+                if (Extensions.Pipeline.EnabledBundling)
                 {
                     string route = Bundle;
                     char sep = '?';

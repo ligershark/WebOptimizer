@@ -9,9 +9,15 @@ namespace Bundler
     public class Pipeline
     {
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="Pipeline"/> is enabled.
+        /// Gets or sets a value indicating whether the TagHelpers should bundle or write out
+        /// tags for each source file.
         /// </summary>
-        public bool Enabled { get; set; } = true;
+        public bool EnabledBundling { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether server-side caching is enabled
+        /// </summary>
+        public bool EnableCaching { get; set; } = true;
 
         /// <summary>
         /// Gets a list of transforms added.
