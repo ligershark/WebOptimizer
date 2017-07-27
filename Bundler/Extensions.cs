@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Bundler.Processors;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Builder;
@@ -88,6 +89,22 @@ namespace Bundler
         /// <summary>
         /// Extension method to localizes the files in a bundle
         /// </summary>
+        public static IEnumerable<IAsset> Localize<T>(this IEnumerable<IAsset> assets)
+        {
+            IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(Builder);
+            var localizer = new ScriptLocalizer(stringProvider);
+
+            foreach (IAsset asset in assets)
+            {
+                asset.PostProcessors.Add(localizer);
+            }
+
+            return assets;
+        }
+
+        /// <summary>
+        /// Extension method to localizes the files in a bundle
+        /// </summary>
         public static IAsset Localize<T>(this IAsset asset)
         {
             IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(Builder);
@@ -101,20 +118,39 @@ namespace Bundler
         /// <summary>
         /// Runs the JavaScript minifier on the content.
         /// </summary>
-        public static IAsset MinifyJavaScript(this IAsset bundle)
+        public static IAsset MinifyJavaScript(this IAsset asset)
         {
-            return bundle.MinifyJavaScript(new CodeSettings());
+            return asset.MinifyJavaScript(new CodeSettings());
         }
 
         /// <summary>
         /// Runs the JavaScript minifier on the content.
         /// </summary>
-        public static IAsset MinifyJavaScript(this IAsset bundle, CodeSettings settings)
+        public static IAsset MinifyJavaScript(this IAsset asset, CodeSettings settings)
         {
             var minifier = new JavaScriptMinifier(settings);
-            bundle.PostProcessors.Add(minifier);
+            asset.PostProcessors.Add(minifier);
 
-            return bundle;
+            return asset;
+        }
+
+        /// <summary>
+        /// Runs the JavaScript minifier on the content.
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyJavaScript(this IEnumerable<IAsset> assets)
+        {
+            return assets.MinifyJavaScript(new CodeSettings()).ToArray();
+        }
+
+        /// <summary>
+        /// Runs the JavaScript minifier on the content.
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyJavaScript(this IEnumerable<IAsset> assets, CodeSettings settings)
+        {
+            foreach (IAsset asset in assets)
+            {
+                yield return asset.MinifyJavaScript(settings);
+            }
         }
 
         /// <summary>
@@ -134,6 +170,25 @@ namespace Bundler
             bundle.PostProcessors.Add(minifier);
 
             return bundle;
+        }
+
+        /// <summary>
+        /// Runs the JavaScript minifier on the content.
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyCss(this IEnumerable<IAsset> assets)
+        {
+            return assets.MinifyCss(new CssSettings()).ToArray();
+        }
+
+        /// <summary>
+        /// Runs the JavaScript minifier on the content.
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyCss(this IEnumerable<IAsset> assets, CssSettings settings)
+        {
+            foreach (IAsset asset in assets)
+            {
+                yield return asset.MinifyCss(settings);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Bundler
 {
@@ -53,6 +54,14 @@ namespace Bundler
             Assets.Add(asset);
 
             return asset;
+        }
+
+        /// <summary>
+        /// Adds a list of assets to the pipeline.
+        /// </summary>
+        public IEnumerable<IAsset> AddFiles(string contentType, params string[] sourceFiles)
+        {
+            return sourceFiles.Select(f => Add(f, contentType)).ToArray();
         }
     }
 }
