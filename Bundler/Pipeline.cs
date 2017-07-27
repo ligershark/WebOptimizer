@@ -49,7 +49,7 @@ namespace Bundler
                 sources = new[] { route };
             }
 
-            IAsset asset = Asset.Create(route, contentType, sourceFiles);
+            IAsset asset = Asset.Create(route, contentType, sources);
             Assets.Add(asset);
 
             return asset;

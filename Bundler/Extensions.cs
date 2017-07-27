@@ -16,11 +16,15 @@ namespace Bundler
     /// </summary>
     public static class Extensions
     {
-        // TODO: Add this to DI
         /// <summary>
         /// Gets the asset pipeline configuration
         /// </summary>
         public static Pipeline Pipeline { get; } = new Pipeline();
+
+        /// <summary>
+        /// Gets the builder associated with the pipeline.
+        /// </summary>
+        public static IApplicationBuilder Builder { get; private set; }
 
         /// <summary>
         /// Adds Bundler to the <see cref="IApplicationBuilder"/> request execution pipeline
@@ -29,6 +33,7 @@ namespace Bundler
         /// <param name="assetPipeline">The transform options.</param>
         public static void UseAssetPipeline(this IApplicationBuilder app, Action<Pipeline> assetPipeline)
         {
+            Builder = app;
             assetPipeline(Pipeline);
 
             AssetMiddleware mw = ActivatorUtilities.CreateInstance<AssetMiddleware>(app.ApplicationServices);
@@ -43,7 +48,7 @@ namespace Bundler
         }
 
         /// <summary>
-        /// Adds a JavaScript asset to the pipeline.
+        /// Adds a JavaScript with minification asset to the pipeline.
         /// </summary>
         public static IAsset AddJs(this Pipeline pipeline, string route, params string[] sourceFiles)
         {
@@ -51,7 +56,7 @@ namespace Bundler
         }
 
         /// <summary>
-        /// Adds a JavaScript asset to the pipeline.
+        /// Adds a JavaScript with minification asset to the pipeline.
         /// </summary>
         public static IAsset AddJs(this Pipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
         {
@@ -62,7 +67,7 @@ namespace Bundler
         }
 
         /// <summary>
-        /// Adds a CSS asset to the pipeline.
+        /// Adds a CSS asset with minification to the pipeline.
         /// </summary>
         public static IAsset AddCss(this Pipeline pipeline, string route, params string[] sourceFiles)
         {
@@ -70,7 +75,7 @@ namespace Bundler
         }
 
         /// <summary>
-        /// Adds a CSS asset to the pipeline.
+        /// Adds a CSS asset with minification to the pipeline.
         /// </summary>
         public static IAsset AddCss(this Pipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
         {
@@ -83,20 +88,9 @@ namespace Bundler
         /// <summary>
         /// Extension method to localizes the files in a bundle
         /// </summary>
-        public static IEnumerable<IAsset> Localize<T>(this IEnumerable<IAsset> assets, IApplicationBuilder app)
+        public static IAsset Localize<T>(this IAsset asset)
         {
-            foreach (IAsset asset in assets)
-            {
-                yield return asset.Localize<T>(app);
-            }
-        }
-
-        /// <summary>
-        /// Extension method to localizes the files in a bundle
-        /// </summary>
-        public static IAsset Localize<T>(this IAsset asset, IApplicationBuilder app)
-        {
-            IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(app);
+            IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(Builder);
             var localizer = new ScriptLocalizer(stringProvider);
 
             asset.PostProcessors.Add(localizer);
@@ -111,17 +105,6 @@ namespace Bundler
         {
             return bundle.MinifyJavaScript(new CodeSettings());
         }
-
-        ///// <summary>
-        ///// Runs the JavaScript minifier on the content.
-        ///// </summary>
-        //public static IEnumerable<IAsset> MinifyJavaScript(this IEnumerable<IAsset> bundle, CodeSettings settings)
-        //{
-        //    foreach (IAsset asset in bundle)
-        //    {
-        //        yield return asset.MinifyJavaScript(settings);
-        //    }
-        //}
 
         /// <summary>
         /// Runs the JavaScript minifier on the content.
@@ -141,17 +124,6 @@ namespace Bundler
         {
             return bundle.MinifyCss(new CssSettings());
         }
-
-        ///// <summary>
-        ///// Runs the CSS minifier on the content.
-        ///// </summary>
-        //public static IEnumerable<IAsset> MinifyCss(this IEnumerable<IAsset> bundle, CssSettings settings)
-        //{
-        //    foreach (IAsset asset in bundle)
-        //    {
-        //        yield return asset.MinifyCss(settings);
-        //    }
-        //}
 
         /// <summary>
         /// Runs the CSS minifier on the content.
