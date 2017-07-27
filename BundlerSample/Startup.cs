@@ -60,6 +60,9 @@ namespace Bundler
                 assets.AddFiles("application/javascript", "js/site.js", "js/b.js")
                       .Localize<Strings>()
                       .MinifyJavaScript();
+
+                assets.AddScss("scss.css", "css/test.scss")
+                      .MinifyCss();
             });
 
             app.UseStaticFiles();
