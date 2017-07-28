@@ -101,7 +101,7 @@ namespace Bundler
         private async Task WriteOutputAsync(HttpContext context, IAsset asset, string content, string cacheKey)
         {
             context.Response.ContentType = asset.ContentType;
-            
+
             if (AssetManager.Pipeline.EnableCaching && !string.IsNullOrEmpty(cacheKey))
             {
                 context.Response.Headers["Cache-Control"] = $"max-age=31536000"; // 1 year

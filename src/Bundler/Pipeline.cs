@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using NUglify.Css;
 using NUglify.JavaScript;
@@ -17,22 +19,31 @@ namespace Bundler
 
         public bool EnableCaching { get; set; }
 
-        public IPipeline Add(IAsset asset)
+        public IAsset Add(IAsset asset)
         {
-            AssetManager.Assets.Add(asset);
-
-            return this;
+            return Add(asset.Route, asset.ContentType, asset.SourceFiles.ToArray());
         }
 
-        public IPipeline Add(IEnumerable<IAsset> asset)
+        public IEnumerable<IAsset> Add(IEnumerable<IAsset> assets)
         {
-            AssetManager.Assets.AddRange(asset);
+            var list = new List<IAsset>();
 
-            return this;
+            foreach (IAsset asset in assets)
+            {
+                IAsset ass = Add(asset.Route, asset.ContentType, asset.SourceFiles.ToArray());
+                list.Add(ass);
+            }
+
+            return list;
         }
 
         public IAsset Add(string route, string contentType, params string[] sourceFiles)
         {
+            if (AssetManager.Assets.Any(a => a.Route.Equals(route, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new ArgumentException($"The route \"{route}\" was already specified", nameof(route));
+            }
+
             string[] sources = sourceFiles;
 
             if (sourceFiles.Length == 0)

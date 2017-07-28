@@ -21,38 +21,17 @@ namespace Bundler.Test.Processors
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
         }
 
-        [Fact2]
-        public async Task ExecuteTest_EmptyContent_Success()
+        [Theory2]
+        [InlineData("")]
+        [InlineData("   ")]
+        [InlineData("/* comment */")]
+        [InlineData("   /**/ ")]
+        [InlineData("\r\n  \t \r \n")]
+        public async Task ExecuteTest_EmptyContent_Success(string input)
         {
             var minifier = new CssMinifier(new CssSettings());
             var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = "";
-
-            await minifier.ExecuteAsync(context.Object);
-
-            Assert.Equal("", context.Object.Content);
-            Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
-        }
-
-        [Fact2]
-        public async Task ExecuteTest_WhitespaceContent_Success()
-        {
-            var minifier = new CssMinifier(new CssSettings());
-            var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = "    ";
-
-            await minifier.ExecuteAsync(context.Object);
-
-            Assert.Equal("", context.Object.Content);
-            Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
-        }
-
-        [Fact2]
-        public async Task ExecuteTest_CommentsOnly_Success()
-        {
-            var minifier = new CssMinifier(new CssSettings());
-            var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = "/* some comment */";
+            context.Object.Content = input;
 
             await minifier.ExecuteAsync(context.Object);
 

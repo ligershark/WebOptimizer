@@ -21,12 +21,12 @@ namespace Bundler
         /// <summary>
         /// Adds an <see cref="IAsset"/> to the optimization pipeline.
         /// </summary>
-        IPipeline Add(IAsset asset);
+        IAsset Add(IAsset asset);
 
         /// <summary>
         /// Adds an array of <see cref="IAsset"/> to the optimization pipeline.
         /// </summary>
-        IPipeline Add(IEnumerable<IAsset> asset);
+        IEnumerable<IAsset> Add(IEnumerable<IAsset> asset);
 
         /// <summary>
         /// Adds an asset to the optimization pipeline.
