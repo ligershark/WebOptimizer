@@ -12,7 +12,7 @@
         <Copyright>Copyright © LigerShark</Copyright>
         <PackageId>LigerShark.WebOptimizer.Core</PackageId>
         <Product>LigerShark.WebOptimizer.Core</Product>
-        <PackageIconUrl>https://aka.ms/vsextensibilityicon</PackageIconUrl>
+        <PackageIconUrl>https://raw.githubusercontent.com/ligershark/Bundler/master/art/logo64x64.png</PackageIconUrl>
         <PackageProjectUrl>https://github.com/ligershark/Bundler</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/ligershark/Bundler/blob/master/LICENSE.txt</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/ligershark/Bundler</RepositoryUrl>
