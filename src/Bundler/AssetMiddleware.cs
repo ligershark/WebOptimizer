@@ -44,7 +44,7 @@ namespace Bundler
             }
             else
             {
-                string result = await ExecuteAsync(context, asset, _fileCache.FileProvider);
+                string result = Execute(context, asset, _fileCache.FileProvider);
 
                 if (string.IsNullOrEmpty(result))
                 {
@@ -61,9 +61,9 @@ namespace Bundler
         /// <summary>
         /// Executes the bundle and returns the processed output.
         /// </summary>
-        public static async Task<string> ExecuteAsync(HttpContext context, IAsset asset, IFileProvider fileProvider)
+        public static string Execute(HttpContext context, IAsset asset, IFileProvider fileProvider)
         {
-            string source = await GetContentAsync(asset, fileProvider).ConfigureAwait(false);
+            string source = GetContent(asset, fileProvider);
 
             var config = new AssetContext(context, asset)
             {
@@ -78,14 +78,14 @@ namespace Bundler
             return config.Content;
         }
 
-        private static async Task<string> GetContentAsync(IAsset asset, IFileProvider fileProvider)
+        private static string GetContent(IAsset asset, IFileProvider fileProvider)
         {
             IEnumerable<string> absolutes = asset.SourceFiles.Select(f => fileProvider.GetFileInfo(f).PhysicalPath);
             var sb = new StringBuilder();
 
             foreach (string absolute in absolutes)
             {
-                sb.AppendLine(await System.IO.File.ReadAllTextAsync(absolute).ConfigureAwait(false));
+                sb.AppendLine(System.IO.File.ReadAllText(absolute));
             }
 
             return sb.ToString();

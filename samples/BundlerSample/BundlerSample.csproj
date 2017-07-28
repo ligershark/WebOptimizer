@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bundler\Bundler.csproj" />
+    <ProjectReference Include="..\..\src\Bundler\Bundler.csproj" />
   </ItemGroup>
 
   <ItemGroup>
