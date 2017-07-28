@@ -48,7 +48,7 @@ namespace Bundler
     }
 
     /// <summary>
-    /// Extension methods for <see cref="IPipeline"/>.
+    /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
     public static class CssMinifierExtension
     {

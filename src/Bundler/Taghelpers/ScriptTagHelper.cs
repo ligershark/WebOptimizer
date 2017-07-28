@@ -44,7 +44,7 @@ namespace Bundler.Taghelpers
                         sep = '&';
                     }
 
-                    IAsset asset = AssetManager.Assets.FirstOrDefault(t => t.Route.Equals(route));
+                    IAsset asset = AssetManager.Pipeline.FromRoute(route);
                     string href = $"{Bundle}{sep}v={GenerateHash(asset)}";
                     output.Attributes.SetAttribute("src", href);
                 }
@@ -59,7 +59,7 @@ namespace Bundler.Taghelpers
 
         private void WriteIndividualTags(TagHelperOutput output)
         {
-            IAsset asset = AssetManager.Assets.FirstOrDefault(t => t.Route.Equals(Bundle));
+            IAsset asset = AssetManager.Pipeline.FromRoute(Bundle);
             output.SuppressOutput();
 
             var attrs = new List<string>();

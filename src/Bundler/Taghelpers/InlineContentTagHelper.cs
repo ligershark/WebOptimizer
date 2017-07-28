@@ -80,7 +80,7 @@ namespace Bundler.Taghelpers
 
         private async Task<string> GetFileContentAsync(string route)
         {
-            IAsset asset = GetBundle(route);
+            IAsset asset = AssetManager.Pipeline.FromRoute(route);
             string cacheKey = asset == null ? route : AssetMiddleware.GetCacheKey(ViewContext.HttpContext, asset);
 
             if (_fileCache.TryGetValue(cacheKey, out string value))
@@ -109,11 +109,6 @@ namespace Bundler.Taghelpers
             }
 
             throw new FileNotFoundException("File or bundle doesn't exist", route);
-        }
-
-        private IAsset GetBundle(string route)
-        {
-            return AssetManager.Assets.FirstOrDefault(t => t.Route.Equals(route));
         }
     }
 }

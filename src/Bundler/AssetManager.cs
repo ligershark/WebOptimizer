@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
@@ -13,19 +12,14 @@ namespace Bundler
     public static class AssetManager
     {
         /// <summary>
-        /// Gets a list of transforms added.
+        /// Gets the builder associated with the pipeline.
         /// </summary>
-        internal static List<IAsset> Assets { get; } = new List<IAsset>();
+        internal static IApplicationBuilder Builder { get; private set; }
 
         /// <summary>
         /// Gets the asset pipeline configuration
         /// </summary>
-        internal static Pipeline Pipeline { get; set; }
-
-        /// <summary>
-        /// Gets the builder associated with the pipeline.
-        /// </summary>
-        internal static IApplicationBuilder Builder { get; set; }
+        public static IAssetPipeline Pipeline { get; private set; }
 
         /// <summary>
         /// Gets the environment.
@@ -35,11 +29,11 @@ namespace Bundler
         /// <summary>
         /// Adds Bundler to the <see cref="IApplicationBuilder"/> request execution pipeline
         /// </summary>
-        public static void UseWebOptimizer(this IApplicationBuilder app, IHostingEnvironment env, Action<IPipeline> assetPipeline)
+        public static void UseWebOptimizer(this IApplicationBuilder app, IHostingEnvironment env, Action<IAssetPipeline> assetPipeline)
         {
             Environment = env;
             Builder = app;
-            Pipeline = new Pipeline(env);
+            Pipeline = new AssetPipeline(env);
 
             assetPipeline(Pipeline);
 
@@ -47,7 +41,7 @@ namespace Bundler
 
             app.UseRouter(routes =>
             {
-                foreach (IAsset asset in Assets)
+                foreach (IAsset asset in Pipeline.Assets)
                 {
                     routes.MapGet(asset.Route, context => mw.InvokeAsync(context, asset));
                 }

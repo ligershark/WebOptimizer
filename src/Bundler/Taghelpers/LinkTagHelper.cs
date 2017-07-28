@@ -35,7 +35,7 @@ namespace Bundler.Taghelpers
             {
                 if (AssetManager.Pipeline.EnabledBundling)
                 {
-                    IAsset asset = AssetManager.Assets.FirstOrDefault(t => t.Route.Equals(Bundle));
+                    IAsset asset = AssetManager.Pipeline.FromRoute(Bundle);
                     string href = $"{Bundle}?v={GenerateHash(asset)}";
                     output.Attributes.SetAttribute("href", href);
                 }
@@ -50,7 +50,7 @@ namespace Bundler.Taghelpers
 
         private void WriteIndividualTags(TagHelperOutput output)
         {
-            IAsset asset = AssetManager.Assets.FirstOrDefault(t => t.Route.Equals(Bundle));
+            IAsset asset = AssetManager.Pipeline.FromRoute(Bundle);
             output.SuppressOutput();
 
             var attrs = new List<string>();

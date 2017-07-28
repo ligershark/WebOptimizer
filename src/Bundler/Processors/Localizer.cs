@@ -12,7 +12,7 @@ namespace Bundler
     /// <summary>
     /// Localizes script files by replacing specified tokens with the value from the resource file
     /// </summary>
-    internal class ScriptLocalizer : IProcessor
+    internal class Localizer : IProcessor
     {
         private IStringLocalizer _stringProvider;
 
@@ -34,7 +34,7 @@ namespace Bundler
         /// <summary>
         /// Localizes script files
         /// </summary>
-        public ScriptLocalizer(IStringLocalizer stringProvider)
+        public Localizer(IStringLocalizer stringProvider)
         {
             _stringProvider = stringProvider;
         }
@@ -142,7 +142,7 @@ namespace Bundler
     }
 
     /// <summary>
-    /// Extension methods for <see cref="IPipeline"/>.
+    /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
     public static class LocalizerExtensions
     {
@@ -152,7 +152,7 @@ namespace Bundler
         public static IEnumerable<IAsset> Localize<T>(this IEnumerable<IAsset> assets)
         {
             IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(AssetManager.Builder);
-            var localizer = new ScriptLocalizer(stringProvider);
+            var localizer = new Localizer(stringProvider);
 
             foreach (IAsset asset in assets)
             {
@@ -168,7 +168,7 @@ namespace Bundler
         public static IAsset Localize<T>(this IAsset asset)
         {
             IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(AssetManager.Builder);
-            var localizer = new ScriptLocalizer(stringProvider);
+            var localizer = new Localizer(stringProvider);
 
             asset.Processors.Add(localizer);
 
