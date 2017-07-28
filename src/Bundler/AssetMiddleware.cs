@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Bundler.Processors;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
@@ -63,12 +60,7 @@ namespace Bundler
         /// </summary>
         public static string Execute(HttpContext context, IAsset asset, IFileProvider fileProvider)
         {
-            string source = GetContent(asset, fileProvider);
-
-            var config = new AssetContext(context, asset)
-            {
-                Content = source
-            };
+            var config = new AssetContext(context, asset);
 
             foreach (IProcessor processor in asset.PostProcessors)
             {
@@ -76,19 +68,6 @@ namespace Bundler
             }
 
             return config.Content;
-        }
-
-        private static string GetContent(IAsset asset, IFileProvider fileProvider)
-        {
-            IEnumerable<string> absolutes = asset.SourceFiles.Select(f => fileProvider.GetFileInfo(f).PhysicalPath);
-            var sb = new StringBuilder();
-
-            foreach (string absolute in absolutes)
-            {
-                sb.AppendLine(System.IO.File.ReadAllText(absolute));
-            }
-
-            return sb.ToString();
         }
 
         /// <summary>

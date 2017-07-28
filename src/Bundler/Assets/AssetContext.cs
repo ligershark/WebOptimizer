@@ -12,6 +12,7 @@ namespace Bundler
         /// </summary>
         public AssetContext(HttpContext httpContext, IAsset asset)
         {
+            Content = string.Empty;
             HttpContext = httpContext;
             Asset = asset;
         }

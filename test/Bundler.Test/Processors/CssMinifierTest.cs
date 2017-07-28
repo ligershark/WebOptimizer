@@ -9,7 +9,7 @@ namespace Bundler.Test.Processors
 {
     public class CssMinifierTest
     {
-        [Fact]
+        [Fact2]
         public void ExecuteTest_Success()
         {
             var minifier = new CssMinifier(new CssSettings());
@@ -18,7 +18,7 @@ namespace Bundler.Test.Processors
 
             minifier.Execute(context.Object);
 
-            Assert.Equal("body{color:#ff0}", context.Object.Content);
+            Assert.Equal("body{color:ff0}", context.Object.Content);
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
         }
     }

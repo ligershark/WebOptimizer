@@ -26,10 +26,9 @@ namespace Bundler
         /// </summary>
         public static IAsset AddJs(this Pipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
         {
-            IAsset asset = pipeline.Add(route, "application/javascript", sourceFiles);
-            asset.MinifyJavaScript(settings);
-
-            return asset;
+            return pipeline.Add(route, "application/javascript", sourceFiles)
+                           .Bundle()
+                           .MinifyJavaScript(settings);
         }
 
         /// <summary>
@@ -45,10 +44,9 @@ namespace Bundler
         /// </summary>
         public static IAsset AddCss(this Pipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
         {
-            IAsset asset = pipeline.Add(route, "text/css", sourceFiles);
-            asset.MinifyCss(settings);
-
-            return asset;
+            return pipeline.Add(route, "text/css", sourceFiles)
+                           .Bundle()
+                           .MinifyCss(settings);
         }
 
         /// <summary>
@@ -78,6 +76,28 @@ namespace Bundler
             asset.PostProcessors.Add(localizer);
 
             return asset;
+        }
+
+        /// <summary>
+        /// Runs the bundler on the content.
+        /// </summary>
+        public static IAsset Bundle(this IAsset asset)
+        {
+            var bundler = new Processors.Concatinator();
+            asset.PostProcessors.Add(bundler);
+
+            return asset;
+        }
+
+        /// <summary>
+        /// Runs the bundler on the content.
+        /// </summary>
+        public static IEnumerable<IAsset> Bundle(this IEnumerable<IAsset> assets)
+        {
+            foreach (IAsset asset in assets)
+            {
+                yield return asset.Bundle();
+            }
         }
 
         /// <summary>

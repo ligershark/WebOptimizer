@@ -18,5 +18,5 @@ test_script:
   - dotnet test test/bundler.test/bundler.test.csproj
 
 artifacts:
-  - path: bundler\**\*.nupkg
+  - path: src\bundler\**\*.nupkg
     name: NuGet package
