@@ -31,9 +31,7 @@ public class Fact2 : Xunit.FactAttribute
     ///     This is automatically set to the name of the current method;
     ///     there's no need to set a value for this parameter.
     /// </param>
-    public Fact2(string charsToReplace = "_",
-string replacementChars = " ",
-[CallerMemberName] string testMethodName = "")
+    public Fact2(string charsToReplace = "_", string replacementChars = " ", [CallerMemberName] string testMethodName = "")
     {
         if (charsToReplace != null)
         {
