@@ -14,6 +14,9 @@ build_script:
   - dotnet restore -v quiet
   - dotnet build /p:configuration=Release
 
+test_script:
+  - dotnet test test/bundler.test/bundler.test.csproj
+
 artifacts:
   - path: bundler\**\*.nupkg
     name: NuGet package
