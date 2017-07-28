@@ -35,7 +35,7 @@ namespace Bundler
         /// <summary>
         /// Adds Bundler to the <see cref="IApplicationBuilder"/> request execution pipeline
         /// </summary>
-        public static void UseAssetManager(this IApplicationBuilder app, IHostingEnvironment env, Action<Pipeline> assetPipeline)
+        public static void UseWebOptimizer(this IApplicationBuilder app, IHostingEnvironment env, Action<Pipeline> assetPipeline)
         {
             Environment = env;
             Builder = app;
