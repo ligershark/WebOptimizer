@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Bundler.Processors;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -76,6 +75,11 @@ namespace Bundler
         {
             string cacheKey = asset.Route;
 
+            if (context.Request.Headers.TryGetValue("Accept-Encoding", out var enc))
+            {
+                cacheKey += enc.ToString();
+            }
+
             foreach (IProcessor processors in asset.Processors)
             {
                 cacheKey += processors.CacheKey(context);
@@ -97,11 +101,11 @@ namespace Bundler
         private async Task WriteOutputAsync(HttpContext context, IAsset asset, string content, string cacheKey)
         {
             context.Response.ContentType = asset.ContentType;
-
+            
             if (AssetManager.Pipeline.EnableCaching && !string.IsNullOrEmpty(cacheKey))
             {
-                context.Response.Headers["Cache-Control"] = $"public,max-age=31536000"; // 1 year
-                context.Response.Headers["Etag"] = $"\"{cacheKey}\"";
+                context.Response.Headers["Cache-Control"] = $"max-age=31536000"; // 1 year
+                context.Response.Headers["ETag"] = $"\"{cacheKey}\"";
             }
 
             if (!string.IsNullOrEmpty(content))

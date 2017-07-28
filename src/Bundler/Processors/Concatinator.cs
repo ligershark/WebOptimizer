@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
 
-namespace Bundler.Processors
+namespace Bundler
 {
     /// <summary>
     /// Concatinates multiple files into a single string.
     /// </summary>
-    /// <seealso cref="Bundler.Processors.IProcessor" />
     public class Concatinator : IProcessor
     {
         /// <summary>
@@ -38,6 +37,34 @@ namespace Bundler.Processors
             }
 
             context.Content = sb.ToString();
+        }
+    }
+
+    /// <summary>
+    /// Extension methods for <see cref="IPipeline"/>.
+    /// </summary>
+    public static class ConcatinatorExtensions
+    {
+        /// <summary>
+        /// Runs the bundler on the content.
+        /// </summary>
+        public static IAsset Bundle(this IAsset asset)
+        {
+            var bundler = new Concatinator();
+            asset.Processors.Add(bundler);
+
+            return asset;
+        }
+
+        /// <summary>
+        /// Runs the bundler on the content.
+        /// </summary>
+        public static IEnumerable<IAsset> Bundle(this IEnumerable<IAsset> assets)
+        {
+            foreach (IAsset asset in assets)
+            {
+                yield return asset.Bundle();
+            }
         }
     }
 }

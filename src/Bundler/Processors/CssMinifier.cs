@@ -1,9 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NUglify;
 using NUglify.Css;
 
-namespace Bundler.Processors
+namespace Bundler
 {
     /// <summary>
     /// A processor that minifies JavaScript
@@ -42,6 +44,50 @@ namespace Bundler.Processors
                     config.Content = minified.Code;
                 }
             });
+        }
+    }
+
+    /// <summary>
+    /// Extension methods for <see cref="IPipeline"/>.
+    /// </summary>
+    public static class CssMinifierExtension
+    {
+        /// <summary>
+        /// Runs the CSS minifier on the content.
+        /// </summary>
+        public static IAsset MinifyCss(this IAsset bundle)
+        {
+            return bundle.MinifyCss(new CssSettings());
+        }
+
+        /// <summary>
+        /// Runs the CSS minifier on the content.
+        /// </summary>
+        public static IAsset MinifyCss(this IAsset bundle, CssSettings settings)
+        {
+            var minifier = new CssMinifier(settings);
+            bundle.Processors.Add(minifier);
+
+            return bundle;
+        }
+
+        /// <summary>
+        /// Runs the JavaScript minifier on the content.
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyCss(this IEnumerable<IAsset> assets)
+        {
+            return assets.MinifyCss(new CssSettings()).ToArray();
+        }
+
+        /// <summary>
+        /// Runs the JavaScript minifier on the content.
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyCss(this IEnumerable<IAsset> assets, CssSettings settings)
+        {
+            foreach (IAsset asset in assets)
+            {
+                yield return asset.MinifyCss(settings);
+            }
         }
     }
 }

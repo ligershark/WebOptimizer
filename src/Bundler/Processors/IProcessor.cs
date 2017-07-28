@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace Bundler.Processors
+namespace Bundler
 {
     /// <summary>
     /// An interface for post processors.

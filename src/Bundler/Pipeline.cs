@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
-using Bundler.Processors;
 using Microsoft.AspNetCore.Hosting;
+using NUglify.Css;
+using NUglify.JavaScript;
 
 namespace Bundler
 {
@@ -56,6 +57,48 @@ namespace Bundler
             }
 
             return list;
+        }
+    }
+
+    /// <summary>
+    /// Extension methods for <see cref="IPipeline"/>.
+    /// </summary>
+    public static class PipelineExtensions
+    {
+        /// <summary>
+        /// Adds a JavaScript with minification asset to the pipeline.
+        /// </summary>
+        public static IAsset AddJs(this IPipeline pipeline, string route, params string[] sourceFiles)
+        {
+            return pipeline.AddJs(route, new CodeSettings(), sourceFiles);
+        }
+
+        /// <summary>
+        /// Adds a JavaScript with minification asset to the pipeline.
+        /// </summary>
+        public static IAsset AddJs(this IPipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
+        {
+            return pipeline.Add(route, "application/javascript", sourceFiles)
+                           .Bundle()
+                           .MinifyJavaScript(settings);
+        }
+
+        /// <summary>
+        /// Adds a CSS asset with minification to the pipeline.
+        /// </summary>
+        public static IAsset AddCss(this IPipeline pipeline, string route, params string[] sourceFiles)
+        {
+            return pipeline.AddCss(route, new CssSettings(), sourceFiles);
+        }
+
+        /// <summary>
+        /// Adds a CSS asset with minification to the pipeline.
+        /// </summary>
+        public static IAsset AddCss(this IPipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
+        {
+            return pipeline.Add(route, "text/css", sourceFiles)
+                           .Bundle()
+                           .MinifyCss(settings);
         }
     }
 }

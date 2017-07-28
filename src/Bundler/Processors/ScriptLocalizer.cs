@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Bundler.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Localization;
 
-namespace Bundler.Processors
+namespace Bundler
 {
     /// <summary>
     /// Localizes script files by replacing specified tokens with the value from the resource file
@@ -145,6 +147,41 @@ namespace Bundler.Processors
         private void InvalidDocFormat(string param)
         {
             throw new InvalidOperationException($"{param} argument not correctly terminated (did you forget a '}}'?)");
+        }
+    }
+
+    /// <summary>
+    /// Extension methods for <see cref="IPipeline"/>.
+    /// </summary>
+    public static class LocalizerExtensions
+    {
+        /// <summary>
+        /// Extension method to localizes the files in a bundle
+        /// </summary>
+        public static IEnumerable<IAsset> Localize<T>(this IEnumerable<IAsset> assets)
+        {
+            IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(AssetManager.Builder);
+            var localizer = new ScriptLocalizer(stringProvider);
+
+            foreach (IAsset asset in assets)
+            {
+                asset.Processors.Add(localizer);
+            }
+
+            return assets;
+        }
+
+        /// <summary>
+        /// Extension method to localizes the files in a bundle
+        /// </summary>
+        public static IAsset Localize<T>(this IAsset asset)
+        {
+            IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(AssetManager.Builder);
+            var localizer = new ScriptLocalizer(stringProvider);
+
+            asset.Processors.Add(localizer);
+
+            return asset;
         }
     }
 }

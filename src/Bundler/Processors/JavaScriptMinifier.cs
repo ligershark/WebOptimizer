@@ -1,9 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NUglify;
 using NUglify.JavaScript;
 
-namespace Bundler.Processors
+namespace Bundler
 {
     /// <summary>
     /// A processor that minifies JavaScript
@@ -42,6 +44,50 @@ namespace Bundler.Processors
                     config.Content = minified.Code;
                 }
             });
+        }
+    }
+
+    /// <summary>
+    /// Extension methods for <see cref="IPipeline"/>.
+    /// </summary>
+    public static class JavaScriptMinifierExtensions
+    {
+        /// <summary>
+        /// Runs the JavaScript minifier on the content.
+        /// </summary>
+        public static IAsset MinifyJavaScript(this IAsset asset)
+        {
+            return asset.MinifyJavaScript(new CodeSettings());
+        }
+
+        /// <summary>
+        /// Runs the JavaScript minifier on the content.
+        /// </summary>
+        public static IAsset MinifyJavaScript(this IAsset asset, CodeSettings settings)
+        {
+            var minifier = new JavaScriptMinifier(settings);
+            asset.Processors.Add(minifier);
+
+            return asset;
+        }
+
+        /// <summary>
+        /// Runs the JavaScript minifier on the content.
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyJavaScript(this IEnumerable<IAsset> assets)
+        {
+            return assets.MinifyJavaScript(new CodeSettings()).ToArray();
+        }
+
+        /// <summary>
+        /// Runs the JavaScript minifier on the content.
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyJavaScript(this IEnumerable<IAsset> assets, CodeSettings settings)
+        {
+            foreach (IAsset asset in assets)
+            {
+                yield return asset.MinifyJavaScript(settings);
+            }
         }
     }
 }
