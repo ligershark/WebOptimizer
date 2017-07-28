@@ -59,7 +59,7 @@ namespace Bundler
 
             foreach (IAsset asset in assets)
             {
-                asset.PostProcessors.Add(localizer);
+                asset.Processors.Add(localizer);
             }
 
             return assets;
@@ -73,7 +73,7 @@ namespace Bundler
             IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(AssetManager.Builder);
             var localizer = new ScriptLocalizer(stringProvider);
 
-            asset.PostProcessors.Add(localizer);
+            asset.Processors.Add(localizer);
 
             return asset;
         }
@@ -84,7 +84,7 @@ namespace Bundler
         public static IAsset Bundle(this IAsset asset)
         {
             var bundler = new Processors.Concatinator();
-            asset.PostProcessors.Add(bundler);
+            asset.Processors.Add(bundler);
 
             return asset;
         }
@@ -114,7 +114,7 @@ namespace Bundler
         public static IAsset MinifyJavaScript(this IAsset asset, CodeSettings settings)
         {
             var minifier = new JavaScriptMinifier(settings);
-            asset.PostProcessors.Add(minifier);
+            asset.Processors.Add(minifier);
 
             return asset;
         }
@@ -152,7 +152,7 @@ namespace Bundler
         public static IAsset MinifyCss(this IAsset bundle, CssSettings settings)
         {
             var minifier = new CssMinifier(settings);
-            bundle.PostProcessors.Add(minifier);
+            bundle.Processors.Add(minifier);
 
             return bundle;
         }

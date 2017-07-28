@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Bundler;
 using Bundler.Processors;
 using Microsoft.AspNetCore.Http;
@@ -19,22 +20,25 @@ namespace BundlerSample
 
         public string CacheKey(HttpContext context) => string.Empty;
 
-        public void Execute(IAssetContext context)
+        public Task ExecuteAsync(IAssetContext context)
         {
-            var options = new ScssOptions();
-
-            foreach (string route in _routes)
+            return Task.Run(() =>
             {
-                IFileInfo file = AssetManager.Environment.WebRootFileProvider.GetFileInfo(route);
-                string dir = Path.GetDirectoryName(file.PhysicalPath);
+                var options = new ScssOptions();
 
-                if (!options.IncludePaths.Contains(dir))
+                foreach (string route in _routes)
                 {
-                    options.IncludePaths.Add(dir);
-                }
-            }
+                    IFileInfo file = AssetManager.Environment.WebRootFileProvider.GetFileInfo(route);
+                    string dir = Path.GetDirectoryName(file.PhysicalPath);
 
-            context.Content = Scss.ConvertToCss(context.Content, options).Css;
+                    if (!options.IncludePaths.Contains(dir))
+                    {
+                        options.IncludePaths.Add(dir);
+                    }
+                }
+
+                context.Content = Scss.ConvertToCss(context.Content, options).Css;
+            });
         }
     }
 
@@ -42,7 +46,7 @@ namespace BundlerSample
     {
         public static IAsset CompileScss(this IAsset asset)
         {
-            asset.PostProcessors.Add(new ScssCompiler(asset.SourceFiles));
+            asset.Processors.Add(new ScssCompiler(asset.SourceFiles));
             return asset;
         }
 

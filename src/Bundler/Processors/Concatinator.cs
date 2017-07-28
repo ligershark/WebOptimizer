@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
 
@@ -20,7 +22,7 @@ namespace Bundler.Processors
         /// <summary>
         /// Executes the processor on the specified configuration.
         /// </summary>
-        public void Execute(IAssetContext context)
+        public async Task ExecuteAsync(IAssetContext context)
         {
             IFileProvider fileProvider = AssetManager.Environment.WebRootFileProvider;
             IEnumerable<string> absolutes = context.Asset.SourceFiles.Select(f => fileProvider.GetFileInfo(f).PhysicalPath);
@@ -28,7 +30,10 @@ namespace Bundler.Processors
 
             foreach (string absolute in absolutes)
             {
-                sb.AppendLine(System.IO.File.ReadAllText(absolute));
+                using (var reader = new StreamReader(absolute))
+                {
+                    sb.AppendLine(await reader.ReadToEndAsync());
+                }
             }
 
             context.Content = sb.ToString();

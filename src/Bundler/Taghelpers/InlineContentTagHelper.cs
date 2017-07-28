@@ -45,7 +45,7 @@ namespace Bundler.Taghelpers
         /// <summary>
         /// Creates a tag helper for inlining content
         /// </summary>
-        public override void Process(TagHelperContext context, TagHelperOutput output)
+        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
             if (output.TagName.Equals("link", StringComparison.OrdinalIgnoreCase))
             {
@@ -57,7 +57,7 @@ namespace Bundler.Taghelpers
                 ParseRoute(output.Attributes["src"].Value.ToString());
             }
 
-            string content = GetFileContent(_route);
+            string content = await GetFileContentAsync(_route);
 
             output.Content.SetHtmlContent(content);
             output.TagMode = TagMode.StartTagAndEndTag;
@@ -78,7 +78,7 @@ namespace Bundler.Taghelpers
             }
         }
 
-        private string GetFileContent(string route)
+        private async Task<string> GetFileContentAsync(string route)
         {
             IAsset asset = GetBundle(route);
             string cacheKey = asset == null ? route : AssetMiddleware.GetCacheKey(ViewContext.HttpContext, asset);
@@ -90,7 +90,7 @@ namespace Bundler.Taghelpers
 
             if (asset != null)
             {
-                string contents = AssetMiddleware.Execute(ViewContext.HttpContext, asset, _fileCache.FileProvider);
+                string contents = await AssetMiddleware.ExecuteAsync(ViewContext.HttpContext, asset);
 
                 _fileCache.Add(cacheKey, contents, asset.SourceFiles);
                 return contents;

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using NUglify;
 using NUglify.JavaScript;
 
@@ -30,14 +31,17 @@ namespace Bundler.Processors
         /// <summary>
         /// Executes the processor on the specified configuration.
         /// </summary>
-        public void Execute(IAssetContext config)
+        public Task ExecuteAsync(IAssetContext config)
         {
-            UglifyResult minified = Uglify.Js(config.Content, Settings);
-
-            if (!minified.HasErrors)
+            return Task.Run(() =>
             {
-                config.Content = minified.Code;
-            }
+                UglifyResult minified = Uglify.Js(config.Content, Settings);
+
+                if (!minified.HasErrors)
+                {
+                    config.Content = minified.Code;
+                }
+            });
         }
     }
 }

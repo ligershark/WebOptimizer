@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Bundler.Processors
 {
@@ -10,7 +11,7 @@ namespace Bundler.Processors
         /// <summary>
         /// Executes the processor on the specified configuration.
         /// </summary>
-        void Execute(IAssetContext context);
+        Task ExecuteAsync(IAssetContext context);
 
         /// <summary>
         /// Gets the custom key that should be used when calculating the memory cache key.

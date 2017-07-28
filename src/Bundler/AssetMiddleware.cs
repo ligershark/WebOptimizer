@@ -41,7 +41,7 @@ namespace Bundler
             }
             else
             {
-                string result = Execute(context, asset, _fileCache.FileProvider);
+                string result = await ExecuteAsync(context, asset);
 
                 if (string.IsNullOrEmpty(result))
                 {
@@ -58,13 +58,13 @@ namespace Bundler
         /// <summary>
         /// Executes the bundle and returns the processed output.
         /// </summary>
-        public static string Execute(HttpContext context, IAsset asset, IFileProvider fileProvider)
+        public static async Task<string> ExecuteAsync(HttpContext context, IAsset asset)
         {
             var config = new AssetContext(context, asset);
 
-            foreach (IProcessor processor in asset.PostProcessors)
+            foreach (IProcessor processor in asset.Processors)
             {
-                processor.Execute(config);
+                await processor.ExecuteAsync(config).ConfigureAwait(false);
             }
 
             return config.Content;
@@ -77,7 +77,7 @@ namespace Bundler
         {
             string cacheKey = asset.Route;
 
-            foreach (IProcessor processors in asset.PostProcessors)
+            foreach (IProcessor processors in asset.Processors)
             {
                 cacheKey += processors.CacheKey(context);
             }

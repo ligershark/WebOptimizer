@@ -14,9 +14,9 @@ namespace Bundler
         string ContentType { get; }
 
         /// <summary>
-        /// Gets a list of post processors
+        /// Gets a list of processors
         /// </summary>
-        IList<IProcessor> PostProcessors { get; }
+        IList<IProcessor> Processors { get; }
 
         /// <summary>
         /// Gets the route to the bundle output.

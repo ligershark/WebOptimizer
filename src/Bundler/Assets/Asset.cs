@@ -33,7 +33,7 @@ namespace Bundler
         /// <summary>
         /// Gets a list of post processors
         /// </summary>
-        public IList<IProcessor> PostProcessors { get; private set; }
+        public IList<IProcessor> Processors { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Asset"/> class.
@@ -45,7 +45,7 @@ namespace Bundler
                 Route = route,
                 ContentType = contentType,
                 SourceFiles = sourceFiles,
-                PostProcessors = new List<IProcessor>(),
+                Processors = new List<IProcessor>(),
             };
 
             return bundle;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Localization;
@@ -48,10 +49,12 @@ namespace Bundler.Processors
         /// <summary>
         /// Executes the processor on the specified configuration.
         /// </summary>
-        /// <param name="config"></param>
-        public void Execute(IAssetContext config)
+        public Task ExecuteAsync(IAssetContext config)
         {
-            config.Content = Localize(config.Content);
+            return Task.Run(() =>
+            {
+                config.Content = Localize(config.Content);
+            });
         }
 
         private string Localize(string document)
