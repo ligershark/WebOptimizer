@@ -4,7 +4,6 @@ using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.FileProviders;
 
 namespace Bundler
 {
@@ -33,15 +32,15 @@ namespace Bundler
             if (IsConditionalGet(context, cacheKey))
             {
                 context.Response.StatusCode = 304;
-                await WriteOutputAsync(context, asset, string.Empty, cacheKey);
+                await WriteOutputAsync(context, asset, string.Empty, cacheKey).ConfigureAwait(false);
             }
             else if (AssetManager.Pipeline.EnableCaching && _fileCache.TryGetValue(cacheKey, out string value))
             {
-                await WriteOutputAsync(context, asset, value, cacheKey);
+                await WriteOutputAsync(context, asset, value, cacheKey).ConfigureAwait(false);
             }
             else
             {
-                string result = await ExecuteAsync(context, asset);
+                string result = await ExecuteAsync(context, asset).ConfigureAwait(false);
 
                 if (string.IsNullOrEmpty(result))
                 {
@@ -51,7 +50,7 @@ namespace Bundler
 
                 _fileCache.Add(cacheKey, result, asset.SourceFiles);
 
-                await WriteOutputAsync(context, asset, result, cacheKey);
+                await WriteOutputAsync(context, asset, result, cacheKey).ConfigureAwait(false);
             }
         }
 
@@ -107,7 +106,7 @@ namespace Bundler
 
             if (!string.IsNullOrEmpty(content))
             {
-                await context.Response.WriteAsync(content);
+                await context.Response.WriteAsync(content).ConfigureAwait(false);
             }
         }
     }

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using Bundler.Processors;
 using Microsoft.AspNetCore.Hosting;
 
 namespace Bundler
@@ -46,7 +46,16 @@ namespace Bundler
 
         public IEnumerable<IAsset> AddFiles(string contentType, params string[] sourceFiles)
         {
-            return sourceFiles.Select(f => Add(f, contentType)).ToArray();
+            var list = new List<IAsset>();
+
+            foreach (string file in sourceFiles)
+            {
+                IAsset asset = Add(file, contentType, file);
+                asset.Processors.Add(new Concatinator());
+                list.Add(asset);
+            }
+
+            return list;
         }
     }
 }
