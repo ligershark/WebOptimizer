@@ -9,10 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bundler", "src\Bundler\Bund
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9BE34752-7E0B-40DB-A192-7B6CB09217D4}"
 	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bundler.Test", "test\Bundler.Test\Bundler.Test.csproj", "{68BA50A0-966B-41AC-9A6D-B73ADFC65D2F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bundler.Test", "test\Bundler.Test\Bundler.Test.csproj", "{68BA50A0-966B-41AC-9A6D-B73ADFC65D2F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

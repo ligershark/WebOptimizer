@@ -18,5 +18,14 @@ test_script:
   - dotnet test test/bundler.test/bundler.test.csproj
 
 artifacts:
-  - path: src\bundler\**\*.nupkg
+  - path: src\bundler\bin\release\*.nupkg
     name: NuGet package
+
+deploy:
+  - provider: NuGet
+    artifact: /NuGet/
+    api_key:
+      secure: 6xBu/05BWJDPa2PRkxEH3PHU/caLvy2lzf1eWdRBGXwSCTejHtI+6e0V4s2LaVri
+    on:
+      branch: master
+      appveyor_repo_commit_message_extended: /\[release\]/
