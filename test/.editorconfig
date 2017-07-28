@@ -1,0 +1,5 @@
+# Dotnet code style settings:
+[*.{cs,vb}]
+# Naming rules - async methods to be prefixed with Async
+dotnet_naming_rule.async_methods_must_end_with_async.severity = none
+csharp_style_var_elsewhere                                    = true : suggestion
