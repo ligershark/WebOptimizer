@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Xunit;
 
-namespace Bundler.Test.Assets
+namespace Bundler.Test
 {
     public class AssetContextTest
     {

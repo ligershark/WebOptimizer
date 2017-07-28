@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.FileProviders;
 using NUglify.Css;
 using NUglify.JavaScript;
 
@@ -15,6 +16,7 @@ namespace Bundler
         {
             EnabledBundling = true;
             EnableCaching = !env.IsDevelopment();
+            FileProvider = env.WebRootFileProvider;
         }
 
         public bool EnabledBundling { get; set; }
@@ -25,6 +27,8 @@ namespace Bundler
         /// Gets a list of transforms added.
         /// </summary>
         public IReadOnlyList<IAsset> Assets => _assets;
+
+        public IFileProvider FileProvider { get; set; }
 
         /// <summary>
         /// Gets the <see cref="IAsset" /> from the specified route.

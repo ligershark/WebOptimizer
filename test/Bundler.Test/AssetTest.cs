@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace Bundler.Test.Assets
+namespace Bundler.Test
 {
     public class AssetTest
     {

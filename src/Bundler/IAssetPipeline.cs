@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.FileProviders;
 
 namespace Bundler
 {
@@ -22,6 +23,11 @@ namespace Bundler
         /// Gets the assets registered on the pipeline.
         /// </summary>
         IReadOnlyList<IAsset> Assets { get; }
+
+        /// <summary>
+        /// Gets the file provider.
+        /// </summary>
+        IFileProvider FileProvider { get; set; }
 
         /// <summary>
         /// Adds an <see cref="IAsset"/> to the optimization pipeline.
