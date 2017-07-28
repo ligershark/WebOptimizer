@@ -16,7 +16,7 @@ namespace Bundler
         /// <summary>
         /// Adds a JavaScript with minification asset to the pipeline.
         /// </summary>
-        public static IAsset AddJs(this Pipeline pipeline, string route, params string[] sourceFiles)
+        public static IAsset AddJs(this IPipeline pipeline, string route, params string[] sourceFiles)
         {
             return pipeline.AddJs(route, new CodeSettings(), sourceFiles);
         }
@@ -24,7 +24,7 @@ namespace Bundler
         /// <summary>
         /// Adds a JavaScript with minification asset to the pipeline.
         /// </summary>
-        public static IAsset AddJs(this Pipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
+        public static IAsset AddJs(this IPipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
         {
             return pipeline.Add(route, "application/javascript", sourceFiles)
                            .Bundle()
@@ -34,7 +34,7 @@ namespace Bundler
         /// <summary>
         /// Adds a CSS asset with minification to the pipeline.
         /// </summary>
-        public static IAsset AddCss(this Pipeline pipeline, string route, params string[] sourceFiles)
+        public static IAsset AddCss(this IPipeline pipeline, string route, params string[] sourceFiles)
         {
             return pipeline.AddCss(route, new CssSettings(), sourceFiles);
         }
@@ -42,7 +42,7 @@ namespace Bundler
         /// <summary>
         /// Adds a CSS asset with minification to the pipeline.
         /// </summary>
-        public static IAsset AddCss(this Pipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
+        public static IAsset AddCss(this IPipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
         {
             return pipeline.Add(route, "text/css", sourceFiles)
                            .Bundle()

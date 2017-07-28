@@ -58,7 +58,7 @@ namespace BundlerSample
             }
         }
 
-        public static IAsset AddScss(this Pipeline pipeline, string route, params string[] sourceFiles)
+        public static IAsset AddScss(this IPipeline pipeline, string route, params string[] sourceFiles)
         {
             return pipeline.Add(route, "text/css", sourceFiles)
                            .Bundle()
