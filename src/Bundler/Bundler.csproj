@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>netstandard1.6</TargetFramework>
         <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Bundler.xml</DocumentationFile>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <PackageTags>bundle, minify, optimize, asp.net core</PackageTags>

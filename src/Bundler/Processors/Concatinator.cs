@@ -30,7 +30,8 @@ namespace Bundler.Processors
 
             foreach (string absolute in absolutes)
             {
-                using (var reader = new StreamReader(absolute))
+                using (var fs = new FileStream(absolute, FileMode.Open))
+                using (var reader = new StreamReader(fs))
                 {
                     sb.AppendLine(await reader.ReadToEndAsync());
                 }
