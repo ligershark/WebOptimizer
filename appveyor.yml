@@ -1,4 +1,5 @@
 image: Visual Studio 2017
+version: 1.0.{build}
 
 install:
    # .NET Core SDK binaries
@@ -12,7 +13,7 @@ install:
 
 build_script:
   - dotnet restore -v quiet
-  - dotnet build /p:configuration=Release /p:Version="{version}-alpha"
+  - dotnet build /p:configuration=Release /p:Version=$env:appveyor_build_version-alpha
 
 test_script:
   - dotnet test test/bundler.test/bundler.test.csproj
