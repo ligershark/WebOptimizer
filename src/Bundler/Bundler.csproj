@@ -10,8 +10,8 @@
         <Company>LigerShark</Company>
         <Description>A runtime bundler and minifier for ASP.NET Core</Description>
         <Copyright>Copyright © LigerShark</Copyright>
-        <PackageId>LigerShark.Bundler</PackageId>
-        <Product>LigerShark.Bundler</Product>
+        <PackageId>LigerShark.AssetManager</PackageId>
+        <Product>LigerShark.AssetManager</Product>
         <PackageIconUrl>https://aka.ms/vsextensibilityicon</PackageIconUrl>
         <PackageProjectUrl>https://github.com/ligershark/Bundler</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/ligershark/Bundler/blob/master/LICENSE.txt</PackageLicenseUrl>
