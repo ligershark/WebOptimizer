@@ -12,7 +12,7 @@ install:
 
 build_script:
   - dotnet restore -v quiet
-  - dotnet build bundler/bundler.csproj /p:configuration=Release
+  - dotnet build /p:configuration=Release
 
 artifacts:
   - path: bundler\**\*.nupkg
