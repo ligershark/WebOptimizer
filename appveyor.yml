@@ -12,7 +12,7 @@ install:
 
 build_script:
   - dotnet restore -v quiet
-  - dotnet build /p:configuration=Release /p:Version={version}-alpha
+  - dotnet build /p:configuration=Release /p:Version="{version}-alpha"
 
 test_script:
   - dotnet test test/bundler.test/bundler.test.csproj
