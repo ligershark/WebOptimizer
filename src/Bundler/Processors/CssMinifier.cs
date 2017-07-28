@@ -10,7 +10,7 @@ namespace Bundler
     /// <summary>
     /// A processor that minifies JavaScript
     /// </summary>
-    public class CssMinifier : IProcessor
+    internal class CssMinifier : IProcessor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CssMinifier"/> class.

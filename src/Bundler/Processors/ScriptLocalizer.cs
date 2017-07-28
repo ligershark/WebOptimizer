@@ -12,7 +12,7 @@ namespace Bundler
     /// <summary>
     /// Localizes script files by replacing specified tokens with the value from the resource file
     /// </summary>
-    public class ScriptLocalizer : IProcessor
+    internal class ScriptLocalizer : IProcessor
     {
         private IStringLocalizer _stringProvider;
 
@@ -38,15 +38,6 @@ namespace Bundler
         {
             _stringProvider = stringProvider;
         }
-
-        ///// <summary>
-        ///// Replaces string keys with values from the resource manager
-        ///// </summary>
-        //public string Localize(string document, IStringLocalizer stringProvider)
-        //{
-        //    var localizer = new ScriptLocalizer(stringProvider);
-        //    return localizer.Localize(document);
-        //}
 
         /// <summary>
         /// Executes the processor on the specified configuration.

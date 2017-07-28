@@ -11,7 +11,7 @@ namespace Bundler
     /// <summary>
     /// Concatinates multiple files into a single string.
     /// </summary>
-    public class Concatinator : IProcessor
+    internal class Concatinator : IProcessor
     {
         /// <summary>
         /// Gets the custom key that should be used when calculating the memory cache key.
