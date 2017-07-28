@@ -35,12 +35,5 @@ namespace Bundler
         /// <param name="contentType">The content type of the response. Example: "text/css".</param>
         /// <param name="sourceFiles">A list of relative file names of the sources to optimize.</param>
         IAsset Add(string route, string contentType, params string[] sourceFiles);
-
-        /// <summary>
-        /// Adds loose files to the optimization pipeline.
-        /// </summary>
-        /// <param name="contentType">The content type of the response. Example: "text/css".</param>
-        /// <param name="sourceFiles">A list of relative file names of the sources to optimize.</param>
-        IEnumerable<IAsset> AddFiles(string contentType, params string[] sourceFiles);
     }
 }
