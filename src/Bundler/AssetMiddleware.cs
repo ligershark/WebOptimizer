@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Cryptography;
+using System.Threading.Tasks;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Bundler
@@ -85,7 +87,12 @@ namespace Bundler
                 cacheKey += processors.CacheKey(context);
             }
 
-            return cacheKey.GetHashCode().ToString();
+            using (var algo = SHA1.Create())
+            {
+                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(cacheKey);
+                byte[] hash = algo.ComputeHash(buffer);
+                return WebEncoders.Base64UrlEncode(hash);
+            }
         }
 
         private bool IsConditionalGet(HttpContext context, string cacheKey)

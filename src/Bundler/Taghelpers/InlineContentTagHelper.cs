@@ -1,11 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -17,7 +15,7 @@ namespace Bundler.Taghelpers
     /// </summary>
     [HtmlTargetElement("link", Attributes = "inline, href")]
     [HtmlTargetElement("script", Attributes = "inline, src")]
-    public class InlineContentTagHelper : TagHelper
+    public class InlineContentTagHelper : BaseTagHelper
     {
         private readonly FileCache _fileCache;
         private string _route;
@@ -26,21 +24,15 @@ namespace Bundler.Taghelpers
         /// Tag helper for inlining content
         /// </summary>
         public InlineContentTagHelper(IHostingEnvironment env, IMemoryCache cache)
+            : base(env, cache)
         {
             _fileCache = new FileCache(env.WebRootFileProvider, cache);
         }
 
         /// <summary>
-        /// Gets or sets the view context.
+        /// Makes sure this taghelper runs before the built in ones.
         /// </summary>
-        [ViewContext]
-        [HtmlAttributeNotBound]
-        public ViewContext ViewContext { get; set; }
-
-        /// <summary>
-        /// Orders before any built-in TagHelpers run.
-        /// </summary>
-        public override int Order => -2000;
+        public override int Order => base.Order + 1;
 
         /// <summary>
         /// Creates a tag helper for inlining content
@@ -50,18 +42,24 @@ namespace Bundler.Taghelpers
             if (output.TagName.Equals("link", StringComparison.OrdinalIgnoreCase))
             {
                 output.TagName = "style";
-                ParseRoute(output.Attributes["href"].Value.ToString());
+                ParseRoute(context.AllAttributes["href"].Value.ToString());
+                output.Attributes.Clear();
             }
             else if (output.TagName.Equals("script", StringComparison.OrdinalIgnoreCase))
             {
-                ParseRoute(output.Attributes["src"].Value.ToString());
+                ParseRoute(context.AllAttributes["src"].Value.ToString());
+                output.Attributes.RemoveAll("inline");
+                output.Attributes.RemoveAll("integrity");
+                output.Attributes.RemoveAll("language");
+                output.Attributes.RemoveAll("src");
+                output.Attributes.RemoveAll("async");
+                output.Attributes.RemoveAll("defer");
             }
 
             string content = await GetFileContentAsync(_route);
 
             output.Content.SetHtmlContent(content);
             output.TagMode = TagMode.StartTagAndEndTag;
-            output.Attributes.Clear();
         }
 
         private void ParseRoute(string route)

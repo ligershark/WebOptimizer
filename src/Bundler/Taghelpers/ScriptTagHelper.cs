@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
@@ -9,7 +8,7 @@ namespace Bundler.Taghelpers
     /// <summary>
     /// A TagHelper for hooking JavaScript bundles up to the HTML page.
     /// </summary>
-    [HtmlTargetElement("script", Attributes = "bundle")]
+    [HtmlTargetElement("script", Attributes = "src")]
     public class ScriptTagHelper : BaseTagHelper
     {
         /// <summary>
@@ -20,46 +19,37 @@ namespace Bundler.Taghelpers
         { }
 
         /// <summary>
-        /// The route to the bundle file name.
+        /// Gets or sets the source.
         /// </summary>
-        [HtmlAttributeName("bundle")]
-        public string Bundle { get; set; }
+        public string Src { get; set; }
 
         /// <summary>
         /// Synchronously executes the TagHelper
         /// </summary>
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (!string.IsNullOrEmpty(Bundle))
+            IAsset asset = AssetManager.Pipeline.FromRoute(Src);
+
+            if (asset != null && !output.Attributes.ContainsName("inline"))
             {
                 if (AssetManager.Pipeline.EnabledBundling)
                 {
-                    string route = Bundle;
-                    char sep = '?';
-                    int token = Bundle.IndexOf(sep);
-
-                    if (token > -1)
-                    {
-                        route = Bundle.Substring(0, token);
-                        sep = '&';
-                    }
-
-                    IAsset asset = AssetManager.Pipeline.FromRoute(route);
-                    string href = $"{Bundle}{sep}v={GenerateHash(asset)}";
-                    output.Attributes.SetAttribute("src", href);
+                    string src = GenerateHash(asset);
+                    output.Attributes.SetAttribute("src", src);
                 }
                 else
                 {
-                    WriteIndividualTags(output);
+                    WriteIndividualTags(output, asset);
                 }
             }
-
-            base.Process(context, output);
+            else
+            {
+                base.Process(context, output);
+            }
         }
 
-        private void WriteIndividualTags(TagHelperOutput output)
+        private void WriteIndividualTags(TagHelperOutput output, IAsset asset)
         {
-            IAsset asset = AssetManager.Pipeline.FromRoute(Bundle);
             output.SuppressOutput();
 
             var attrs = new List<string>();

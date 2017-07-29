@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.TagHelpers.Internal;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -27,6 +25,11 @@ namespace Bundler.Taghelpers
             _env = env;
             _cache = cache;
         }
+
+        /// <summary>
+        /// Makes sure this taghelper runs before the built in ones.
+        /// </summary>
+        public override int Order => 10;
 
         /// <summary>
         /// Gets or sets the view context.
@@ -56,7 +59,14 @@ namespace Bundler.Taghelpers
         /// </summary>
         protected string AddFileVersionToPath(string fileName)
         {
-            EnsureVersionFileProvider();
+            if (_fileProvider == null)
+            {
+                _fileProvider = new FileVersionProvider(
+                    _env.WebRootFileProvider,
+                    _cache,
+                    ViewContext.HttpContext.Request.PathBase);
+            }
+
             return _fileProvider.AddFileVersionToPath(fileName);
         }
 
@@ -65,19 +75,9 @@ namespace Bundler.Taghelpers
         /// </summary>
         protected string GenerateHash(IAsset asset)
         {
-            IEnumerable<string> hashes = asset.SourceFiles.Select(f => AddFileVersionToPath(f));
+            string hash = AssetMiddleware.GetCacheKey(ViewContext.HttpContext, asset);
 
-            return string.Join(string.Empty, hashes).GetHashCode().ToString();
-        }
-
-        private void EnsureVersionFileProvider()
-        {
-            if (_fileProvider == null)
-            {
-                _fileProvider = new FileVersionProvider(_env.WebRootFileProvider,
-                                                        _cache,
-                                                        ViewContext.HttpContext.Request.PathBase);
-            }
+            return $"{asset.Route}?v={hash}";
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
@@ -9,7 +8,7 @@ namespace Bundler.Taghelpers
     /// <summary>
     /// A TagHelper for hooking CSS bundles up to the HTML page.
     /// </summary>
-    [HtmlTargetElement("link", Attributes = "bundle")]
+    [HtmlTargetElement("link", Attributes = "href")]
     public class LinkTagHelper : BaseTagHelper
     {
         /// <summary>
@@ -19,38 +18,36 @@ namespace Bundler.Taghelpers
             : base(env, cache)
         { }
 
-
         /// <summary>
-        /// The route to the bundle file name.
+        /// Gets or sets the href attribute.
         /// </summary>
-        [HtmlAttributeName("bundle")]
-        public string Bundle { get; set; }
+        public string Href { get; set; }
 
         /// <summary>
         /// Synchronously executes the TagHelper
         /// </summary>
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (!string.IsNullOrEmpty(Bundle))
+            IAsset asset = AssetManager.Pipeline.FromRoute(Href);
+
+            if (asset != null && !output.Attributes.ContainsName("inline"))
             {
                 if (AssetManager.Pipeline.EnabledBundling)
                 {
-                    IAsset asset = AssetManager.Pipeline.FromRoute(Bundle);
-                    string href = $"{Bundle}?v={GenerateHash(asset)}";
+                    string href = GenerateHash(asset);
                     output.Attributes.SetAttribute("href", href);
                 }
                 else
                 {
-                    WriteIndividualTags(output);
+                    WriteIndividualTags(output, asset);
                 }
             }
 
             base.Process(context, output);
         }
 
-        private void WriteIndividualTags(TagHelperOutput output)
+        private void WriteIndividualTags(TagHelperOutput output, IAsset asset)
         {
-            IAsset asset = AssetManager.Pipeline.FromRoute(Bundle);
             output.SuppressOutput();
 
             var attrs = new List<string>();
