@@ -28,7 +28,7 @@ namespace Bundler.Taghelpers
         /// <summary>
         /// The cache object.
         /// </summary>
-        protected IMemoryCache Cache;
+        protected IMemoryCache Cache { get; }
 
         /// <summary>
         /// Makes sure this taghelper runs before the built in ones.
