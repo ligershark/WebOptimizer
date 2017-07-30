@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using Bundler.Utilities;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -11,14 +11,14 @@ namespace Bundler
     /// </summary>
     internal class AssetMiddleware
     {
-        private readonly FileCache _fileCache;
+        private readonly IMemoryCache _cache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AssetMiddleware"/> class.
         /// </summary>
         public AssetMiddleware(IHostingEnvironment env, IMemoryCache cache)
         {
-            _fileCache = new FileCache(env.WebRootFileProvider, cache);
+            _cache = cache;
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Bundler
                 context.Response.StatusCode = 304;
                 await WriteOutputAsync(context, asset, string.Empty, cacheKey).ConfigureAwait(false);
             }
-            else if (AssetManager.Pipeline.EnableCaching && _fileCache.TryGetValue(cacheKey, out string value))
+            else if (AssetManager.Pipeline.EnableCaching && _cache.TryGetValue(cacheKey, out string value))
             {
                 await WriteOutputAsync(context, asset, value, cacheKey).ConfigureAwait(false);
             }
@@ -47,10 +47,22 @@ namespace Bundler
                     return;
                 }
 
-                _fileCache.Add(cacheKey, result, asset.SourceFiles);
+                AddToCache(cacheKey, result, asset.SourceFiles);
 
                 await WriteOutputAsync(context, asset, result, cacheKey).ConfigureAwait(false);
             }
+        }
+
+        private void AddToCache(string cacheKey, string value, IEnumerable<string> files)
+        {
+            var cacheOptions = new MemoryCacheEntryOptions();
+
+            foreach (string file in files)
+            {
+                cacheOptions.AddExpirationToken(AssetManager.Pipeline.FileProvider.Watch(file));
+            }
+
+            _cache.Set(cacheKey, value, cacheOptions);
         }
 
         private bool IsConditionalGet(HttpContext context, string cacheKey)

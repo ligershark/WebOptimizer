@@ -14,7 +14,6 @@ namespace Bundler.Taghelpers
     public class BaseTagHelper : TagHelper
     {
         private IHostingEnvironment _env;
-        private IMemoryCache _cache;
         private FileVersionProvider _fileProvider;
 
         /// <summary>
@@ -23,8 +22,13 @@ namespace Bundler.Taghelpers
         public BaseTagHelper(IHostingEnvironment env, IMemoryCache cache)
         {
             _env = env;
-            _cache = cache;
+            Cache = cache;
         }
+
+        /// <summary>
+        /// The cache object.
+        /// </summary>
+        protected IMemoryCache Cache;
 
         /// <summary>
         /// Makes sure this taghelper runs before the built in ones.
@@ -62,8 +66,8 @@ namespace Bundler.Taghelpers
             if (_fileProvider == null)
             {
                 _fileProvider = new FileVersionProvider(
-                    _env.WebRootFileProvider,
-                    _cache,
+                    AssetManager.Pipeline.FileProvider,
+                    Cache,
                     ViewContext.HttpContext.Request.PathBase);
             }
 

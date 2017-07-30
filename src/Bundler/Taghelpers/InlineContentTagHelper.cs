@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -17,7 +17,6 @@ namespace Bundler.Taghelpers
     [HtmlTargetElement("script", Attributes = "inline, src")]
     public class InlineContentTagHelper : BaseTagHelper
     {
-        private readonly FileCache _fileCache;
         private string _route;
 
         /// <summary>
@@ -25,9 +24,7 @@ namespace Bundler.Taghelpers
         /// </summary>
         public InlineContentTagHelper(IHostingEnvironment env, IMemoryCache cache)
             : base(env, cache)
-        {
-            _fileCache = new FileCache(env.WebRootFileProvider, cache);
-        }
+        { }
 
         /// <summary>
         /// Makes sure this taghelper runs before the built in ones.
@@ -81,7 +78,7 @@ namespace Bundler.Taghelpers
             IAsset asset = AssetManager.Pipeline.FromRoute(route);
             string cacheKey = asset == null ? route : asset.GenerateCacheKey(ViewContext.HttpContext);
 
-            if (_fileCache.TryGetValue(cacheKey, out string value))
+            if (Cache.TryGetValue(cacheKey, out string value))
             {
                 return value;
             }
@@ -90,23 +87,35 @@ namespace Bundler.Taghelpers
             {
                 string contents = await asset.ExecuteAsync(ViewContext.HttpContext);
 
-                _fileCache.Add(cacheKey, contents, asset.SourceFiles);
+                AddToCache(cacheKey, contents, asset.SourceFiles.ToArray());
                 return contents;
             }
             else
             {
-                string file = _fileCache.FileProvider.GetFileInfo(route).PhysicalPath;
+                string file = AssetManager.Pipeline.FileProvider.GetFileInfo(route).PhysicalPath;
 
                 if (File.Exists(file))
                 {
                     string contents = File.ReadAllText(file);
-                    _fileCache.Add(cacheKey, contents, file);
+                    AddToCache(cacheKey, contents, file);
 
                     return contents;
                 }
             }
 
             throw new FileNotFoundException("File or bundle doesn't exist", route);
+        }
+
+        private void AddToCache(string cacheKey, string value, params string[] files)
+        {
+            var cacheOptions = new MemoryCacheEntryOptions();
+
+            foreach (string file in files)
+            {
+                cacheOptions.AddExpirationToken(AssetManager.Pipeline.FileProvider.Watch(file));
+            }
+
+            Cache.Set(cacheKey, value, cacheOptions);
         }
     }
 }

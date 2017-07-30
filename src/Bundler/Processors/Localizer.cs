@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Bundler.Utilities;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 
 namespace Bundler
@@ -151,7 +152,7 @@ namespace Bundler
         /// </summary>
         public static IEnumerable<IAsset> Localize<T>(this IEnumerable<IAsset> assets)
         {
-            IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(AssetManager.Builder);
+            IStringLocalizer<T> stringProvider = GetStringLocalizer<T>(AssetManager.Builder);
             var localizer = new Localizer(stringProvider);
 
             foreach (IAsset asset in assets)
@@ -162,12 +163,29 @@ namespace Bundler
             return assets;
         }
 
+        private static IStringLocalizer<T> GetStringLocalizer<T>(IApplicationBuilder app)
+        {
+            try
+            {
+                IStringLocalizer<T> stringProvider = app.ApplicationServices.GetRequiredService<IStringLocalizer<T>>();
+                return stringProvider;
+            }
+            catch (InvalidOperationException e)
+            {
+                if (e.HResult == -2146233079)
+                {
+                    throw new InvalidOperationException("No IStringLocalizer could be found.  Did you forget to register localization middleware in ConfigureServices?");
+                }
+                throw;
+            }
+        }
+
         /// <summary>
         /// Extension method to localizes the files in a bundle
         /// </summary>
         public static IAsset Localize<T>(this IAsset asset)
         {
-            IStringLocalizer<T> stringProvider = LocalizationUtilities.GetStringLocalizer<T>(AssetManager.Builder);
+            IStringLocalizer<T> stringProvider = GetStringLocalizer<T>(AssetManager.Builder);
             var localizer = new Localizer(stringProvider);
 
             asset.Processors.Add(localizer);
