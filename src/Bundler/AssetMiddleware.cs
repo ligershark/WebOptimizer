@@ -1,9 +1,7 @@
-﻿using System.Security.Cryptography;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Bundler.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Bundler
@@ -28,7 +26,7 @@ namespace Bundler
         /// </summary>
         public async Task InvokeAsync(HttpContext context, IAsset asset)
         {
-            string cacheKey = GetCacheKey(context, asset);
+            string cacheKey = asset.GenerateCacheKey(context);
 
             if (IsConditionalGet(context, cacheKey))
             {
@@ -41,7 +39,7 @@ namespace Bundler
             }
             else
             {
-                string result = await ExecuteAsync(context, asset).ConfigureAwait(false);
+                string result = await asset.ExecuteAsync(context).ConfigureAwait(false);
 
                 if (string.IsNullOrEmpty(result))
                 {
@@ -52,46 +50,6 @@ namespace Bundler
                 _fileCache.Add(cacheKey, result, asset.SourceFiles);
 
                 await WriteOutputAsync(context, asset, result, cacheKey).ConfigureAwait(false);
-            }
-        }
-
-        /// <summary>
-        /// Executes the bundle and returns the processed output.
-        /// </summary>
-        public static async Task<string> ExecuteAsync(HttpContext context, IAsset asset)
-        {
-            var config = new AssetContext(context, asset);
-
-            foreach (IProcessor processor in asset.Processors)
-            {
-                await processor.ExecuteAsync(config).ConfigureAwait(false);
-            }
-
-            return config.Content;
-        }
-
-        /// <summary>
-        /// Gets the cache key.
-        /// </summary>
-        public static string GetCacheKey(HttpContext context, IAsset asset)
-        {
-            string cacheKey = asset.Route;
-
-            if (context.Request.Headers.TryGetValue("Accept-Encoding", out var enc))
-            {
-                cacheKey += enc.ToString();
-            }
-
-            foreach (IProcessor processors in asset.Processors)
-            {
-                cacheKey += processors.CacheKey(context);
-            }
-
-            using (var algo = SHA1.Create())
-            {
-                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(cacheKey);
-                byte[] hash = algo.ComputeHash(buffer);
-                return WebEncoders.Base64UrlEncode(hash);
             }
         }
 

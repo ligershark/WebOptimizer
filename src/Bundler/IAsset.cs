@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Bundler
 {
@@ -26,5 +28,15 @@ namespace Bundler
         /// Gets the webroot relative source files.
         /// </summary>
         IEnumerable<string> SourceFiles { get; }
+
+        /// <summary>
+        /// Executes the processors and returns the modified content.
+        /// </summary>
+        Task<string> ExecuteAsync(HttpContext context);
+
+        /// <summary>
+        /// Gets the cache key associated with this version of the asset.
+        /// </summary>
+        string GenerateCacheKey(HttpContext context);
     }
 }

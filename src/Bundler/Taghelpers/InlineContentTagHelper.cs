@@ -79,7 +79,7 @@ namespace Bundler.Taghelpers
         private async Task<string> GetFileContentAsync(string route)
         {
             IAsset asset = AssetManager.Pipeline.FromRoute(route);
-            string cacheKey = asset == null ? route : AssetMiddleware.GetCacheKey(ViewContext.HttpContext, asset);
+            string cacheKey = asset == null ? route : asset.GenerateCacheKey(ViewContext.HttpContext);
 
             if (_fileCache.TryGetValue(cacheKey, out string value))
             {
@@ -88,7 +88,7 @@ namespace Bundler.Taghelpers
 
             if (asset != null)
             {
-                string contents = await AssetMiddleware.ExecuteAsync(ViewContext.HttpContext, asset);
+                string contents = await asset.ExecuteAsync(ViewContext.HttpContext);
 
                 _fileCache.Add(cacheKey, contents, asset.SourceFiles);
                 return contents;

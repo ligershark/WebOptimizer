@@ -75,7 +75,7 @@ namespace Bundler.Taghelpers
         /// </summary>
         protected string GenerateHash(IAsset asset)
         {
-            string hash = AssetMiddleware.GetCacheKey(ViewContext.HttpContext, asset);
+            string hash = asset.GenerateCacheKey(ViewContext.HttpContext);
 
             return $"{asset.Route}?v={hash}";
         }
