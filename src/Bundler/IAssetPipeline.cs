@@ -11,13 +11,13 @@ namespace Bundler
         /// <summary>
         /// Gets or sets a value indicating whether server-side caching is enabled
         /// </summary>
-        bool EnableCaching { get; set; }
+        bool? EnableCaching { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the TagHelpers should bundle or write out
         /// tags for each source file.
         /// </summary>
-        bool EnabledBundling { get; set; }
+        bool? EnabledBundling { get; set; }
 
         /// <summary>
         /// Gets the assets registered on the pipeline.

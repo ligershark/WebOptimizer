@@ -14,8 +14,8 @@ namespace Bundler.Taghelpers
         /// <summary>
         /// Initializes a new instance of the <see cref="ScriptTagHelper"/> class.
         /// </summary>
-        public ScriptTagHelper(IHostingEnvironment env, IMemoryCache cache)
-            : base(env, cache)
+        public ScriptTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline)
+            : base(env, cache, pipeline)
         { }
 
         /// <summary>
@@ -28,11 +28,11 @@ namespace Bundler.Taghelpers
         /// </summary>
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            IAsset asset = AssetManager.Pipeline.FromRoute(Src);
+            IAsset asset = Pipeline.FromRoute(Src);
 
             if (asset != null && !output.Attributes.ContainsName("inline"))
             {
-                if (AssetManager.Pipeline.EnabledBundling)
+                if (Pipeline.EnabledBundling == true)
                 {
                     string src = GenerateHash(asset);
                     output.Attributes.SetAttribute("src", src);

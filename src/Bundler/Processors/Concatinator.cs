@@ -23,7 +23,8 @@ namespace Bundler
         /// </summary>
         public async Task ExecuteAsync(IAssetContext context)
         {
-            IFileProvider fileProvider = AssetManager.Pipeline.FileProvider;
+            var pipeline = (IAssetPipeline)context.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
+            IFileProvider fileProvider = pipeline.FileProvider;
             IEnumerable<string> absolutes = context.Asset.SourceFiles.Select(f => fileProvider.GetFileInfo(f).PhysicalPath);
             var sb = new StringBuilder();
 

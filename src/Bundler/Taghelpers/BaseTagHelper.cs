@@ -13,22 +13,32 @@ namespace Bundler.Taghelpers
     /// <seealso cref="Microsoft.AspNetCore.Razor.TagHelpers.TagHelper" />
     public class BaseTagHelper : TagHelper
     {
-        private IHostingEnvironment _env;
         private FileVersionProvider _fileProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTagHelper"/> class.
         /// </summary>
-        public BaseTagHelper(IHostingEnvironment env, IMemoryCache cache)
+        public BaseTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline)
         {
-            _env = env;
+            HostingEnvironment = env;
             Cache = cache;
+            Pipeline = pipeline;
         }
+
+        /// <summary>
+        /// Gets the hosting environment.
+        /// </summary>
+        protected IHostingEnvironment HostingEnvironment { get; }
 
         /// <summary>
         /// The cache object.
         /// </summary>
         protected IMemoryCache Cache { get; }
+
+        /// <summary>
+        /// Gets the pipeline.
+        /// </summary>
+        protected IAssetPipeline Pipeline { get; }
 
         /// <summary>
         /// Makes sure this taghelper runs before the built in ones.
@@ -65,8 +75,9 @@ namespace Bundler.Taghelpers
         {
             if (_fileProvider == null)
             {
+                Pipeline.EnsureDefaults(HostingEnvironment);
                 _fileProvider = new FileVersionProvider(
-                    AssetManager.Pipeline.FileProvider,
+                    Pipeline.FileProvider,
                     Cache,
                     ViewContext.HttpContext.Request.PathBase);
             }

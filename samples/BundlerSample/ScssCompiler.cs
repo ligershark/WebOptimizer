@@ -21,13 +21,15 @@ namespace BundlerSample
 
         public Task ExecuteAsync(IAssetContext context)
         {
+            var pipeline = (IAssetPipeline)context.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
+
             return Task.Run(() =>
             {
                 var options = new ScssOptions();
 
                 foreach (string route in _routes)
                 {
-                    IFileInfo file = AssetManager.Pipeline.FileProvider.GetFileInfo(route);
+                    IFileInfo file = pipeline.FileProvider.GetFileInfo(route);
                     string dir = Path.GetDirectoryName(file.PhysicalPath);
 
                     if (!options.IncludePaths.Contains(dir))

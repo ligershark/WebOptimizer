@@ -11,21 +11,37 @@ namespace Bundler
     /// </summary>
     internal class AssetMiddleware
     {
+        private readonly RequestDelegate _next;
+        private readonly IHostingEnvironment _env;
         private readonly IMemoryCache _cache;
+        private readonly IAssetPipeline _pipeline;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AssetMiddleware"/> class.
         /// </summary>
-        public AssetMiddleware(IHostingEnvironment env, IMemoryCache cache)
+        public AssetMiddleware(RequestDelegate next, IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline)
         {
+            _next = next;
+            _env = env;
             _cache = cache;
+            _pipeline = pipeline;
         }
 
         /// <summary>
         /// Invokes the middleware
         /// </summary>
-        public async Task InvokeAsync(HttpContext context, IAsset asset)
+        public async Task InvokeAsync(HttpContext context)
         {
+            IAsset asset = _pipeline.FromRoute(context.Request.Path);
+
+            if (asset == null)
+            {
+                await _next(context);
+                return;
+            }
+
+            _pipeline.EnsureDefaults(_env);
+
             string cacheKey = asset.GenerateCacheKey(context);
 
             if (IsConditionalGet(context, cacheKey))
@@ -33,7 +49,7 @@ namespace Bundler
                 context.Response.StatusCode = 304;
                 await WriteOutputAsync(context, asset, string.Empty, cacheKey).ConfigureAwait(false);
             }
-            else if (AssetManager.Pipeline.EnableCaching && _cache.TryGetValue(cacheKey, out string value))
+            else if (_pipeline.EnableCaching == true && _cache.TryGetValue(cacheKey, out string value))
             {
                 await WriteOutputAsync(context, asset, value, cacheKey).ConfigureAwait(false);
             }
@@ -59,7 +75,7 @@ namespace Bundler
 
             foreach (string file in files)
             {
-                cacheOptions.AddExpirationToken(AssetManager.Pipeline.FileProvider.Watch(file));
+                cacheOptions.AddExpirationToken(_pipeline.FileProvider.Watch(file));
             }
 
             _cache.Set(cacheKey, value, cacheOptions);
@@ -79,7 +95,7 @@ namespace Bundler
         {
             context.Response.ContentType = asset.ContentType;
 
-            if (AssetManager.Pipeline.EnableCaching && !string.IsNullOrEmpty(cacheKey))
+            if (_pipeline.EnableCaching == true && !string.IsNullOrEmpty(cacheKey))
             {
                 context.Response.Headers["Cache-Control"] = $"max-age=31536000"; // 1 year
                 context.Response.Headers["ETag"] = $"\"{cacheKey}\"";

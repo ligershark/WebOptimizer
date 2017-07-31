@@ -22,8 +22,8 @@ namespace Bundler.Taghelpers
         /// <summary>
         /// Tag helper for inlining content
         /// </summary>
-        public InlineContentTagHelper(IHostingEnvironment env, IMemoryCache cache)
-            : base(env, cache)
+        public InlineContentTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline)
+            : base(env, cache, pipeline)
         { }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Bundler.Taghelpers
 
         private async Task<string> GetFileContentAsync(string route)
         {
-            IAsset asset = AssetManager.Pipeline.FromRoute(route);
+            IAsset asset = Pipeline.FromRoute(route);
             string cacheKey = asset == null ? route : asset.GenerateCacheKey(ViewContext.HttpContext);
 
             if (Cache.TryGetValue(cacheKey, out string value))
@@ -92,7 +92,9 @@ namespace Bundler.Taghelpers
             }
             else
             {
-                string file = AssetManager.Pipeline.FileProvider.GetFileInfo(route).PhysicalPath;
+                Pipeline.EnsureDefaults(HostingEnvironment);
+
+                string file = Pipeline.FileProvider.GetFileInfo(route).PhysicalPath;
 
                 if (File.Exists(file))
                 {
@@ -112,7 +114,7 @@ namespace Bundler.Taghelpers
 
             foreach (string file in files)
             {
-                cacheOptions.AddExpirationToken(AssetManager.Pipeline.FileProvider.Watch(file));
+                cacheOptions.AddExpirationToken(Pipeline.FileProvider.Watch(file));
             }
 
             Cache.Set(cacheKey, value, cacheOptions);

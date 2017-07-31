@@ -13,7 +13,7 @@ namespace Bundler
     /// <summary>
     /// Localizes script files by replacing specified tokens with the value from the resource file
     /// </summary>
-    internal class Localizer : IProcessor
+    internal class Localizer<T> : IProcessor
     {
         private IStringLocalizer _stringProvider;
 
@@ -33,23 +33,33 @@ namespace Bundler
         }
 
         /// <summary>
-        /// Localizes script files
-        /// </summary>
-        public Localizer(IStringLocalizer stringProvider)
-        {
-            _stringProvider = stringProvider;
-        }
-
-        /// <summary>
         /// Executes the processor on the specified configuration.
         /// </summary>
         public Task ExecuteAsync(IAssetContext config)
         {
             return Task.Run(() =>
             {
+                _stringProvider = config.HttpContext.RequestServices.GetService<IStringLocalizer<T>>();
                 config.Content = Localize(config.Content);
             });
         }
+
+        //private static IStringLocalizer<T> GetStringLocalizer<T>(IApplicationBuilder app)
+        //{
+        //    try
+        //    {
+        //        IStringLocalizer<T> stringProvider = app.ApplicationServices.GetRequiredService<IStringLocalizer<T>>();
+        //        return stringProvider;
+        //    }
+        //    catch (InvalidOperationException e)
+        //    {
+        //        if (e.HResult == -2146233079)
+        //        {
+        //            throw new InvalidOperationException("No IStringLocalizer could be found.  Did you forget to register localization middleware in ConfigureServices?");
+        //        }
+        //        throw;
+        //    }
+        //}
 
         private string Localize(string document)
         {
@@ -152,8 +162,8 @@ namespace Bundler
         /// </summary>
         public static IEnumerable<IAsset> Localize<T>(this IEnumerable<IAsset> assets)
         {
-            IStringLocalizer<T> stringProvider = GetStringLocalizer<T>(AssetManager.Builder);
-            var localizer = new Localizer(stringProvider);
+            //IStringLocalizer<T> stringProvider = GetStringLocalizer<T>(app);
+            var localizer = new Localizer<T>();
 
             foreach (IAsset asset in assets)
             {
@@ -185,8 +195,7 @@ namespace Bundler
         /// </summary>
         public static IAsset Localize<T>(this IAsset asset)
         {
-            IStringLocalizer<T> stringProvider = GetStringLocalizer<T>(AssetManager.Builder);
-            var localizer = new Localizer(stringProvider);
+            var localizer = new Localizer<T>();
 
             asset.Processors.Add(localizer);
 

@@ -14,8 +14,8 @@ namespace Bundler.Taghelpers
         /// <summary>
         /// Initializes a new instance of the <see cref="LinkTagHelper"/> class.
         /// </summary>
-        public LinkTagHelper(IHostingEnvironment env, IMemoryCache cache)
-            : base(env, cache)
+        public LinkTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline)
+            : base(env, cache, pipeline)
         { }
 
         /// <summary>
@@ -28,11 +28,11 @@ namespace Bundler.Taghelpers
         /// </summary>
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            IAsset asset = AssetManager.Pipeline.FromRoute(Href);
+            IAsset asset = Pipeline.FromRoute(Href);
 
             if (asset != null && !output.Attributes.ContainsName("inline"))
             {
-                if (AssetManager.Pipeline.EnabledBundling)
+                if (Pipeline.EnabledBundling == true)
                 {
                     string href = GenerateHash(asset);
                     output.Attributes.SetAttribute("href", href);

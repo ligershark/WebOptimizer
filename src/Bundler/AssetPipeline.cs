@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using NUglify.Css;
 using NUglify.JavaScript;
@@ -12,16 +14,9 @@ namespace Bundler
     {
         private List<IAsset> _assets = new List<IAsset>();
 
-        public AssetPipeline(IHostingEnvironment env)
-        {
-            EnabledBundling = true;
-            EnableCaching = !env.IsDevelopment();
-            FileProvider = env.WebRootFileProvider;
-        }
+        public bool? EnabledBundling { get; set; }
 
-        public bool EnabledBundling { get; set; }
-
-        public bool EnableCaching { get; set; }
+        public bool? EnableCaching { get; set; }
 
         /// <summary>
         /// Gets a list of transforms added.
@@ -34,10 +29,19 @@ namespace Bundler
         /// Gets the <see cref="IAsset" /> from the specified route.
         /// </summary>
         /// <param name="route">The route to find the asset by.</param>
-        /// <returns></returns>
         public IAsset FromRoute(string route)
         {
-            return Assets.FirstOrDefault(a => a.Route.Equals(route, StringComparison.OrdinalIgnoreCase));
+            route = route.TrimStart('/');
+
+            foreach (IAsset asset in Assets)
+            {
+                if (asset.Route.Equals(route, StringComparison.OrdinalIgnoreCase))
+                {
+                    return asset;
+                }
+            }
+
+            return null;
         }
 
         public IAsset Add(IAsset asset)
@@ -60,6 +64,8 @@ namespace Bundler
 
         public IAsset Add(string route, string contentType, params string[] sourceFiles)
         {
+            route = route.TrimStart('/');
+
             if (FromRoute(route) != null)
             {
                 throw new ArgumentException($"The route \"{route}\" was already specified", nameof(route));
@@ -84,6 +90,35 @@ namespace Bundler
     /// </summary>
     public static class PipelineExtensions
     {
+        /// <summary>
+        /// Adds WebOptimizer to the <see cref="IApplicationBuilder"/> request execution pipeline
+        /// </summary>
+        public static void UseWebOptimizer(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<AssetMiddleware>();
+        }
+
+        /// <summary>
+        /// Adds WebOptimizer to the specified <see cref="IServiceCollection"/>.
+        /// </summary>
+        public static void AddWebOptimizer(this IServiceCollection services, Action<IAssetPipeline> assetPipeline)
+        {
+            var pipeline = new AssetPipeline();
+            assetPipeline(pipeline);
+
+            services.AddSingleton<IAssetPipeline, AssetPipeline>(factory => pipeline);
+        }
+
+        /// <summary>
+        /// Ensures that defaults are set
+        /// </summary>
+        public static void EnsureDefaults(this IAssetPipeline pipeline, IHostingEnvironment env)
+        {
+            pipeline.FileProvider = pipeline.FileProvider ?? env.WebRootFileProvider;
+            pipeline.EnableCaching = pipeline.EnableCaching ?? !env.IsDevelopment();
+            pipeline.EnabledBundling = pipeline.EnableCaching ?? true;
+        }
+
         /// <summary>
         /// Adds a JavaScript with minification asset to the pipeline.
         /// </summary>

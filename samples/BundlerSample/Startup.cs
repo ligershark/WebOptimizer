@@ -22,6 +22,29 @@ namespace Bundler
         {
             services.AddMvc()
                 .AddViewLocalization(options => options.ResourcesPath = "Resources");
+
+            services.AddWebOptimizer(assets =>
+            {
+                assets.EnableCaching = true;
+                assets.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
+
+                assets.AddJs("all.js", "js/site.js", "js/b.js")
+                      .Localize<Strings>();
+
+                assets.Add("test.js", "application/javascript", "js/site.js", "js/b.js")
+                      .Bundle()
+                      .MinifyJavaScript()
+                      .Localize<Strings>();
+
+                // These files exist on disk and will now be localized and minified
+                assets.AddFiles("application/javascript", "js/site.js", "js/b.js")
+                      .Localize<Strings>()
+                      .MinifyJavaScript(new NUglify.JavaScript.CodeSettings { PreserveImportantComments = false });
+
+                assets.AddScss("scss.css", "css/test.scss", "css/test2.scss")
+                      .Localize<Strings>()
+                      .MinifyCss();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,28 +71,7 @@ namespace Bundler
                 SupportedUICultures = cultures
             });
 
-            app.UseWebOptimizer(env, assets =>
-            {
-                assets.EnableCaching = true;
-                assets.AddCss("all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
-
-                assets.AddJs("all.js", "js/site.js", "js/b.js")
-                      .Localize<Strings>();
-
-                assets.Add("test.js", "application/javascript", "js/site.js", "js/b.js")
-                      .Bundle()
-                      .MinifyJavaScript()
-                      .Localize<Strings>();
-
-                // These files exist on disk and will now be localized and minified
-                assets.AddFiles("application/javascript", "js/site.js", "js/b.js")
-                      .Localize<Strings>()
-                      .MinifyJavaScript(new NUglify.JavaScript.CodeSettings { PreserveImportantComments = false });
-
-                assets.AddScss("scss.css", "css/test.scss", "css/test2.scss")
-                      .Localize<Strings>()
-                      .MinifyCss();
-            });
+            app.UseWebOptimizer();
 
             app.UseStaticFiles();
 
