@@ -1,4 +1,7 @@
-﻿(function () {
+﻿/*!
+    Important comment
+*/
+(function () {
 
     var ostehat = 0;
 

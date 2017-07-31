@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NUglify;
@@ -76,7 +75,7 @@ namespace Bundler
         /// </summary>
         public static IEnumerable<IAsset> MinifyJavaScript(this IEnumerable<IAsset> assets)
         {
-            return assets.MinifyJavaScript(new CodeSettings()).ToArray();
+            return assets.MinifyJavaScript(new CodeSettings());
         }
 
         /// <summary>
@@ -84,10 +83,14 @@ namespace Bundler
         /// </summary>
         public static IEnumerable<IAsset> MinifyJavaScript(this IEnumerable<IAsset> assets, CodeSettings settings)
         {
+            var list = new List<IAsset>();
+
             foreach (IAsset asset in assets)
             {
-                yield return asset.MinifyJavaScript(settings);
+                list.Add(asset.MinifyJavaScript(settings));
             }
+
+            return list;
         }
     }
 }

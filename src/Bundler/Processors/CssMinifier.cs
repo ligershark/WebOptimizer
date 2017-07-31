@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NUglify;
@@ -76,7 +75,7 @@ namespace Bundler
         /// </summary>
         public static IEnumerable<IAsset> MinifyCss(this IEnumerable<IAsset> assets)
         {
-            return assets.MinifyCss(new CssSettings()).ToArray();
+            return assets.MinifyCss(new CssSettings());
         }
 
         /// <summary>
@@ -84,10 +83,14 @@ namespace Bundler
         /// </summary>
         public static IEnumerable<IAsset> MinifyCss(this IEnumerable<IAsset> assets, CssSettings settings)
         {
+            var list = new List<IAsset>();
+
             foreach (IAsset asset in assets)
             {
-                yield return asset.MinifyCss(settings);
+                list.Add(asset.MinifyCss(settings));
             }
+
+            return list;
         }
     }
 }
