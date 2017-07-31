@@ -75,8 +75,12 @@ namespace Bundler.Taghelpers
 
         private async Task<string> GetFileContentAsync(string route)
         {
-            IAsset asset = Pipeline.FromRoute(route);
-            string cacheKey = asset == null ? route : asset.GenerateCacheKey(ViewContext.HttpContext);
+            string cacheKey = route;
+
+            if (Pipeline.TryFromRoute(route, out IAsset asset))
+            {
+                cacheKey = asset.GenerateCacheKey(ViewContext.HttpContext);
+            }
 
             if (Cache.TryGetValue(cacheKey, out string value))
             {

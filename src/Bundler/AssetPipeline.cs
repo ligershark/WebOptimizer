@@ -29,19 +29,22 @@ namespace Bundler
         /// Gets the <see cref="IAsset" /> from the specified route.
         /// </summary>
         /// <param name="route">The route to find the asset by.</param>
-        public IAsset FromRoute(string route)
+        /// <param name="asset">The asset matching the route.</param>
+        public bool TryFromRoute(string route, out IAsset asset)
         {
+            asset = null;
             route = route.TrimStart('/');
 
-            foreach (IAsset asset in Assets)
+            foreach (IAsset a in Assets)
             {
-                if (asset.Route.Equals(route, StringComparison.OrdinalIgnoreCase))
+                if (a.Route.Equals(route, StringComparison.OrdinalIgnoreCase))
                 {
-                    return asset;
+                    asset = a;
+                    return true;
                 }
             }
 
-            return null;
+            return false;
         }
 
         public IAsset Add(IAsset asset)
@@ -66,7 +69,7 @@ namespace Bundler
         {
             route = route.TrimStart('/');
 
-            if (FromRoute(route) != null)
+            if (TryFromRoute(route, out var existing))
             {
                 throw new ArgumentException($"The route \"{route}\" was already specified", nameof(route));
             }

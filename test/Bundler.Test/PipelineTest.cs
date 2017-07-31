@@ -75,10 +75,10 @@ namespace Bundler.Test
             pipeline.Add("/route1", "text/css", "file.css");
             pipeline.Add("route2", "text/css", "file.css");
 
-            Assert.NotNull(pipeline.FromRoute("/route1"));
-            Assert.NotNull(pipeline.FromRoute("route1"));
-            Assert.NotNull(pipeline.FromRoute("/route2"));
-            Assert.NotNull(pipeline.FromRoute("route2"));
+            Assert.True(pipeline.TryFromRoute("/route1", out var a1));
+            Assert.True(pipeline.TryFromRoute("route1", out var a2));
+            Assert.True(pipeline.TryFromRoute("/route2", out var a3));
+            Assert.True(pipeline.TryFromRoute("route2", out var a4));
         }
     }
 }

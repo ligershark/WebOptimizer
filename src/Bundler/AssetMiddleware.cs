@@ -30,16 +30,18 @@ namespace Bundler
         /// <summary>
         /// Invokes the middleware
         /// </summary>
-        public async Task InvokeAsync(HttpContext context)
+        public Task InvokeAsync(HttpContext context)
         {
-            IAsset asset = _pipeline.FromRoute(context.Request.Path);
-
-            if (asset == null)
+            if (_pipeline.TryFromRoute(context.Request.Path, out IAsset asset))
             {
-                await _next(context);
-                return;
+                return HandleAssetAsync(context, asset);
             }
 
+            return _next(context);
+        }
+
+        private async Task HandleAssetAsync(HttpContext context, IAsset asset)
+        {
             _pipeline.EnsureDefaults(_env);
 
             string cacheKey = asset.GenerateCacheKey(context);
@@ -59,7 +61,7 @@ namespace Bundler
 
                 if (string.IsNullOrEmpty(result))
                 {
-                    // TODO: Do some clever error handling
+                    await _next(context);
                     return;
                 }
 

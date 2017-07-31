@@ -28,9 +28,7 @@ namespace Bundler.Taghelpers
         /// </summary>
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            IAsset asset = Pipeline.FromRoute(Href);
-
-            if (asset != null && !output.Attributes.ContainsName("inline"))
+            if (Pipeline.TryFromRoute(Href, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
                 if (Pipeline.EnabledBundling == true)
                 {

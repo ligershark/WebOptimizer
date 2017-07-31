@@ -51,6 +51,7 @@ namespace Bundler
         /// Gets the <see cref="IAsset"/> from the specified route.
         /// </summary>
         /// <param name="route">The route to find the asset by.</param>
-        IAsset FromRoute(string route);
+        /// <param name="asset">The asset matching the route.</param>
+        bool TryFromRoute(string route, out IAsset asset);
     }
 }
