@@ -61,10 +61,14 @@ namespace Bundler
         /// </summary>
         public static IEnumerable<IAsset> Bundle(this IEnumerable<IAsset> assets)
         {
+            var list = new List<IAsset>();
+
             foreach (IAsset asset in assets)
             {
-                yield return asset.Bundle();
+                list.Add(asset.Bundle());
             }
+
+            return list;
         }
     }
 }
