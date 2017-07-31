@@ -6,6 +6,16 @@ namespace Bundler.Test
     public class PipelineTest
     {
         [Fact2]
+        public void DefaultValuesAsExpected()
+        {
+            var pipeline = new AssetPipeline();
+
+            Assert.Equal(false, pipeline.EnableCaching.HasValue);
+            Assert.Equal(false, pipeline.EnabledBundling.HasValue);
+            Assert.Null(pipeline.FileProvider);
+        }
+
+        [Fact2]
         public void CachingDisabledInDevelopment()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
@@ -56,6 +66,19 @@ namespace Bundler.Test
 
             Assert.Equal(ex.ParamName, "route");
             Assert.Equal(1, pipeline.Assets.Count);
+        }
+
+        [Fact2]
+        public void FromRoute_MixedSlashes_Success()
+        {
+            var pipeline = new AssetPipeline();
+            pipeline.Add("/route1", "text/css", "file.css");
+            pipeline.Add("route2", "text/css", "file.css");
+
+            Assert.NotNull(pipeline.FromRoute("/route1"));
+            Assert.NotNull(pipeline.FromRoute("route1"));
+            Assert.NotNull(pipeline.FromRoute("/route2"));
+            Assert.NotNull(pipeline.FromRoute("route2"));
         }
     }
 }
