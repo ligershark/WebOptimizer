@@ -11,7 +11,7 @@ namespace Bundler
     /// <summary>
     /// Concatinates multiple files into a single string.
     /// </summary>
-    internal class Concatinator : IProcessor
+    internal class SourceReader : IProcessor
     {
         /// <summary>
         /// Gets the custom key that should be used when calculating the memory cache key.
@@ -44,29 +44,29 @@ namespace Bundler
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
-    public static class ConcatinatorExtensions
+    public static class SourceReaderExtensions
     {
         /// <summary>
-        /// Runs the bundler on the content.
+        /// Adds the string content of all source files to the pipeline.
         /// </summary>
-        public static IAsset Bundle(this IAsset asset)
+        public static IAsset ReadFromDisk(this IAsset asset)
         {
-            var bundler = new Concatinator();
+            var bundler = new SourceReader();
             asset.Processors.Add(bundler);
 
             return asset;
         }
 
         /// <summary>
-        /// Runs the bundler on the content.
+        /// Adds the string content of all source files to the pipeline.
         /// </summary>
-        public static IEnumerable<IAsset> Bundle(this IEnumerable<IAsset> assets)
+        public static IEnumerable<IAsset> ReadFromDisk(this IEnumerable<IAsset> assets)
         {
             var list = new List<IAsset>();
 
             foreach (IAsset asset in assets)
             {
-                list.Add(asset.Bundle());
+                list.Add(asset.ReadFromDisk());
             }
 
             return list;

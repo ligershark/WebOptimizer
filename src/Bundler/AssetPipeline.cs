@@ -123,7 +123,7 @@ namespace Bundler
         }
 
         /// <summary>
-        /// Adds a JavaScript with minification asset to the pipeline.
+        /// Creates a JavaScript bundle on the specified route and minifies the output.
         /// </summary>
         public static IAsset AddJs(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
         {
@@ -131,17 +131,17 @@ namespace Bundler
         }
 
         /// <summary>
-        /// Adds a JavaScript with minification asset to the pipeline.
+        /// Creates a JavaScript bundle on the specified route and minifies the output.
         /// </summary>
         public static IAsset AddJs(this IAssetPipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
         {
             return pipeline.Add(route, "application/javascript", sourceFiles)
-                           .Bundle()
+                           .ReadFromDisk()
                            .MinifyJavaScript(settings);
         }
 
         /// <summary>
-        /// Adds a CSS asset with minification to the pipeline.
+        /// Creates a CSS bundle on the specified route and minifies the output.
         /// </summary>
         public static IAsset AddCss(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
         {
@@ -149,12 +149,12 @@ namespace Bundler
         }
 
         /// <summary>
-        /// Adds a CSS asset with minification to the pipeline.
+        /// Creates a CSS bundle on the specified route and minifies the output.
         /// </summary>
         public static IAsset AddCss(this IAssetPipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
         {
             return pipeline.Add(route, "text/css", sourceFiles)
-                           .Bundle()
+                           .ReadFromDisk()
                            .MinifyCss(settings);
         }
 
@@ -164,7 +164,6 @@ namespace Bundler
         /// <param name="pipeline">The pipeline object.</param>
         /// <param name="contentType">The content type of the response. Example: "text/css".</param>
         /// <param name="sourceFiles">A list of relative file names of the sources to optimize.</param>
-        /// <returns></returns>
         public static IEnumerable<IAsset> AddFiles(this IAssetPipeline pipeline, string contentType, params string[] sourceFiles)
         {
             var list = new List<IAsset>();
@@ -172,7 +171,7 @@ namespace Bundler
             foreach (string file in sourceFiles)
             {
                 IAsset asset = pipeline.Add(file, contentType, file);
-                asset.Processors.Add(new Concatinator());
+                asset.Processors.Add(new SourceReader());
                 list.Add(asset);
             }
 

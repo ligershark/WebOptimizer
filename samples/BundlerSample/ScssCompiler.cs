@@ -62,7 +62,7 @@ namespace BundlerSample
         public static IAsset AddScss(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
         {
             return pipeline.Add(route, "text/css", sourceFiles)
-                           .Bundle()
+                           .ReadFromDisk()
                            .CompileScss();
         }
     }
