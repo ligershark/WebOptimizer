@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Bundler;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
 using SharpScss;
+using WebOptimizer;
 
 namespace BundlerSample
 {

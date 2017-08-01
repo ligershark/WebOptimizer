@@ -10,6 +10,7 @@ ASP.NET Core middleware for bundling and minification of CSS and JavaScript file
 - [Configure](#configure)
 - [Use](#use)
 - [API reference](#api-reference)
+- [Extend the pipeline](#extend)
 
 ## How it works
 Web Optimizer will concatinate (bundle) and minify any text based files such as JavaScript and CSS. This results in fewer HTTP requests and smaller payloads which increases the performance of your web application.
@@ -86,10 +87,10 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 Make sure the call to `app.UseWebOptimizer` is before the call to `app.UseStaticFiles`.
 
 ### Step 3
-In `_ViewImports.cshtml` register the TagHelpers by adding `@addTagHelper *, Bundler` to the file.
+In `_ViewImports.cshtml` register the TagHelpers by adding `@addTagHelper *, WebOptimizer.Core` to the file.
 
 ```text
-@addTagHelper *, Bundler
+@addTagHelper *, WebOptimizer.Core
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 ```
 
@@ -123,4 +124,7 @@ To do this, simply add the attribute `inline` to any `<link>` or `<script>` elem
 ```
 
 ### API reference
+coming soon...
+
+### Extend
 coming soon...
