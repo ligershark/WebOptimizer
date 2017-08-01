@@ -16,7 +16,7 @@ build_script:
   - ps: dotnet build /p:configuration=Release /p:Version=$($env:appveyor_build_version)-beta
 
 test_script:
-  - dotnet test test/WebOptimizer.Test/WebOptimizer.Test.csproj
+  - dotnet test test/WebOptimizer.Core.Test/WebOptimizer.Core.Test.csproj
 
 artifacts:
   - path: src\WebOptimizer.Core\bin\release\*.nupkg
