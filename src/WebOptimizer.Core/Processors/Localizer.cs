@@ -40,10 +40,17 @@ namespace WebOptimizer
             return Task.Run(() =>
             {
                 _stringProvider = config.HttpContext.RequestServices.GetService<IStringLocalizer<T>>();
-                config.Content = Localize(config.Content);
+                var content = new Dictionary<string, string>();
+
+                foreach (string route in config.Content.Keys)
+                {
+                    content[route] = Localize(config.Content[route]);
+                }
+
+                config.Content = content;
             });
         }
-        
+
         private string Localize(string document)
         {
             var sb = new StringBuilder();

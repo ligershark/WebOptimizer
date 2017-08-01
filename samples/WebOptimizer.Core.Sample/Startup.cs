@@ -33,7 +33,7 @@ namespace BundlerSample
                       .Localize<Strings>();
 
                 assets.Add("test.js", "application/javascript", "js/site.js", "js/b.js")
-                      .ReadFromDisk()
+                      .Concatinate()
                       .MinifyJavaScript()
                       .Localize<Strings>();
 

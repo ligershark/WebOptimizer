@@ -36,12 +36,19 @@ namespace WebOptimizer
         {
             return Task.Run(() =>
             {
-                UglifyResult minified = Uglify.Js(config.Content, Settings);
+                var content = new Dictionary<string, string>();
 
-                if (!minified.HasErrors)
+                foreach (string key in config.Content.Keys)
                 {
-                    config.Content = minified.Code;
+                    UglifyResult minified = Uglify.Js(config.Content[key], Settings);
+
+                    if (!minified.HasErrors)
+                    {
+                        content[key] = minified.Code;
+                    }
                 }
+
+                config.Content = content;
             });
         }
     }

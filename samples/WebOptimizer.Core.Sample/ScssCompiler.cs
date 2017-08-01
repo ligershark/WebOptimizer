@@ -11,35 +11,27 @@ namespace BundlerSample
 {
     public class ScssCompiler : IProcessor
     {
-        private IEnumerable<string> _routes;
-
-        public ScssCompiler(IEnumerable<string> routes)
-        {
-            _routes = routes;
-        }
-
         public string CacheKey(HttpContext context) => string.Empty;
 
-        public async Task ExecuteAsync(IAssetContext context)
+        public Task ExecuteAsync(IAssetContext context)
         {
-            var pipeline = (IAssetPipeline)context.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
-            var sb = new StringBuilder();
-
-            foreach (string route in _routes)
+            return Task.Run(() =>
             {
-                IFileInfo file = pipeline.FileProvider.GetFileInfo(route);
-                var options = new ScssOptions { InputFile = file.PhysicalPath };
+                var pipeline = (IAssetPipeline)context.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
+                var content = new Dictionary<string, string>();
 
-                using (var reader = new StreamReader(file.PhysicalPath))
+                foreach (string route in context.Content.Keys)
                 {
-                    string source = await reader.ReadToEndAsync();
-                    ScssResult result = Scss.ConvertToCss(source, options);
+                    IFileInfo file = pipeline.FileProvider.GetFileInfo(route);
+                    var options = new ScssOptions { InputFile = file.PhysicalPath };
 
-                    sb.AppendLine(result.Css);
+                    ScssResult result = Scss.ConvertToCss(context.Content[route], options);
+
+                    content[route] = result.Css;
                 }
-            }
 
-            context.Content = sb.ToString();
+                context.Content = content;
+            });
         }
     }
 
@@ -47,7 +39,7 @@ namespace BundlerSample
     {
         public static IAsset CompileScss(this IAsset asset)
         {
-            asset.Processors.Add(new ScssCompiler(asset.SourceFiles));
+            asset.Processors.Add(new ScssCompiler());
             return asset;
         }
 
@@ -62,8 +54,8 @@ namespace BundlerSample
         public static IAsset AddScss(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
         {
             return pipeline.Add(route, "text/css", sourceFiles)
-                           .ReadFromDisk()
-                           .CompileScss();
+                           .CompileScss()
+                           .Concatinate();
         }
     }
 }

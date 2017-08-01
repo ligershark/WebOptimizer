@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.FileProviders;
 
 namespace WebOptimizer
 {
@@ -58,14 +61,25 @@ namespace WebOptimizer
         /// </summary>
         public async Task<string> ExecuteAsync(HttpContext context)
         {
+            var pipeline = (IAssetPipeline)context.RequestServices.GetService(typeof(IAssetPipeline));
             var config = new AssetContext(context, this);
+
+            foreach (string sourceFile in SourceFiles)
+            {
+                IFileInfo file = pipeline.FileProvider.GetFileInfo(sourceFile);
+
+                using (var reader = new StreamReader(file.CreateReadStream()))
+                {
+                    config.Content.Add(sourceFile, await reader.ReadToEndAsync());
+                }
+            }
 
             foreach (IProcessor processor in Processors)
             {
                 await processor.ExecuteAsync(config).ConfigureAwait(false);
             }
 
-            return config.Content;
+            return config.Content.FirstOrDefault().Value;
         }
 
         /// <summary>

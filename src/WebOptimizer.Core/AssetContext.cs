@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace WebOptimizer
 {
@@ -12,7 +13,7 @@ namespace WebOptimizer
         /// </summary>
         public AssetContext(HttpContext httpContext, IAsset asset)
         {
-            Content = string.Empty;
+            Content = new Dictionary<string, string>();
             HttpContext = httpContext;
             Asset = asset;
         }
@@ -20,7 +21,7 @@ namespace WebOptimizer
         /// <summary>
         /// Gets or sets the content of the response.
         /// </summary>
-        public string Content { get; set; }
+        public IDictionary<string, string> Content { get; set; }
 
         /// <summary>
         /// Gets the HTTP context.

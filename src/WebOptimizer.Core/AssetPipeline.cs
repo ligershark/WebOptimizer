@@ -136,7 +136,7 @@ namespace WebOptimizer
         public static IAsset AddJs(this IAssetPipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
         {
             return pipeline.Add(route, "application/javascript", sourceFiles)
-                           .ReadFromDisk()
+                           .Concatinate()
                            .MinifyJavaScript(settings);
         }
 
@@ -154,7 +154,7 @@ namespace WebOptimizer
         public static IAsset AddCss(this IAssetPipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
         {
             return pipeline.Add(route, "text/css", sourceFiles)
-                           .ReadFromDisk()
+                           .Concatinate()
                            .MinifyCss(settings);
         }
 
@@ -171,7 +171,7 @@ namespace WebOptimizer
             foreach (string file in sourceFiles)
             {
                 IAsset asset = pipeline.Add(file, contentType, file);
-                asset.Processors.Add(new SourceReader());
+                asset.Processors.Add(new Concatinator());
                 list.Add(asset);
             }
 
