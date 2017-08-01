@@ -13,7 +13,7 @@ install:
 
 build_script:
   - dotnet restore -v quiet
-  - ps: dotnet build /p:configuration=Release /p:Version=$($env:appveyor_build_version)-alpha
+  - ps: dotnet build /p:configuration=Release /p:Version=$($env:appveyor_build_version)-beta
 
 test_script:
   - dotnet test test/bundler.test/bundler.test.csproj
