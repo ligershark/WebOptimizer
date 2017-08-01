@@ -51,8 +51,8 @@ namespace WebOptimizer
         /// </summary>
         public static IAsset ReadFromDisk(this IAsset asset)
         {
-            var bundler = new SourceReader();
-            asset.Processors.Add(bundler);
+            var reader = new SourceReader();
+            asset.Processors.Add(reader);
 
             return asset;
         }

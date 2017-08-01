@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
@@ -12,34 +13,33 @@ namespace BundlerSample
     {
         private IEnumerable<string> _routes;
 
-        public ScssCompiler(IEnumerable<string> route)
+        public ScssCompiler(IEnumerable<string> routes)
         {
-            _routes = route;
+            _routes = routes;
         }
 
         public string CacheKey(HttpContext context) => string.Empty;
 
-        public Task ExecuteAsync(IAssetContext context)
+        public async Task ExecuteAsync(IAssetContext context)
         {
             var pipeline = (IAssetPipeline)context.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
+            var sb = new StringBuilder();
 
-            return Task.Run(() =>
+            foreach (string route in _routes)
             {
-                var options = new ScssOptions();
+                IFileInfo file = pipeline.FileProvider.GetFileInfo(route);
+                var options = new ScssOptions { InputFile = file.PhysicalPath };
 
-                foreach (string route in _routes)
+                using (var reader = new StreamReader(file.PhysicalPath))
                 {
-                    IFileInfo file = pipeline.FileProvider.GetFileInfo(route);
-                    string dir = Path.GetDirectoryName(file.PhysicalPath);
+                    string source = await reader.ReadToEndAsync();
+                    ScssResult result = Scss.ConvertToCss(source, options);
 
-                    if (!options.IncludePaths.Contains(dir))
-                    {
-                        options.IncludePaths.Add(dir);
-                    }
+                    sb.AppendLine(result.Css);
                 }
+            }
 
-                context.Content = Scss.ConvertToCss(context.Content, options).Css;
-            });
+            context.Content = sb.ToString();
         }
     }
 
