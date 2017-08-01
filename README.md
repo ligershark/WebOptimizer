@@ -35,7 +35,7 @@ Then simply reference the new bundle route from the HTML like any other file:
 <script src="/all.js"></script>
 ```
 
-Check out the [sample application](https://github.com/ligershark/Bundler/blob/master/samples/BundlerSample/Startup.cs).
+Check out the [sample application](https://github.com/ligershark/WebOptimizer/blob/master/samples/WebOptimizer.Core.Sample/Startup.cs).
 
 ## Install
 Add the NuGet package [LigerShark.WebOptimizer.Core](https://preview.nuget.org/packages/LigerShark.WebOptimizer.Core/) to any ASP.NET Core project supporting .NET Standard 1.6 or higher.

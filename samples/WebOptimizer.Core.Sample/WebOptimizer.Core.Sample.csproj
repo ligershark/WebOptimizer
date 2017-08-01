@@ -4,6 +4,8 @@
         <TargetFramework>netcoreapp2.0</TargetFramework>
         <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
         <UserSecretsId>aspnet-Bundler-0FD76794-6C49-406B-8DFD-0065261C9839</UserSecretsId>
+        <AssemblyName>BundlerSample</AssemblyName>
+        <RootNamespace>BundlerSample</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
