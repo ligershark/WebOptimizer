@@ -91,7 +91,7 @@ namespace Bundler
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
-    public static class PipelineExtensions
+    public static partial class PipelineExtensions
     {
         /// <summary>
         /// Adds WebOptimizer to the <see cref="IApplicationBuilder"/> request execution pipeline

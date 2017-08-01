@@ -43,24 +43,7 @@ namespace Bundler
                 config.Content = Localize(config.Content);
             });
         }
-
-        //private static IStringLocalizer<T> GetStringLocalizer<T>(IApplicationBuilder app)
-        //{
-        //    try
-        //    {
-        //        IStringLocalizer<T> stringProvider = app.ApplicationServices.GetRequiredService<IStringLocalizer<T>>();
-        //        return stringProvider;
-        //    }
-        //    catch (InvalidOperationException e)
-        //    {
-        //        if (e.HResult == -2146233079)
-        //        {
-        //            throw new InvalidOperationException("No IStringLocalizer could be found.  Did you forget to register localization middleware in ConfigureServices?");
-        //        }
-        //        throw;
-        //    }
-        //}
-
+        
         private string Localize(string document)
         {
             var sb = new StringBuilder();
@@ -155,7 +138,7 @@ namespace Bundler
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
-    public static class LocalizerExtensions
+    public static partial class PipelineExtensions
     {
         /// <summary>
         /// Extension method to localizes the files in a bundle
@@ -171,23 +154,6 @@ namespace Bundler
             }
 
             return assets;
-        }
-
-        private static IStringLocalizer<T> GetStringLocalizer<T>(IApplicationBuilder app)
-        {
-            try
-            {
-                IStringLocalizer<T> stringProvider = app.ApplicationServices.GetRequiredService<IStringLocalizer<T>>();
-                return stringProvider;
-            }
-            catch (InvalidOperationException e)
-            {
-                if (e.HResult == -2146233079)
-                {
-                    throw new InvalidOperationException("No IStringLocalizer could be found.  Did you forget to register localization middleware in ConfigureServices?");
-                }
-                throw;
-            }
         }
 
         /// <summary>

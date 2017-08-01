@@ -44,7 +44,7 @@ namespace Bundler
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
-    public static class SourceReaderExtensions
+    public static partial class PipelineExtensions
     {
         /// <summary>
         /// Adds the string content of all source files to the pipeline.

@@ -49,7 +49,7 @@ namespace Bundler
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
-    public static class CssMinifierExtension
+    public static partial class PipelineExtensions
     {
         /// <summary>
         /// Runs the CSS minifier on the content.
