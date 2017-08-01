@@ -2,7 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/twj2lkgnm4th6qh9?svg=true)](https://ci.appveyor.com/project/madskristensen/weboptimizer)
 
-ASP.NET Core middleware for bundling and minification of CSS and JavaScript files.
+ASP.NET Core middleware for bundling, minification and localization of CSS and JavaScript files.
 
 ## Content
 - [How it works](#how-it-works)
