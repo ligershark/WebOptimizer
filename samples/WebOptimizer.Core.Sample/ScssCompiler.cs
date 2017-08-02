@@ -57,7 +57,9 @@ namespace BundlerSample
         {
             return pipeline.Add(route, "text/css", sourceFiles)
                            .CompileScss()
-                           .Concatinate();
+                           .AdjustRelativePaths()
+                           .Concatinate()
+                           .CssFingerprint();
         }
     }
 }

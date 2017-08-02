@@ -13,9 +13,11 @@ namespace WebOptimizer.Test.Processors
     {
         [Theory2]
         [InlineData("url(/img/foo.png)", "url(/img/foo.png)")]
-        [InlineData("url(img/foo.png)", "url(../css/img/foo.png)")]
+        [InlineData("url(/img/foo.png?1=1)", "url(/img/foo.png?1=1)")]
         [InlineData("url(img/foo.png)", "url(../css/img/foo.png)")]
         [InlineData("url(http://foo.png)", "url(http://foo.png)")]
+        [InlineData("url('img/foo.png')", "url('../css/img/foo.png')")]
+        [InlineData("url(\"img/foo.png\")", "url(\"../css/img/foo.png\")")]
         public async Task AdjustRelativePaths_Success(string url, string newUrl)
         {
             var adjuster = new RelativePathAdjuster();

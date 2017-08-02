@@ -1,6 +1,9 @@
 ﻿@import "variables.scss";
 
+
 body {
     background: $bgcolor;
     content: "{{hello}}";
+    background: url(img/banner1.svg);
+    background-image: url(../images/banner1.svg);
 }

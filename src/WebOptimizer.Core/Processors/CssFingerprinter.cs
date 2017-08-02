@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.FileProviders;
 
 namespace WebOptimizer
@@ -11,7 +13,7 @@ namespace WebOptimizer
     /// <summary>
     /// A processor that minifies JavaScript
     /// </summary>
-    internal class RelativePathAdjuster : IProcessor
+    internal class CssFingerprinter : IProcessor
     {
         private static readonly Regex _rxUrl = new Regex(@"url\s*\(\s*([""']?)([^:)]+)\1\s*\)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly string _protocol = "file:///";
@@ -36,32 +38,28 @@ namespace WebOptimizer
                     IFileInfo input = pipeline.FileProvider.GetFileInfo(key);
                     IFileInfo output = pipeline.FileProvider.GetFileInfo(config.Asset.Route);
 
-                    content[key] = Adjust(config.Content[key], input.PhysicalPath, output.PhysicalPath);
+                    content[key] = Adjust(config.Content[key], input, output);
                 }
 
                 config.Content = content;
             });
         }
 
-        private static string Adjust(string cssFileContents, string inputFile, string outputPath)
+        private static string Adjust(string content, IFileInfo input, IFileInfo output)
         {
-            string absoluteOutputPath = new FileInfo(outputPath).FullName;
-
-            // apply the RegEx to the file (to change relative paths)
-            MatchCollection matches = _rxUrl.Matches(cssFileContents);
+            MatchCollection matches = _rxUrl.Matches(content);
 
             // Ignore the file if no match
             if (matches.Count > 0)
             {
-                string cssDirectoryPath = Path.GetDirectoryName(inputFile);
+                string inputDir = Path.GetDirectoryName(input.PhysicalPath);
 
                 foreach (Match match in matches)
                 {
-                    string quoteDelimiter = match.Groups[1].Value; //url('') vs url("")
                     string urlValue = match.Groups[2].Value;
 
-                    // Ignore root relative references
-                    if (urlValue.StartsWith("/", StringComparison.Ordinal))
+                    // Ignore references with protocols
+                    if (urlValue.Contains("://") || urlValue.StartsWith("//"))
                         continue;
 
                     //prevent query string from causing error
@@ -69,24 +67,36 @@ namespace WebOptimizer
                     string pathOnly = pathAndQuery[0];
                     string queryOnly = pathAndQuery.Length == 2 ? pathAndQuery[1] : string.Empty;
 
-                    string absolutePath = GetAbsolutePath(cssDirectoryPath, pathOnly);
-                    string serverRelativeUrl = MakeRelative(absoluteOutputPath, absolutePath);
+                    var info = new FileInfo(Path.Combine(inputDir, pathOnly.TrimStart('/')));
+
+                    if (!info.Exists)
+                    {
+                        continue;
+                    }
+
+                    string hash = GenerateHash(info.LastWriteTime.Ticks.ToString());
+                    string withHash = pathOnly + $"?v={hash}";
 
                     if (!string.IsNullOrEmpty(queryOnly))
-                        serverRelativeUrl += "?" + queryOnly;
+                    {
+                        withHash += $"&{queryOnly}";
+                    }
 
-                    string replace = string.Format("url({0}{1}{0})", quoteDelimiter, serverRelativeUrl);
-
-                    cssFileContents = cssFileContents.Replace(match.Groups[0].Value, replace);
+                    content = content.Replace(match.Groups[2].Value, withHash);
                 }
             }
 
-            return cssFileContents;
+            return content;
         }
 
-        private static string GetAbsolutePath(string cssFilePath, string pathOnly)
+        private static string GenerateHash(string content)
         {
-            return Path.GetFullPath(Path.Combine(cssFilePath, pathOnly));
+            using (var algo = SHA1.Create())
+            {
+                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(content);
+                byte[] hash = algo.ComputeHash(buffer);
+                return WebEncoders.Base64UrlEncode(hash);
+            }
         }
 
         private static string MakeRelative(string baseFile, string file)
@@ -117,20 +127,22 @@ namespace WebOptimizer
     {
 
         /// <summary>
-        /// Adjusts the relative paths in CSS documents.
+        /// Adds a fingerprint to local url() references.
+        /// NOTE: Make sure to call Concatinate() before this method
         /// </summary>
-        public static IAsset AdjustRelativePaths(this IAsset bundle)
+        public static IAsset CssFingerprint(this IAsset bundle)
         {
-            var minifier = new RelativePathAdjuster();
+            var minifier = new CssFingerprinter();
             bundle.Processors.Add(minifier);
 
             return bundle;
         }
 
         /// <summary>
-        /// Adjusts the relative paths in CSS documents.
+        /// Adds a fingerprint to local url() references.
+        /// NOTE: Make sure to call Concatinate() before this method
         /// </summary>
-        public static IEnumerable<IAsset> AdjustRelativePaths(this IEnumerable<IAsset> assets)
+        public static IEnumerable<IAsset> CssFingerprint(this IEnumerable<IAsset> assets)
         {
             var list = new List<IAsset>();
 

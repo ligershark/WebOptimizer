@@ -156,6 +156,7 @@ namespace WebOptimizer
             return pipeline.Add(route, "text/css", sourceFiles)
                            .AdjustRelativePaths()
                            .Concatinate()
+                           .CssFingerprint()
                            .MinifyCss(settings);
         }
 
