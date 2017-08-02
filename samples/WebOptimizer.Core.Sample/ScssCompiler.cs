@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
@@ -45,10 +43,14 @@ namespace BundlerSample
 
         public static IEnumerable<IAsset> CompileScss(this IEnumerable<IAsset> assets)
         {
+            var list = new List<IAsset>();
+
             foreach (IAsset asset in assets)
             {
-                yield return asset.CompileScss();
+                list.Add(asset.CompileScss());
             }
+
+            return list;
         }
 
         public static IAsset AddScss(this IAssetPipeline pipeline, string route, params string[] sourceFiles)

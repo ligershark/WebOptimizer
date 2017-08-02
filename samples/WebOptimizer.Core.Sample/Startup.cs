@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
-using BundlerSample;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -26,8 +25,8 @@ namespace BundlerSample
 
             services.AddWebOptimizer(assets =>
             {
-                //assets.EnableCaching = true;
-                assets.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
+                assets.EnableCaching = true;
+                assets.AddCss("all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
 
                 assets.AddJs("all.js", "js/site.js", "js/b.js")
                       .Localize<Strings>();

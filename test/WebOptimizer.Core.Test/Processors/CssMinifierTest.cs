@@ -11,7 +11,7 @@ namespace WebOptimizer.Test.Processors
     public class CssMinifierTest
     {
         [Fact2]
-        public async Task ExecuteTest_DefaultSettings_Success()
+        public async Task MinifyCss_DefaultSettings_Success()
         {
             var minifier = new CssMinifier(new CssSettings());
             var context = new Mock<IAssetContext>().SetupAllProperties();
@@ -29,7 +29,7 @@ namespace WebOptimizer.Test.Processors
         [InlineData("/* comment */")]
         [InlineData("   /**/ ")]
         [InlineData("\r\n  \t \r \n")]
-        public async Task ExecuteTest_EmptyContent_Success(string input)
+        public async Task MinifyCss_EmptyContent_Success(string input)
         {
             var minifier = new CssMinifier(new CssSettings());
             var context = new Mock<IAssetContext>().SetupAllProperties();
@@ -42,7 +42,7 @@ namespace WebOptimizer.Test.Processors
         }
 
         [Fact2]
-        public async Task ExecuteTest_CustomSettings_Success()
+        public async Task MinifyCss_CustomSettings_Success()
         {
             var settings = new CssSettings { TermSemicolons = true, ColorNames = CssColor.NoSwap };
             var minifier = new CssMinifier(settings);

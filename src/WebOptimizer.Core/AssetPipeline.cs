@@ -154,6 +154,7 @@ namespace WebOptimizer
         public static IAsset AddCss(this IAssetPipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
         {
             return pipeline.Add(route, "text/css", sourceFiles)
+                           .AdjustRelativePaths()
                            .Concatinate()
                            .MinifyCss(settings);
         }

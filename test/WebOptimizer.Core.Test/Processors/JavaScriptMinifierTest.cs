@@ -11,7 +11,7 @@ namespace WebOptimizer.Test.Processors
     public class JavaScriptMinifierTest
     {
         [Fact2]
-        public async Task ExecuteTest_DefaultSettings_Success()
+        public async Task MinifyJs_DefaultSettings_Success()
         {
             var minifier = new JavaScriptMinifier(new CodeSettings());
             var context = new Mock<IAssetContext>().SetupAllProperties();
@@ -30,7 +30,7 @@ namespace WebOptimizer.Test.Processors
         [InlineData("// comment")]
         [InlineData("   // ")]
         [InlineData("\r\n  \t \r \n")]
-        public async Task ExecuteTest_EmptyContent_Success(string input)
+        public async Task MinifyJs_EmptyContent_Success(string input)
         {
             var minifier = new JavaScriptMinifier(new CodeSettings());
             var context = new Mock<IAssetContext>().SetupAllProperties();
@@ -43,7 +43,7 @@ namespace WebOptimizer.Test.Processors
         }
 
         [Fact2]
-        public async Task ExecuteTest_CustomSettings_Success()
+        public async Task MinifyJs_CustomSettings_Success()
         {
             var settings = new CodeSettings { TermSemicolons = true};
             var minifier = new JavaScriptMinifier(settings);
