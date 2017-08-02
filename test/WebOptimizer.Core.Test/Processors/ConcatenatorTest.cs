@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Moq;
-using NUglify.Css;
 using Xunit;
 
 namespace WebOptimizer.Test.Processors
@@ -35,6 +33,26 @@ namespace WebOptimizer.Test.Processors
             await processor.ExecuteAsync(context.Object);
 
             Assert.Equal(1, context.Object.Content.Count);
+        }
+
+        [Fact2]
+        public void AddConcatinate_Assets_Success()
+        {
+            var env = new HostingEnvironment { EnvironmentName = "Development" };
+            var asset1 = Asset.Create("/file1", "text/css", new[] { "file.css" });
+            var asset2 = Asset.Create("/file2", "text/css", new[] { "file.css" });
+            var pipeline = new AssetPipeline();
+            var assets = pipeline.Add(new[] { asset1, asset2 });
+
+            assets = assets.Concatinate();
+
+            Assert.Equal(2, assets.Count());
+
+            foreach (var asset in assets)
+            {
+                Assert.Equal(1, asset.Processors.Count);
+                Assert.True(asset.Processors.First() is Concatenator);
+            }
         }
     }
 }
