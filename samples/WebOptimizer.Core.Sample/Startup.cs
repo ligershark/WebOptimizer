@@ -25,7 +25,7 @@ namespace BundlerSample
 
             services.AddWebOptimizer(assets =>
             {
-                assets.EnableCaching = true;
+                assets.EnableTagHelperBundling = true;
                 assets.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
 
                 assets.AddJs("/all.js", "js/site.js", "js/b.js")
@@ -48,7 +48,7 @@ namespace BundlerSample
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IAssetPipeline pipeline)
         {
             if (env.IsDevelopment())
             {
@@ -71,7 +71,11 @@ namespace BundlerSample
                 SupportedUICultures = cultures
             });
 
-            app.UseWebOptimizer();
+            pipeline.FileProvider = env.WebRootFileProvider;
+            app.UseWebOptimizer(options =>
+            {
+                options.EnableCaching = true;
+            });
 
             app.UseStaticFiles();
 

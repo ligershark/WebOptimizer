@@ -9,7 +9,7 @@ namespace WebOptimizer
     /// <summary>
     /// Concatinates multiple files into a single string.
     /// </summary>
-    internal class Concatinator : IProcessor
+    internal class Concatenator : IProcessor
     {
         /// <summary>
         /// Gets the custom key that should be used when calculating the memory cache key.
@@ -21,20 +21,19 @@ namespace WebOptimizer
         /// </summary>
         public Task ExecuteAsync(IAssetContext context)
         {
-            return Task.Run(() =>
+            var sb = new StringBuilder();
+
+            foreach (string content in context.Content.Values)
             {
-                var sb = new StringBuilder();
+                sb.AppendLine(content);
+            }
 
-                foreach (string content in context.Content.Values)
-                {
-                    sb.AppendLine(content);
-                }
+            context.Content = new Dictionary<string, string>
+            {
+                { Guid.NewGuid().ToString(), sb.ToString() }
+            };
 
-                context.Content = new Dictionary<string, string>
-                {
-                    { Guid.NewGuid().ToString(), sb.ToString() }
-                };
-            });
+            return Task.CompletedTask;
         }
     }
 
@@ -48,7 +47,7 @@ namespace WebOptimizer
         /// </summary>
         public static IAsset Concatinate(this IAsset asset)
         {
-            var reader = new Concatinator();
+            var reader = new Concatenator();
             asset.Processors.Add(reader);
 
             return asset;

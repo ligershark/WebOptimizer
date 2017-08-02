@@ -13,23 +13,22 @@ namespace BundlerSample
 
         public Task ExecuteAsync(IAssetContext context)
         {
-            return Task.Run(() =>
+            var pipeline = (IAssetPipeline)context.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
+            var content = new Dictionary<string, string>();
+
+            foreach (string route in context.Content.Keys)
             {
-                var pipeline = (IAssetPipeline)context.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
-                var content = new Dictionary<string, string>();
+                IFileInfo file = pipeline.FileProvider.GetFileInfo(route);
+                var options = new ScssOptions { InputFile = file.PhysicalPath };
 
-                foreach (string route in context.Content.Keys)
-                {
-                    IFileInfo file = pipeline.FileProvider.GetFileInfo(route);
-                    var options = new ScssOptions { InputFile = file.PhysicalPath };
+                ScssResult result = Scss.ConvertToCss(context.Content[route], options);
 
-                    ScssResult result = Scss.ConvertToCss(context.Content[route], options);
+                content[route] = result.Css;
+            }
 
-                    content[route] = result.Css;
-                }
+            context.Content = content;
 
-                context.Content = content;
-            });
+            return Task.CompletedTask;
         }
     }
 

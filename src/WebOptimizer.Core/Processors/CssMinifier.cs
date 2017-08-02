@@ -34,22 +34,21 @@ namespace WebOptimizer
         /// </summary>
         public Task ExecuteAsync(IAssetContext config)
         {
-            return Task.Run(() =>
+            var content = new Dictionary<string, string>();
+
+            foreach (string key in config.Content.Keys)
             {
-                var content = new Dictionary<string, string>();
+                UglifyResult minified = Uglify.Css(config.Content[key], Settings);
 
-                foreach (string key in config.Content.Keys)
+                if (!minified.HasErrors)
                 {
-                    UglifyResult minified = Uglify.Css(config.Content[key], Settings);
-
-                    if (!minified.HasErrors)
-                    {
-                        content[key] = minified.Code;
-                    }
+                    content[key] = minified.Code;
                 }
+            }
 
-                config.Content = content;
-            });
+            config.Content = content;
+
+            return Task.CompletedTask;
         }
     }
 

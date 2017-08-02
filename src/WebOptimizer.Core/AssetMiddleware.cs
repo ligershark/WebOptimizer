@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -15,16 +17,18 @@ namespace WebOptimizer
         private readonly IHostingEnvironment _env;
         private readonly IMemoryCache _cache;
         private readonly IAssetPipeline _pipeline;
+        private readonly IAssetMiddlewareOptions _options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AssetMiddleware"/> class.
         /// </summary>
-        public AssetMiddleware(RequestDelegate next, IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline)
+        public AssetMiddleware(RequestDelegate next, IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IAssetMiddlewareOptions options)
         {
             _next = next;
             _env = env;
             _cache = cache;
             _pipeline = pipeline;
+            _options = options;
         }
 
         /// <summary>
@@ -51,7 +55,7 @@ namespace WebOptimizer
                 context.Response.StatusCode = 304;
                 await WriteOutputAsync(context, asset, string.Empty, cacheKey).ConfigureAwait(false);
             }
-            else if (_pipeline.EnableCaching == true && _cache.TryGetValue(cacheKey, out string value))
+            else if (_options.EnableCaching == true && _cache.TryGetValue(cacheKey, out string value))
             {
                 await WriteOutputAsync(context, asset, value, cacheKey).ConfigureAwait(false);
             }
@@ -97,7 +101,7 @@ namespace WebOptimizer
         {
             context.Response.ContentType = asset.ContentType;
 
-            if (_pipeline.EnableCaching == true && !string.IsNullOrEmpty(cacheKey))
+            if (_options.EnableCaching == true && !string.IsNullOrEmpty(cacheKey))
             {
                 context.Response.Headers["Cache-Control"] = $"max-age=31536000"; // 1 year
                 context.Response.Headers["ETag"] = $"\"{cacheKey}\"";
@@ -107,6 +111,35 @@ namespace WebOptimizer
             {
                 await context.Response.WriteAsync(content).ConfigureAwait(false);
             }
+        }
+    }
+
+    /// <summary>
+    /// Extension methods for <see cref="IAssetPipeline"/>.
+    /// </summary>
+    public static partial class PipelineExtensions
+    {
+        /// <summary>
+        /// Adds WebOptimizer to the <see cref="IApplicationBuilder"/> request execution pipeline
+        /// </summary>
+        public static void UseWebOptimizer(this IApplicationBuilder app)
+        {
+            var env = (IHostingEnvironment)app.ApplicationServices.GetService(typeof(IHostingEnvironment));
+            var options = new AssetMiddlewareOptions(env);
+
+            app.UseMiddleware<AssetMiddleware>(options);
+        }
+
+        /// <summary>
+        /// Adds WebOptimizer to the <see cref="IApplicationBuilder"/> request execution pipeline
+        /// </summary>
+        public static void UseWebOptimizer(this IApplicationBuilder app, Action<IAssetMiddlewareOptions> assetMiddlewareOptions)
+        {
+            var env = (IHostingEnvironment)app.ApplicationServices.GetService(typeof(IHostingEnvironment));
+            var options = new AssetMiddlewareOptions(env);
+            assetMiddlewareOptions(options);
+
+            app.UseMiddleware<AssetMiddleware>(options);
         }
     }
 }

@@ -26,21 +26,20 @@ namespace WebOptimizer
         /// </summary>
         public Task ExecuteAsync(IAssetContext config)
         {
-            return Task.Run(() =>
+            var content = new Dictionary<string, string>();
+            var pipeline = (IAssetPipeline)config.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
+
+            foreach (string key in config.Content.Keys)
             {
-                var content = new Dictionary<string, string>();
-                var pipeline = (IAssetPipeline)config.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
+                IFileInfo input = pipeline.FileProvider.GetFileInfo(key);
+                IFileInfo output = pipeline.FileProvider.GetFileInfo(config.Asset.Route);
 
-                foreach (string key in config.Content.Keys)
-                {
-                    IFileInfo input = pipeline.FileProvider.GetFileInfo(key);
-                    IFileInfo output = pipeline.FileProvider.GetFileInfo(config.Asset.Route);
+                content[key] = Adjust(config.Content[key], input.PhysicalPath, output.PhysicalPath);
+            }
 
-                    content[key] = Adjust(config.Content[key], input.PhysicalPath, output.PhysicalPath);
-                }
+            config.Content = content;
 
-                config.Content = content;
-            });
+            return Task.CompletedTask;
         }
 
         private static string Adjust(string cssFileContents, string inputFile, string outputPath)
@@ -73,7 +72,9 @@ namespace WebOptimizer
                     string serverRelativeUrl = MakeRelative(absoluteOutputPath, absolutePath);
 
                     if (!string.IsNullOrEmpty(queryOnly))
+                    {
                         serverRelativeUrl += "?" + queryOnly;
+                    }
 
                     string replace = string.Format("url({0}{1}{0})", quoteDelimiter, serverRelativeUrl);
 

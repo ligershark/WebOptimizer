@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,18 +36,17 @@ namespace WebOptimizer
         /// </summary>
         public Task ExecuteAsync(IAssetContext config)
         {
-            return Task.Run(() =>
+            _stringProvider = config.HttpContext.RequestServices.GetService<IStringLocalizer<T>>();
+            var content = new Dictionary<string, string>();
+
+            foreach (string route in config.Content.Keys)
             {
-                _stringProvider = config.HttpContext.RequestServices.GetService<IStringLocalizer<T>>();
-                var content = new Dictionary<string, string>();
+                content[route] = Localize(config.Content[route]);
+            }
 
-                foreach (string route in config.Content.Keys)
-                {
-                    content[route] = Localize(config.Content[route]);
-                }
+            config.Content = content;
 
-                config.Content = content;
-            });
+            return Task.CompletedTask;
         }
 
         private string Localize(string document)
@@ -152,7 +150,6 @@ namespace WebOptimizer
         /// </summary>
         public static IEnumerable<IAsset> Localize<T>(this IEnumerable<IAsset> assets)
         {
-            //IStringLocalizer<T> stringProvider = GetStringLocalizer<T>(app);
             var localizer = new Localizer<T>();
 
             foreach (IAsset asset in assets)

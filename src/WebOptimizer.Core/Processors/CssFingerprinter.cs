@@ -16,7 +16,6 @@ namespace WebOptimizer
     internal class CssFingerprinter : IProcessor
     {
         private static readonly Regex _rxUrl = new Regex(@"url\s*\(\s*([""']?)([^:)]+)\1\s*\)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly string _protocol = "file:///";
 
         /// <summary>
         /// Gets the custom key that should be used when calculating the memory cache key.
@@ -28,21 +27,20 @@ namespace WebOptimizer
         /// </summary>
         public Task ExecuteAsync(IAssetContext config)
         {
-            return Task.Run(() =>
+            var content = new Dictionary<string, string>();
+            var pipeline = (IAssetPipeline)config.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
+
+            foreach (string key in config.Content.Keys)
             {
-                var content = new Dictionary<string, string>();
-                var pipeline = (IAssetPipeline)config.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
+                IFileInfo input = pipeline.FileProvider.GetFileInfo(key);
+                IFileInfo output = pipeline.FileProvider.GetFileInfo(config.Asset.Route);
 
-                foreach (string key in config.Content.Keys)
-                {
-                    IFileInfo input = pipeline.FileProvider.GetFileInfo(key);
-                    IFileInfo output = pipeline.FileProvider.GetFileInfo(config.Asset.Route);
+                content[key] = Adjust(config.Content[key], input, output);
+            }
 
-                    content[key] = Adjust(config.Content[key], input, output);
-                }
+            config.Content = content;
 
-                config.Content = content;
-            });
+            return Task.CompletedTask;
         }
 
         private static string Adjust(string content, IFileInfo input, IFileInfo output)
@@ -96,26 +94,6 @@ namespace WebOptimizer
                 byte[] buffer = System.Text.Encoding.UTF8.GetBytes(content);
                 byte[] hash = algo.ComputeHash(buffer);
                 return WebEncoders.Base64UrlEncode(hash);
-            }
-        }
-
-        private static string MakeRelative(string baseFile, string file)
-        {
-            if (string.IsNullOrEmpty(file))
-                return file;
-
-            // The file:// protocol is to make it work on Linux.
-            // See https://github.com/madskristensen/BundlerMinifier/commit/01fe7a050eda073f8949caa90eedc4c23e04d0ce
-            var baseUri = new Uri(_protocol + baseFile, UriKind.RelativeOrAbsolute);
-            var fileUri = new Uri(_protocol + file, UriKind.RelativeOrAbsolute);
-
-            if (baseUri.IsAbsoluteUri)
-            {
-                return Uri.UnescapeDataString(baseUri.MakeRelativeUri(fileUri).ToString());
-            }
-            else
-            {
-                return baseUri.ToString();
             }
         }
     }

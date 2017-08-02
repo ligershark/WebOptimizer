@@ -8,12 +8,12 @@ using Xunit;
 
 namespace WebOptimizer.Test.Processors
 {
-    public class ConcatinatorTest
+    public class ConcatenatorTest
     {
         [Fact2]
         public async Task Concatinate_MultipleSources_Success()
         {
-            var processor = new Concatinator();
+            var processor = new Concatenator();
             var context = new Mock<IAssetContext>().SetupAllProperties();
             context.Object.Content = new Dictionary<string, string> {
                 { "/route1", "content" },
@@ -28,7 +28,7 @@ namespace WebOptimizer.Test.Processors
         [Fact2]
         public async Task Concatinate_NoSources_Success()
         {
-            var processor = new Concatinator();
+            var processor = new Concatenator();
             var context = new Mock<IAssetContext>().SetupAllProperties();
             context.Object.Content = new Dictionary<string, string>();
 

@@ -75,7 +75,6 @@ namespace WebOptimizer.Taghelpers
         {
             if (_fileProvider == null)
             {
-                Pipeline.EnsureDefaults(HostingEnvironment);
                 _fileProvider = new FileVersionProvider(
                     Pipeline.FileProvider,
                     Cache,

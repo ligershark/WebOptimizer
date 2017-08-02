@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -14,9 +13,7 @@ namespace WebOptimizer
     {
         private List<IAsset> _assets = new List<IAsset>();
 
-        public bool? EnabledBundling { get; set; }
-
-        public bool? EnableCaching { get; set; }
+        public bool? EnableTagHelperBundling { get; set; }
 
         /// <summary>
         /// Gets a list of transforms added.
@@ -96,14 +93,6 @@ namespace WebOptimizer
     public static partial class PipelineExtensions
     {
         /// <summary>
-        /// Adds WebOptimizer to the <see cref="IApplicationBuilder"/> request execution pipeline
-        /// </summary>
-        public static void UseWebOptimizer(this IApplicationBuilder app)
-        {
-            app.UseMiddleware<AssetMiddleware>();
-        }
-
-        /// <summary>
         /// Adds WebOptimizer to the specified <see cref="IServiceCollection"/>.
         /// </summary>
         public static void AddWebOptimizer(this IServiceCollection services, Action<IAssetPipeline> assetPipeline)
@@ -120,8 +109,7 @@ namespace WebOptimizer
         public static void EnsureDefaults(this IAssetPipeline pipeline, IHostingEnvironment env)
         {
             pipeline.FileProvider = pipeline.FileProvider ?? env.WebRootFileProvider;
-            pipeline.EnableCaching = pipeline.EnableCaching ?? !env.IsDevelopment();
-            pipeline.EnabledBundling = pipeline.EnableCaching ?? true;
+            pipeline.EnableTagHelperBundling = pipeline.EnableTagHelperBundling ?? !env.IsDevelopment();
         }
 
         /// <summary>
@@ -175,7 +163,7 @@ namespace WebOptimizer
             foreach (string file in sourceFiles)
             {
                 IAsset asset = pipeline.Add(file, contentType, file);
-                asset.Processors.Add(new Concatinator());
+                asset.Processors.Add(new Concatenator());
                 list.Add(asset);
             }
 

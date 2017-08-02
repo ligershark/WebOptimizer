@@ -53,6 +53,7 @@ namespace WebOptimizer.Taghelpers
                 output.Attributes.RemoveAll("defer");
             }
 
+            Pipeline.EnsureDefaults(HostingEnvironment);
             string content = await GetFileContentAsync(_route);
 
             output.Content.SetHtmlContent(content);
@@ -96,8 +97,6 @@ namespace WebOptimizer.Taghelpers
             }
             else
             {
-                Pipeline.EnsureDefaults(HostingEnvironment);
-
                 string file = Pipeline.FileProvider.GetFileInfo(route).PhysicalPath;
 
                 if (File.Exists(file))
