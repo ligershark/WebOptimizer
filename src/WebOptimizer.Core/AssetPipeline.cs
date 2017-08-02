@@ -33,7 +33,6 @@ namespace WebOptimizer
         public bool TryFromRoute(string route, out IAsset asset)
         {
             asset = null;
-            route = route.TrimStart('/');
 
             foreach (IAsset a in Assets)
             {
@@ -67,7 +66,10 @@ namespace WebOptimizer
 
         public IAsset Add(string route, string contentType, params string[] sourceFiles)
         {
-            route = route.TrimStart('/');
+            if (!route.StartsWith("/"))
+            {
+                throw new ArgumentException($"The route \"{route}\" must start with a /", nameof(route));
+            }
 
             if (TryFromRoute(route, out var existing))
             {

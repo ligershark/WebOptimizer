@@ -1,8 +1,8 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
-    background: url(img/banner1.svg);
-    background-image: url(../images/banner1.svg);
+    /*background: url(img/banner1.svg);
+    background-image: url(../images/banner1.svg);*/
 }
 
 /* Wrapping element */
