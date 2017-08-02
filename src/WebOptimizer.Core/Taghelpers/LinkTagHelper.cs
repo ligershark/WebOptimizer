@@ -8,7 +8,7 @@ namespace WebOptimizer.Taghelpers
     /// <summary>
     /// A TagHelper for hooking CSS bundles up to the HTML page.
     /// </summary>
-    [HtmlTargetElement("link", Attributes = "href")]
+    [HtmlTargetElement("link", Attributes = "href, [rel=stylesheet]")]
     public class LinkTagHelper : BaseTagHelper
     {
         /// <summary>
