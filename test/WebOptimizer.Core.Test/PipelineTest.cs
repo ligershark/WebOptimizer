@@ -30,7 +30,7 @@ namespace WebOptimizer.Test
         public void AddSingeAsset_Succes()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            var asset = Asset.Create("route", "text/css", new[] { "file.css" });
+            var asset = Asset.Create("/route", "text/css", new[] { "file.css" });
             var pipeline = new AssetPipeline();
             pipeline.EnsureDefaults(env);
 
@@ -43,8 +43,8 @@ namespace WebOptimizer.Test
         public void AddTwoAsset_Succes()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            var asset1 = Asset.Create("route1", "text/css", new[] { "file.css" });
-            var asset2 = Asset.Create("route2", "text/css", new[] { "file.css" });
+            var asset1 = Asset.Create("/route1", "text/css", new[] { "file.css" });
+            var asset2 = Asset.Create("/route2", "text/css", new[] { "file.css" });
             var pipeline = new AssetPipeline();
             pipeline.EnsureDefaults(env);
 
@@ -57,8 +57,8 @@ namespace WebOptimizer.Test
         public void AddTwoSameRoutes_Throws()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            var asset1 = Asset.Create("route", "text/css", new[] { "file.css" });
-            var asset2 = Asset.Create("route", "text/css", new[] { "file.css" });
+            var asset1 = Asset.Create("/route", "text/css", new[] { "file.css" });
+            var asset2 = Asset.Create("/route", "text/css", new[] { "file.css" });
             var pipeline = new AssetPipeline();
             pipeline.EnsureDefaults(env);
 
@@ -73,12 +73,9 @@ namespace WebOptimizer.Test
         {
             var pipeline = new AssetPipeline();
             pipeline.Add("/route1", "text/css", "file.css");
-            pipeline.Add("route2", "text/css", "file.css");
 
             Assert.True(pipeline.TryFromRoute("/route1", out var a1));
-            Assert.True(pipeline.TryFromRoute("route1", out var a2));
-            Assert.True(pipeline.TryFromRoute("/route2", out var a3));
-            Assert.True(pipeline.TryFromRoute("route2", out var a4));
+            Assert.False(pipeline.TryFromRoute("route1", out var a2));
         }
     }
 }
