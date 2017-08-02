@@ -24,5 +24,17 @@ namespace WebOptimizer.Test.Processors
 
             Assert.Equal(1, context.Object.Content.Count);
         }
+
+        [Fact2]
+        public async Task Concatinate_NoSources_Success()
+        {
+            var processor = new Concatinator();
+            var context = new Mock<IAssetContext>().SetupAllProperties();
+            context.Object.Content = new Dictionary<string, string>();
+
+            await processor.ExecuteAsync(context.Object);
+
+            Assert.Equal(1, context.Object.Content.Count);
+        }
     }
 }

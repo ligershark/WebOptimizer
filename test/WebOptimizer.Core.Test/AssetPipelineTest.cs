@@ -3,7 +3,7 @@ using Xunit;
 
 namespace WebOptimizer.Test
 {
-    public class PipelineTest
+    public class AssetPipelineTest
     {
         [Fact2]
         public void DefaultValuesAsExpected()
