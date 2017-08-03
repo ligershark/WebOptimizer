@@ -92,6 +92,7 @@ namespace WebOptimizer.Test
 
             Assert.True(pipeline.TryFromRoute("/route1", out var a1));
             Assert.False(pipeline.TryFromRoute("route1", out var a2));
+            Assert.True(pipeline.TryFromRoute("~/route1", out var a3));
         }
 
         [Fact2]

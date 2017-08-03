@@ -58,7 +58,17 @@ namespace BundlerSample
                            .CompileScss()
                            .AdjustRelativePaths()
                            .Concatinate()
-                           .CssFingerprint();
+                           .CssFingerprint()
+                           .MinifyCss();
+        }
+
+        public static IAsset AddScss(this IAssetPipeline pipeline)
+        {
+            return pipeline.AddFileExtension(".scss", "text/css")
+                           .CompileScss()
+                           .AdjustRelativePaths()
+                           .CssFingerprint()
+                           .MinifyCss();
         }
     }
 }

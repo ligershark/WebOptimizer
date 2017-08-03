@@ -45,15 +45,13 @@ namespace WebOptimizer
         /// </summary>
         public static IAsset Create(string route, string contentType, IEnumerable<string> sourceFiles)
         {
-            var bundle = new Asset
+            return new Asset
             {
                 Route = route,
                 ContentType = contentType,
                 SourceFiles = sourceFiles,
                 Processors = new List<IProcessor>(),
             };
-
-            return bundle;
         }
 
         /// <summary>
@@ -63,6 +61,7 @@ namespace WebOptimizer
         {
             var pipeline = (IAssetPipeline)context.RequestServices.GetService(typeof(IAssetPipeline));
             var config = new AssetContext(context, this);
+            bool isExtension = Route.StartsWith(".");
 
             foreach (string sourceFile in SourceFiles)
             {
@@ -105,6 +104,11 @@ namespace WebOptimizer
                 byte[] hash = algo.ComputeHash(buffer);
                 return WebEncoders.Base64UrlEncode(hash);
             }
+        }
+
+        public override string ToString()
+        {
+            return Route;
         }
     }
 }

@@ -55,7 +55,7 @@ namespace WebOptimizer
                 context.Response.StatusCode = 304;
                 await WriteOutputAsync(context, asset, string.Empty, cacheKey).ConfigureAwait(false);
             }
-            else if (_options.EnableCaching == true && _cache.TryGetValue(cacheKey, out string value))
+            else if (_cache.TryGetValue(cacheKey, out string value))
             {
                 await WriteOutputAsync(context, asset, value, cacheKey).ConfigureAwait(false);
             }
@@ -77,14 +77,17 @@ namespace WebOptimizer
 
         private void AddToCache(string cacheKey, string value, IEnumerable<string> files)
         {
-            var cacheOptions = new MemoryCacheEntryOptions();
-
-            foreach (string file in files)
+            if (_options.EnableCaching == true)
             {
-                cacheOptions.AddExpirationToken(_pipeline.FileProvider.Watch(file));
-            }
+                var cacheOptions = new MemoryCacheEntryOptions();
 
-            _cache.Set(cacheKey, value, cacheOptions);
+                foreach (string file in files)
+                {
+                    cacheOptions.AddExpirationToken(_pipeline.FileProvider.Watch(file));
+                }
+
+                _cache.Set(cacheKey, value, cacheOptions);
+            }
         }
 
         private bool IsConditionalGet(HttpContext context, string cacheKey)
@@ -124,10 +127,7 @@ namespace WebOptimizer
         /// </summary>
         public static void UseWebOptimizer(this IApplicationBuilder app)
         {
-            var env = (IHostingEnvironment)app.ApplicationServices.GetService(typeof(IHostingEnvironment));
-            var options = new AssetMiddlewareOptions(env);
-
-            app.UseMiddleware<AssetMiddleware>(options);
+            app.UseWebOptimizer(asset => { });
         }
 
         /// <summary>

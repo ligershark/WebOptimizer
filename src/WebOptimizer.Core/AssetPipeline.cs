@@ -30,12 +30,29 @@ namespace WebOptimizer
         public bool TryFromRoute(string route, out IAsset asset)
         {
             asset = null;
+            string cleanRoute = route.TrimStart('~');
 
-            foreach (IAsset a in Assets)
+            foreach (IAsset existing in Assets)
             {
-                if (a.Route.Equals(route, StringComparison.OrdinalIgnoreCase))
+                if (existing.Route.Equals(cleanRoute, StringComparison.OrdinalIgnoreCase))
                 {
-                    asset = a;
+                    asset = existing;
+                    return true;
+                }
+            }
+
+            foreach (IAsset existing in Assets.Where(a => a.Route[0] == '.'))
+            {
+                if (route.EndsWith(existing.Route, StringComparison.OrdinalIgnoreCase))
+                {
+                    asset = Asset.Create(cleanRoute, existing.ContentType, new[] { cleanRoute });
+
+                    foreach (IProcessor processor in existing.Processors)
+                    {
+                        asset.Processors.Add(processor);
+                    }
+
+                    _assets.Add(asset);
                     return true;
                 }
             }
@@ -63,19 +80,19 @@ namespace WebOptimizer
 
         public IAsset Add(string route, string contentType, params string[] sourceFiles)
         {
-            if (!route.StartsWith("/"))
+            if (!route.StartsWith("/") && !route.StartsWith("."))
             {
-                throw new ArgumentException($"The route \"{route}\" must start with a /", nameof(route));
+                throw new ArgumentException($"The route \"{route}\" must start with a / or a .", nameof(route));
             }
 
-            if (TryFromRoute(route, out var existing))
+            if (Assets.Any(a => a.Route.Equals(route, StringComparison.OrdinalIgnoreCase)))
             {
                 throw new ArgumentException($"The route \"{route}\" was already specified", nameof(route));
             }
 
             string[] sources = sourceFiles;
 
-            if (sourceFiles.Length == 0)
+            if (!route.StartsWith(".") && sourceFiles.Length == 0)
             {
                 sources = new[] { route };
             }
@@ -113,6 +130,23 @@ namespace WebOptimizer
         }
 
         /// <summary>
+        /// Dynamically adds all requested .css files to the pipeline.
+        /// </summary>
+        public static IAsset AddJs(this IAssetPipeline pipeline)
+        {
+            return pipeline.AddJs(new CodeSettings());
+        }
+
+        /// <summary>
+        /// Dynamically adds all requested .css files to the pipeline.
+        /// </summary>
+        public static IAsset AddJs(this IAssetPipeline pipeline, CodeSettings settings)
+        {
+            return pipeline.AddFileExtension(".js", "application/javascript")
+                           .MinifyJavaScript(settings);
+        }
+
+        /// <summary>
         /// Creates a JavaScript bundle on the specified route and minifies the output.
         /// </summary>
         public static IAsset AddJs(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
@@ -128,6 +162,24 @@ namespace WebOptimizer
             return pipeline.Add(route, "application/javascript", sourceFiles)
                            .Concatinate()
                            .MinifyJavaScript(settings);
+        }
+
+        /// <summary>
+        /// Dynamically adds all requested .css files to the pipeline.
+        /// </summary>
+        public static IAsset AddCss(this IAssetPipeline pipeline)
+        {
+            return pipeline.AddCss(new CssSettings());
+        }
+
+        /// <summary>
+        /// Dynamically adds all requested .css files to the pipeline.
+        /// </summary>
+        public static IAsset AddCss(this IAssetPipeline pipeline, CssSettings settings)
+        {
+            return pipeline.AddFileExtension(".css", "text/css")
+                           .CssFingerprint()
+                           .MinifyCss(settings);
         }
 
         /// <summary>
@@ -168,6 +220,18 @@ namespace WebOptimizer
             }
 
             return list;
+        }
+
+        /// <summary>
+        /// Adds the file extension.
+        /// </summary>
+        /// <param name="pipeline">The pipeline.</param>
+        /// <param name="extension">The extension to use. Example: .css or .js</param>
+        /// <param name="contentType">The content type of the response. Example: text/css or application/javascript.</param>
+        public static IAsset AddFileExtension(this IAssetPipeline pipeline, string extension, string contentType)
+        {
+            IAsset asset = Asset.Create(extension, contentType, Enumerable.Empty<string>());
+            return pipeline.Add(asset);
         }
     }
 }

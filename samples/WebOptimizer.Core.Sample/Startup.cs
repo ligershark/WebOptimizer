@@ -37,9 +37,13 @@ namespace BundlerSample
                       .Localize<Strings>();
 
                 // These files exist on disk and will now be localized and minified
-                assets.AddFiles("application/javascript", "/js/site.js", "/js/b.js")
-                      .Localize<Strings>()
-                      .MinifyJavaScript(new NUglify.JavaScript.CodeSettings { PreserveImportantComments = false });
+                //assets.AddFiles("application/javascript", "/js/site.js", "/js/b.js")
+                //      .Localize<Strings>()
+                //      .MinifyJavaScript(new NUglify.JavaScript.CodeSettings { PreserveImportantComments = false });
+
+                assets.AddCss();
+                assets.AddJs();
+                assets.AddScss();
 
                 assets.AddScss("/scss.css", "css/test.scss", "css/test2.scss")
                       .Localize<Strings>()
@@ -74,7 +78,7 @@ namespace BundlerSample
             pipeline.FileProvider = env.WebRootFileProvider;
             app.UseWebOptimizer(options =>
             {
-                options.EnableCaching = true;
+                //options.EnableCaching = true;
             });
 
             app.UseStaticFiles();

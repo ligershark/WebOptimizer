@@ -19,22 +19,19 @@ namespace WebOptimizer.Taghelpers
         { }
 
         /// <summary>
-        /// Gets or sets the source.
-        /// </summary>
-        public string Src { get; set; }
-
-        /// <summary>
         /// Synchronously executes the TagHelper
         /// </summary>
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (Pipeline.TryFromRoute(Src, out IAsset asset) && !output.Attributes.ContainsName("inline"))
+            string src = context.AllAttributes["src"].Value.ToString();
+
+            if (Pipeline.TryFromRoute(src, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
                 Pipeline.EnsureDefaults(HostingEnvironment);
 
                 if (Pipeline.EnableTagHelperBundling == true)
                 {
-                    string src = GenerateHash(asset);
+                    src = GenerateHash(asset);
                     output.Attributes.SetAttribute("src", src);
                 }
                 else

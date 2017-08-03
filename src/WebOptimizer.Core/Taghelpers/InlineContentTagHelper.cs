@@ -97,7 +97,7 @@ namespace WebOptimizer.Taghelpers
             }
             else
             {
-                string file = Pipeline.FileProvider.GetFileInfo(route).PhysicalPath;
+                string file = Pipeline.FileProvider.GetFileInfo(route.TrimStart('~')).PhysicalPath;
 
                 if (File.Exists(file))
                 {
