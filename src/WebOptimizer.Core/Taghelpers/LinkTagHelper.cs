@@ -21,22 +21,19 @@ namespace WebOptimizer.Taghelpers
         { }
 
         /// <summary>
-        /// Gets or sets the href attribute.
-        /// </summary>
-        public string Href { get; set; }
-
-        /// <summary>
         /// Synchronously executes the TagHelper
         /// </summary>
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (Pipeline.TryFromRoute(Href, out IAsset asset) && !output.Attributes.ContainsName("inline"))
+            string href = context.AllAttributes["href"].Value.ToString();
+
+            if (Pipeline.TryFromRoute(href, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
                 Pipeline.EnsureDefaults(HostingEnvironment);
 
                 if (Pipeline.EnableTagHelperBundling == true)
                 {
-                    string href = GenerateHash(asset);
+                    href = GenerateHash(asset);
                     output.Attributes.SetAttribute("href", href);
                 }
                 else
