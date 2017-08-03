@@ -11,6 +11,7 @@ ASP.NET Core middleware for bundling, minification and localization of CSS and J
 - [Use](#use)
 - [API reference](#api-reference)
 - [Extend the pipeline](#extend)
+- [Plugins](#plugins)
 
 ## How it works
 Web Optimizer will concatinate (bundle) and minify any text based files such as JavaScript and CSS. This results in fewer HTTP requests and smaller payloads which increases the performance of your web application.
@@ -128,3 +129,7 @@ coming soon...
 
 ### Extend
 coming soon...
+
+### Plugins
+
+ - [Sass/Scss compiler](https://github.com/ligershark/WebOptimizer.Sass)
