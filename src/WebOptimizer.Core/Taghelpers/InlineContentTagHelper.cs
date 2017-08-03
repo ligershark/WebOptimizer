@@ -93,7 +93,8 @@ namespace WebOptimizer.Taghelpers
                 string contents = await asset.ExecuteAsync(ViewContext.HttpContext);
 
                 AddToCache(cacheKey, contents, asset.SourceFiles.ToArray());
-                return contents;
+
+                return contents ?? $"/* File '{route}' not found */";
             }
             else
             {

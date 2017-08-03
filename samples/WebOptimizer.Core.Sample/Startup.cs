@@ -22,6 +22,8 @@ namespace BundlerSample
         {
             services.AddMvc()
                 .AddViewLocalization(options => options.ResourcesPath = "Resources");
+            //services.AddWebOptimizer()
+            //        .AddScss();
 
             services.AddWebOptimizer(assets =>
             {
@@ -36,24 +38,20 @@ namespace BundlerSample
                       .MinifyJavaScript()
                       .Localize<Strings>();
 
-                // These files exist on disk and will now be localized and minified
-                //assets.AddFiles("application/javascript", "/js/site.js", "/js/b.js")
-                //      .Localize<Strings>()
-                //      .MinifyJavaScript(new NUglify.JavaScript.CodeSettings { PreserveImportantComments = false });
+                assets.AddScss("/scss.css", "css/test.scss", "css/test2.scss")
+                      .Localize<Strings>()
+                      .MinifyCss();
 
                 assets.AddCss();
                 assets.AddJs();
                 assets.AddScss();
-
-                assets.AddScss("/scss.css", "css/test.scss", "css/test2.scss")
-                      .Localize<Strings>()
-                      .MinifyCss();
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IAssetPipeline pipeline)
         {
+            env.EnvironmentName = "Production";
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

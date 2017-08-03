@@ -110,14 +110,41 @@ namespace WebOptimizer
     public static partial class PipelineExtensions
     {
         /// <summary>
+        /// Adds WebOptimizer to the specified <see cref="IServiceCollection"/> and enables CSS and JavaScript minification.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="minifyJavaScript">If <code>true</code>; calls <code>AddJs()</code> on the pipeline.</param>
+        /// <param name="minifyCss">If <code>true</code>; calls <code>AddCss()</code> on the pipeline.</param>
+        public static IAssetPipeline AddWebOptimizer(this IServiceCollection services, bool minifyJavaScript = true, bool minifyCss = true)
+        {
+            var pipeline = new AssetPipeline();
+
+            if (minifyCss)
+            {
+                pipeline.AddCss();
+            }
+
+            if (minifyJavaScript)
+            {
+                pipeline.AddJs();
+            }
+
+            services.AddSingleton<IAssetPipeline, AssetPipeline>(factory => pipeline);
+
+            return pipeline;
+        }
+
+        /// <summary>
         /// Adds WebOptimizer to the specified <see cref="IServiceCollection"/>.
         /// </summary>
-        public static void AddWebOptimizer(this IServiceCollection services, Action<IAssetPipeline> assetPipeline)
+        public static IAssetPipeline AddWebOptimizer(this IServiceCollection services, Action<IAssetPipeline> assetPipeline)
         {
             var pipeline = new AssetPipeline();
             assetPipeline(pipeline);
 
             services.AddSingleton<IAssetPipeline, AssetPipeline>(factory => pipeline);
+
+            return pipeline;
         }
 
         /// <summary>
@@ -165,7 +192,7 @@ namespace WebOptimizer
         }
 
         /// <summary>
-        /// Dynamically adds all requested .css files to the pipeline.
+        /// Minifies and fingerprints any .css file requested.
         /// </summary>
         public static IAsset AddCss(this IAssetPipeline pipeline)
         {
@@ -173,7 +200,7 @@ namespace WebOptimizer
         }
 
         /// <summary>
-        /// Dynamically adds all requested .css files to the pipeline.
+        /// Minifies and fingerprints any .css file requested.
         /// </summary>
         public static IAsset AddCss(this IAssetPipeline pipeline, CssSettings settings)
         {
@@ -200,26 +227,6 @@ namespace WebOptimizer
                            .Concatinate()
                            .CssFingerprint()
                            .MinifyCss(settings);
-        }
-
-        /// <summary>
-        /// Adds loose files to the optimization pipeline.
-        /// </summary>
-        /// <param name="pipeline">The pipeline object.</param>
-        /// <param name="contentType">The content type of the response. Example: "text/css".</param>
-        /// <param name="sourceFiles">A list of relative file names of the sources to optimize.</param>
-        public static IEnumerable<IAsset> AddFiles(this IAssetPipeline pipeline, string contentType, params string[] sourceFiles)
-        {
-            var list = new List<IAsset>();
-
-            foreach (string file in sourceFiles)
-            {
-                IAsset asset = pipeline.Add(file, contentType, file);
-                asset.Processors.Add(new Concatenator());
-                list.Add(asset);
-            }
-
-            return list;
         }
 
         /// <summary>

@@ -67,9 +67,12 @@ namespace WebOptimizer
             {
                 IFileInfo file = pipeline.FileProvider.GetFileInfo(sourceFile);
 
-                using (var reader = new StreamReader(file.CreateReadStream()))
+                if (file.Exists)
                 {
-                    config.Content.Add(sourceFile, await reader.ReadToEndAsync());
+                    using (var reader = new StreamReader(file.CreateReadStream()))
+                    {
+                        config.Content.Add(sourceFile, await reader.ReadToEndAsync());
+                    }
                 }
             }
 

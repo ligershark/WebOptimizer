@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
@@ -51,7 +53,7 @@ namespace WebOptimizer.Taghelpers
 
             var attrs = new List<string>();
 
-            foreach (TagHelperAttribute item in output.Attributes)
+            foreach (TagHelperAttribute item in output.Attributes.Where(a => !a.Name.Equals("src", StringComparison.OrdinalIgnoreCase)))
             {
                 string attr = item.Name;
 

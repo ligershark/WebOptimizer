@@ -38,6 +38,9 @@ namespace WebOptimizer
 
             foreach (string key in config.Content.Keys)
             {
+                if (key.EndsWith(".min.css"))
+                    continue;
+
                 UglifyResult minified = Uglify.Css(config.Content[key], Settings);
 
                 if (!minified.HasErrors)
