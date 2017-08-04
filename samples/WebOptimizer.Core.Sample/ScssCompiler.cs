@@ -52,22 +52,22 @@ namespace BundlerSample
             return list;
         }
 
-        public static IAsset AddScss(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
+        public static IAsset AddScssBundle(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
         {
-            return pipeline.Add(route, "text/css", sourceFiles)
+            return pipeline.AddBundle(route, "text/css", sourceFiles)
                            .CompileScss()
                            .AdjustRelativePaths()
                            .Concatinate()
-                           .CssFingerprint()
+                           .FingerprintUrls()
                            .MinifyCss();
         }
 
-        public static IAsset AddScss(this IAssetPipeline pipeline)
+        public static IAsset CompileScssFiles(this IAssetPipeline pipeline)
         {
             return pipeline.AddFileExtension(".scss", "text/css")
                            .CompileScss()
                            .AdjustRelativePaths()
-                           .CssFingerprint()
+                           .FingerprintUrls()
                            .MinifyCss();
         }
     }

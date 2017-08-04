@@ -54,25 +54,25 @@ namespace WebOptimizer
             return false;
         }
 
-        public IAsset Add(IAsset asset)
+        public IAsset AddBundle(IAsset asset)
         {
-            return Add(asset.Route, asset.ContentType, asset.SourceFiles.ToArray());
+            return AddBundle(asset.Route, asset.ContentType, asset.SourceFiles.ToArray());
         }
 
-        public IEnumerable<IAsset> Add(IEnumerable<IAsset> assets)
+        public IEnumerable<IAsset> AddBundle(IEnumerable<IAsset> assets)
         {
             var list = new List<IAsset>();
 
             foreach (IAsset asset in assets)
             {
-                IAsset ass = Add(asset.Route, asset.ContentType, asset.SourceFiles.ToArray());
+                IAsset ass = AddBundle(asset.Route, asset.ContentType, asset.SourceFiles.ToArray());
                 list.Add(ass);
             }
 
             return list;
         }
 
-        public IAsset Add(string route, string contentType, params string[] sourceFiles)
+        public IAsset AddBundle(string route, string contentType, params string[] sourceFiles)
         {
             if (!route.StartsWith("/") && !route.StartsWith("."))
             {
@@ -115,12 +115,12 @@ namespace WebOptimizer
 
             if (minifyCss)
             {
-                pipeline.AddCss();
+                pipeline.MinifyCssFiles();
             }
 
             if (minifyJavaScript)
             {
-                pipeline.AddJs();
+                pipeline.MinifyJsFiles();
             }
 
             services.AddSingleton<IAssetPipeline, AssetPipeline>(factory => pipeline);
@@ -153,15 +153,15 @@ namespace WebOptimizer
         /// <summary>
         /// Dynamically adds all requested .css files to the pipeline.
         /// </summary>
-        public static IAsset AddJs(this IAssetPipeline pipeline)
+        public static IAsset MinifyJsFiles(this IAssetPipeline pipeline)
         {
-            return pipeline.AddJs(new CodeSettings());
+            return pipeline.MinifyJsFiles(new CodeSettings());
         }
 
         /// <summary>
         /// Dynamically adds all requested .css files to the pipeline.
         /// </summary>
-        public static IAsset AddJs(this IAssetPipeline pipeline, CodeSettings settings)
+        public static IAsset MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings)
         {
             return pipeline.AddFileExtension(".js", "application/javascript")
                            .MinifyJavaScript(settings);
@@ -170,17 +170,17 @@ namespace WebOptimizer
         /// <summary>
         /// Creates a JavaScript bundle on the specified route and minifies the output.
         /// </summary>
-        public static IAsset AddJs(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
+        public static IAsset AddJavaScriptBundle(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
         {
-            return pipeline.AddJs(route, new CodeSettings(), sourceFiles);
+            return pipeline.AddJavaScriptBundle(route, new CodeSettings(), sourceFiles);
         }
 
         /// <summary>
         /// Creates a JavaScript bundle on the specified route and minifies the output.
         /// </summary>
-        public static IAsset AddJs(this IAssetPipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
+        public static IAsset AddJavaScriptBundle(this IAssetPipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
         {
-            return pipeline.Add(route, "application/javascript", sourceFiles)
+            return pipeline.AddBundle(route, "application/javascript", sourceFiles)
                            .Concatinate()
                            .MinifyJavaScript(settings);
         }
@@ -188,38 +188,36 @@ namespace WebOptimizer
         /// <summary>
         /// Minifies and fingerprints any .css file requested.
         /// </summary>
-        public static IAsset AddCss(this IAssetPipeline pipeline)
-        {
-            return pipeline.AddCss(new CssSettings());
-        }
+        public static IAsset MinifyCssFiles(this IAssetPipeline pipeline) =>
+            pipeline.MinifyCssFiles(new CssSettings());
 
         /// <summary>
         /// Minifies and fingerprints any .css file requested.
         /// </summary>
-        public static IAsset AddCss(this IAssetPipeline pipeline, CssSettings settings)
+        public static IAsset MinifyCssFiles(this IAssetPipeline pipeline, CssSettings settings)
         {
             return pipeline.AddFileExtension(".css", "text/css")
-                           .CssFingerprint()
+                           .FingerprintUrls()
                            .MinifyCss(settings);
         }
 
         /// <summary>
         /// Creates a CSS bundle on the specified route and minifies the output.
         /// </summary>
-        public static IAsset AddCss(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
+        public static IAsset AddCssBundle(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
         {
-            return pipeline.AddCss(route, new CssSettings(), sourceFiles);
+            return pipeline.AddCssBundle(route, new CssSettings(), sourceFiles);
         }
 
         /// <summary>
         /// Creates a CSS bundle on the specified route and minifies the output.
         /// </summary>
-        public static IAsset AddCss(this IAssetPipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
+        public static IAsset AddCssBundle(this IAssetPipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
         {
-            return pipeline.Add(route, "text/css", sourceFiles)
+            return pipeline.AddBundle(route, "text/css", sourceFiles)
                            .AdjustRelativePaths()
                            .Concatinate()
-                           .CssFingerprint()
+                           .FingerprintUrls()
                            .MinifyCss(settings);
         }
 
@@ -232,7 +230,7 @@ namespace WebOptimizer
         public static IAsset AddFileExtension(this IAssetPipeline pipeline, string extension, string contentType)
         {
             IAsset asset = Asset.Create(extension, contentType, Enumerable.Empty<string>());
-            return pipeline.Add(asset);
+            return pipeline.AddBundle(asset);
         }
     }
 }

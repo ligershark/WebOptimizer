@@ -29,19 +29,17 @@ namespace BundlerSample
             {
                 pipeline.EnableTagHelperBundling = true;
 
-                pipeline.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
-                pipeline.AddJs("/all.js", "js/site.js", "js/b.js");
+                pipeline.AddCssBundle("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
+                pipeline.AddJavaScriptBundle("/all.js", "js/site.js", "js/b.js");
 
-                pipeline.Add("/test.js", "application/javascript", "js/site.js", "js/b.js")
-                      .Concatinate()
-                      .MinifyJavaScript();
+                pipeline.AddBundle("/demo.txt", "text/plain", "js/site.js", "js/b.js")
+                      .Concatinate();
 
-                pipeline.AddScss("/scss.css", "css/test.scss", "css/test2.scss")
-                      .MinifyCss();
+                pipeline.AddScssBundle("/scss.css", "css/test.scss", "css/test2.scss");
 
-                pipeline.AddCss();
-                pipeline.AddJs();
-                pipeline.AddScss();
+                pipeline.MinifyCssFiles().FingerprintUrls();
+                pipeline.MinifyJsFiles();
+                pipeline.CompileScssFiles();
             });
         }
 

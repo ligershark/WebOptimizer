@@ -25,7 +25,7 @@ namespace WebOptimizer.Test
             var pipeline = new AssetPipeline();
             pipeline.EnsureDefaults(env);
 
-            pipeline.Add(asset);
+            pipeline.AddBundle(asset);
 
             Assert.Equal(1, pipeline.Assets.Count);
         }
@@ -39,7 +39,7 @@ namespace WebOptimizer.Test
             var pipeline = new AssetPipeline();
             pipeline.EnsureDefaults(env);
 
-            pipeline.Add(new[] { asset1, asset2 });
+            pipeline.AddBundle(new[] { asset1, asset2 });
 
             Assert.Equal(2, pipeline.Assets.Count);
         }
@@ -53,7 +53,7 @@ namespace WebOptimizer.Test
             var pipeline = new AssetPipeline();
             pipeline.EnsureDefaults(env);
 
-            var ex = Assert.Throws<ArgumentException>(() => pipeline.Add(new[] { asset1, asset2 }));
+            var ex = Assert.Throws<ArgumentException>(() => pipeline.AddBundle(new[] { asset1, asset2 }));
 
             Assert.Equal(ex.ParamName, "route");
             Assert.Equal(1, pipeline.Assets.Count);
@@ -67,7 +67,7 @@ namespace WebOptimizer.Test
             var pipeline = new AssetPipeline();
             pipeline.EnsureDefaults(env);
 
-            var ex = Assert.Throws<ArgumentException>(() => pipeline.Add(new[] { asset1 }));
+            var ex = Assert.Throws<ArgumentException>(() => pipeline.AddBundle(new[] { asset1 }));
         }
 
         [Fact2]
@@ -78,7 +78,7 @@ namespace WebOptimizer.Test
             var pipeline = new AssetPipeline();
             pipeline.EnsureDefaults(env);
 
-            asset = pipeline.Add(asset);
+            asset = pipeline.AddBundle(asset);
 
             Assert.Equal(1, asset.SourceFiles.Count());
             Assert.Equal(asset.Route, asset.SourceFiles.First());
@@ -88,7 +88,7 @@ namespace WebOptimizer.Test
         public void FromRoute_MixedSlashes_Success()
         {
             var pipeline = new AssetPipeline();
-            pipeline.Add("/route1", "text/css", "file.css");
+            pipeline.AddBundle("/route1", "text/css", "file.css");
 
             Assert.True(pipeline.TryFromRoute("/route1", out var a1));
             Assert.False(pipeline.TryFromRoute("route1", out var a2));
@@ -99,7 +99,7 @@ namespace WebOptimizer.Test
         public void AddJs_DefaultSettings_Success()
         {
             var pipeline = new AssetPipeline();
-            var asset = pipeline.AddJs("/foo.js", "file1.js", "file2.js");
+            var asset = pipeline.AddJavaScriptBundle("/foo.js", "file1.js", "file2.js");
 
             Assert.Equal("/foo.js", asset.Route);
             Assert.Equal("application/javascript", asset.ContentType);
@@ -112,7 +112,7 @@ namespace WebOptimizer.Test
         {
             var settings = new CodeSettings();
             var pipeline = new AssetPipeline();
-            var asset = pipeline.AddJs("/foo.js", settings, "file1.js", "file2.js");
+            var asset = pipeline.AddJavaScriptBundle("/foo.js", settings, "file1.js", "file2.js");
 
             Assert.Equal("/foo.js", asset.Route);
             Assert.Equal("application/javascript", asset.ContentType);
@@ -125,7 +125,7 @@ namespace WebOptimizer.Test
         public void AddCss_DefaultSettings_Success()
         {
             var pipeline = new AssetPipeline();
-            var asset = pipeline.AddCss("/foo.css", "file1.css", "file2.css");
+            var asset = pipeline.AddCssBundle("/foo.css", "file1.css", "file2.css");
 
             Assert.Equal("/foo.css", asset.Route);
             Assert.Equal("text/css", asset.ContentType);
@@ -138,7 +138,7 @@ namespace WebOptimizer.Test
         {
             var settings = new CssSettings();
             var pipeline = new AssetPipeline();
-            var asset = pipeline.AddCss("/foo.css", settings, "file1.css", "file2.css");
+            var asset = pipeline.AddCssBundle("/foo.css", settings, "file1.css", "file2.css");
 
             Assert.Equal("/foo.css", asset.Route);
             Assert.Equal("text/css", asset.ContentType);

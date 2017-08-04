@@ -42,7 +42,7 @@ namespace WebOptimizer.Test.Processors
             var asset1 = Asset.Create("/file1", "text/css", new[] { "file.css" });
             var asset2 = Asset.Create("/file2", "text/css", new[] { "file.css" });
             var pipeline = new AssetPipeline();
-            var assets = pipeline.Add(new[] { asset1, asset2 });
+            var assets = pipeline.AddBundle(new[] { asset1, asset2 });
 
             assets = assets.Concatinate();
 

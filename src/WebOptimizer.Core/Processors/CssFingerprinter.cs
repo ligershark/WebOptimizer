@@ -108,7 +108,7 @@ namespace WebOptimizer
         /// Adds a fingerprint to local url() references.
         /// NOTE: Make sure to call Concatinate() before this method
         /// </summary>
-        public static IAsset CssFingerprint(this IAsset bundle)
+        public static IAsset FingerprintUrls(this IAsset bundle)
         {
             var minifier = new CssFingerprinter();
             bundle.Processors.Add(minifier);
@@ -120,7 +120,7 @@ namespace WebOptimizer
         /// Adds a fingerprint to local url() references.
         /// NOTE: Make sure to call Concatinate() before this method
         /// </summary>
-        public static IEnumerable<IAsset> CssFingerprint(this IEnumerable<IAsset> assets)
+        public static IEnumerable<IAsset> FingerprintUrls(this IEnumerable<IAsset> assets)
         {
             var list = new List<IAsset>();
 

@@ -33,12 +33,12 @@ namespace WebOptimizer
         /// <summary>
         /// Adds an <see cref="IAsset"/> to the optimization pipeline.
         /// </summary>
-        IAsset Add(IAsset asset);
+        IAsset AddBundle(IAsset asset);
 
         /// <summary>
         /// Adds an array of <see cref="IAsset"/> to the optimization pipeline.
         /// </summary>
-        IEnumerable<IAsset> Add(IEnumerable<IAsset> asset);
+        IEnumerable<IAsset> AddBundle(IEnumerable<IAsset> asset);
 
         /// <summary>
         /// Adds an asset to the optimization pipeline.
@@ -46,7 +46,7 @@ namespace WebOptimizer
         /// <param name="route">The route matching for the asset.</param>
         /// <param name="contentType">The content type of the response. Example: "text/css".</param>
         /// <param name="sourceFiles">A list of relative file names of the sources to optimize.</param>
-        IAsset Add(string route, string contentType, params string[] sourceFiles);
+        IAsset AddBundle(string route, string contentType, params string[] sourceFiles);
 
         /// <summary>
         /// Gets the <see cref="IAsset"/> from the specified route.
