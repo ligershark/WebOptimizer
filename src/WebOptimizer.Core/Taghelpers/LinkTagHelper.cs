@@ -25,7 +25,7 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Synchronously executes the TagHelper
         /// </summary>
-        public override void Process(TagHelperContext context, TagHelperOutput output)
+        public override void ProcessSafe(TagHelperContext context, TagHelperOutput output)
         {
             string href = context.AllAttributes["href"].Value.ToString();
 
@@ -43,8 +43,6 @@ namespace WebOptimizer.Taghelpers
                     WriteIndividualTags(output, asset);
                 }
             }
-
-            base.Process(context, output);
         }
 
         private void WriteIndividualTags(TagHelperOutput output, IAsset asset)

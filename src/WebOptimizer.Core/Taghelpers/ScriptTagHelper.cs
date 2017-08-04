@@ -23,7 +23,7 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Synchronously executes the TagHelper
         /// </summary>
-        public override void Process(TagHelperContext context, TagHelperOutput output)
+        public override void ProcessSafe(TagHelperContext context, TagHelperOutput output)
         {
             string src = context.AllAttributes["src"].Value.ToString();
 
@@ -40,10 +40,6 @@ namespace WebOptimizer.Taghelpers
                 {
                     WriteIndividualTags(output, asset);
                 }
-            }
-            else
-            {
-                base.Process(context, output);
             }
         }
 

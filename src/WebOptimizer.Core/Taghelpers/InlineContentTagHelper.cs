@@ -34,7 +34,7 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Creates a tag helper for inlining content
         /// </summary>
-        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+        public override async Task ProcessSafeAsync(TagHelperContext context, TagHelperOutput output)
         {
             if (output.TagName.Equals("link", StringComparison.OrdinalIgnoreCase))
             {
