@@ -30,17 +30,13 @@ namespace BundlerSample
                 pipeline.EnableTagHelperBundling = true;
 
                 pipeline.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
-
-                pipeline.AddJs("/all.js", "js/site.js", "js/b.js")
-                      .Localize<Strings>();
+                pipeline.AddJs("/all.js", "js/site.js", "js/b.js");
 
                 pipeline.Add("/test.js", "application/javascript", "js/site.js", "js/b.js")
                       .Concatinate()
-                      .MinifyJavaScript()
-                      .Localize<Strings>();
+                      .MinifyJavaScript();
 
                 pipeline.AddScss("/scss.css", "css/test.scss", "css/test2.scss")
-                      .Localize<Strings>()
                       .MinifyCss();
 
                 pipeline.AddCss();
