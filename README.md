@@ -132,4 +132,5 @@ coming soon...
 
 ### Plugins
 
- - [Sass/Scss compiler](https://github.com/ligershark/WebOptimizer.Sass)
+- [Sass/Scss compiler](https://github.com/ligershark/WebOptimizer.Sass)
+- [i18n (localization of .js files)](https://github.com/ligershark/WebOptimizer.i18n)
