@@ -53,68 +53,6 @@ namespace WebOptimizer.Taghelpers
         [HtmlAttributeNotBound]
         public ViewContext ViewContext { get; set; }
 
-        /// <summary>
-        /// Synchronously executes the <see cref="T:Microsoft.AspNetCore.Razor.TagHelpers.TagHelper" /> with the given <paramref name="context" /> and
-        /// <paramref name="output" />.
-        /// </summary>
-        /// <param name="context">Contains information associated with the current HTML tag.</param>
-        /// <param name="output">A stateful HTML element used to generate an HTML tag.</param>
-        public sealed override void Process(TagHelperContext context, TagHelperOutput output)
-        {
-            if (string.IsNullOrEmpty(output.TagName))
-            {
-                // output.SuppressOutput() was called by another TagHelper before this one
-                return;
-            }
-
-            ProcessSafe(context, output);
-        }
-
-        /// <summary>
-        /// Asynchronously executes the <see cref="T:Microsoft.AspNetCore.Razor.TagHelpers.TagHelper" /> with the given <paramref name="context" /> and
-        /// <paramref name="output" />.
-        /// </summary>
-        /// <param name="context">Contains information associated with the current HTML tag.</param>
-        /// <param name="output">A stateful HTML element used to generate an HTML tag.</param>
-        /// <returns>
-        /// A <see cref="T:System.Threading.Tasks.Task" /> that on completion updates the <paramref name="output" />.
-        /// </returns>
-        /// <remarks>
-        /// By default this calls into <see cref="M:Microsoft.AspNetCore.Razor.TagHelpers.TagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext,Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput)" />.
-        /// </remarks>
-        /// .
-        public sealed override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-        {
-            if (string.IsNullOrEmpty(output.TagName))
-            {
-                // output.SuppressOutput() was called by another TagHelper before this one
-                return Task.CompletedTask;
-            }
-
-            return ProcessSafeAsync(context, output);
-        }
-
-        /// <summary>
-        /// Synchronously executes the <see cref="T:Microsoft.AspNetCore.Razor.TagHelpers.TagHelper" /> with the given <paramref name="context" /> and
-        /// <paramref name="output" />.
-        /// </summary>
-        /// <param name="context">Contains information associated with the current HTML tag.</param>
-        /// <param name="output">A stateful HTML element used to generate an HTML tag.</param>
-        public virtual void ProcessSafe(TagHelperContext context, TagHelperOutput output)
-        {
-            // nothing
-        }
-
-        /// <summary>
-        /// Synchronously executes the <see cref="T:Microsoft.AspNetCore.Razor.TagHelpers.TagHelper" /> with the given <paramref name="context" /> and
-        /// <paramref name="output" />.
-        /// </summary>
-        /// <param name="context">Contains information associated with the current HTML tag.</param>
-        /// <param name="output">A stateful HTML element used to generate an HTML tag.</param>
-        public virtual Task ProcessSafeAsync(TagHelperContext context, TagHelperOutput output)
-        {
-            return Task.CompletedTask;
-        }
 
         /// <summary>
         /// Gets the quote character.

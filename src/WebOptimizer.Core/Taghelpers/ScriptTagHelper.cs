@@ -23,8 +23,14 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Synchronously executes the TagHelper
         /// </summary>
-        public override void ProcessSafe(TagHelperContext context, TagHelperOutput output)
+        public override void Process(TagHelperContext context, TagHelperOutput output)
         {
+            if (string.IsNullOrEmpty(output.TagName))
+            {
+                // output.SuppressOutput() was called by another TagHelper before this one
+                return;
+            }
+
             string src = context.AllAttributes["src"].Value.ToString();
 
             if (Pipeline.TryFromRoute(src, out IAsset asset) && !output.Attributes.ContainsName("inline"))
