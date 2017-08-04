@@ -60,14 +60,12 @@ namespace WebOptimizer.Test
         }
 
         [Fact2]
-        public void AddRouteWithNoLeadingSlash_Throws()
+        public void AddRouteWithNoLeadingSlash_Success()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
             var asset1 = Asset.Create("route", "text/css", new[] { "file.css" });
-            var pipeline = new AssetPipeline();
-            pipeline.EnsureDefaults(env);
 
-            var ex = Assert.Throws<ArgumentException>(() => pipeline.AddBundle(new[] { asset1 }));
+            Assert.Equal("/route", asset1.Route);
         }
 
         [Fact2]

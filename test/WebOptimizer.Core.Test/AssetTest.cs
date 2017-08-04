@@ -14,7 +14,7 @@ namespace WebOptimizer.Test
 
             var asset = Asset.Create(route, contentType, sourcefiles);
 
-            Assert.Equal(route, asset.Route);
+            Assert.Equal("/" + route, asset.Route);
             Assert.Equal(contentType, asset.ContentType);
             Assert.Equal(sourcefiles, asset.SourceFiles);
             Assert.Equal(0, asset.Processors.Count);
@@ -33,12 +33,12 @@ namespace WebOptimizer.Test
 
             // Check non-gzip value
             string key = asset.GenerateCacheKey(context);
-            Assert.Equal("_BZuuBNh_zEXnNPIPaO_4Ii4UdM", key);
+            Assert.Equal("M4NO8bcOGRbLOJEoi608cVGCkXE", key);
 
             // Check gzip value
             context.Request.Headers["Accept-Encoding"] = "gzip, deflate";
             string gzipKey = asset.GenerateCacheKey(context);
-            Assert.Equal("SvH6WGVAapgMXiPenaOGnKS_oMI", gzipKey);
+            Assert.Equal("Zy_GtIBwEVsy9SkfA501XQxropY", gzipKey);
         }
     }
 }

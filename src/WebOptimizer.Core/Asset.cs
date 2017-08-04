@@ -45,6 +45,11 @@ namespace WebOptimizer
         /// </summary>
         public static IAsset Create(string route, string contentType, IEnumerable<string> sourceFiles)
         {
+            if (!route.StartsWith("/") && !route.StartsWith("."))
+            {
+                route = "/" + route;
+            }
+
             return new Asset
             {
                 Route = route,
