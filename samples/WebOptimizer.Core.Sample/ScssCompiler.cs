@@ -14,16 +14,16 @@ namespace BundlerSample
         public Task ExecuteAsync(IAssetContext context)
         {
             var pipeline = (IAssetPipeline)context.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
-            var content = new Dictionary<string, string>();
+            var content = new Dictionary<string, byte[]>();
 
             foreach (string route in context.Content.Keys)
             {
                 IFileInfo file = pipeline.FileProvider.GetFileInfo(route);
                 var options = new ScssOptions { InputFile = file.PhysicalPath };
 
-                ScssResult result = Scss.ConvertToCss(context.Content[route], options);
+                ScssResult result = Scss.ConvertToCss(context.Content[route].AsString(), options);
 
-                content[route] = result.Css;
+                content[route] = result.Css.AsByteArray();
             }
 
             context.Content = content;
@@ -54,7 +54,7 @@ namespace BundlerSample
 
         public static IAsset AddScssBundle(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
         {
-            return pipeline.AddBundle(route, "text/css", sourceFiles)
+            return pipeline.AddBundle(route, "text/css; charset=UTF-8", sourceFiles)
                            .CompileScss()
                            .AdjustRelativePaths()
                            .Concatinate()
@@ -64,7 +64,7 @@ namespace BundlerSample
 
         public static IAsset CompileScssFiles(this IAssetPipeline pipeline)
         {
-            return pipeline.AddFileExtension(".scss", "text/css")
+            return pipeline.AddFileExtension(".scss", "text/css; charset=UTF-8")
                            .CompileScss()
                            .AdjustRelativePaths()
                            .FingerprintUrls()

@@ -15,12 +15,12 @@ namespace WebOptimizer.Test.Processors
         {
             var minifier = new JavaScriptMinifier(new CodeSettings());
             var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = new Dictionary<string, string> { { "", "var i = 0;" } };
+            context.Object.Content = new Dictionary<string, byte[]> { { "", "var i = 0;".AsByteArray() } };
 
 
             await minifier.ExecuteAsync(context.Object);
 
-            Assert.Equal("var i=0", context.Object.Content.First().Value);
+            Assert.Equal("var i=0", context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
         }
 
@@ -34,11 +34,11 @@ namespace WebOptimizer.Test.Processors
         {
             var minifier = new JavaScriptMinifier(new CodeSettings());
             var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = new Dictionary<string, string> { { "", input } };
+            context.Object.Content = new Dictionary<string, byte[]> { { "", input.AsByteArray() } };
 
             await minifier.ExecuteAsync(context.Object);
 
-            Assert.Equal("", context.Object.Content.First().Value);
+            Assert.Equal("", context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
         }
 
@@ -48,11 +48,11 @@ namespace WebOptimizer.Test.Processors
             var settings = new CodeSettings { TermSemicolons = true};
             var minifier = new JavaScriptMinifier(settings);
             var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = new Dictionary<string, string> { { "", "var i = 0;" } };
+            context.Object.Content = new Dictionary<string, byte[]> { { "", "var i = 0;".AsByteArray() } };
 
             await minifier.ExecuteAsync(context.Object);
 
-            Assert.Equal("var i=0;", context.Object.Content.First().Value);
+            Assert.Equal("var i=0;", context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
         }
     }

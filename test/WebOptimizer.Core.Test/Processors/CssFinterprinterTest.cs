@@ -44,10 +44,10 @@ namespace WebOptimizer.Test.Processors
                    .Returns(inputFile)
                    .Returns(outputFile);
 
-            context.Object.Content = new Dictionary<string, string> { { "css/site.css", url } };
+            context.Object.Content = new Dictionary<string, byte[]> { { "css/site.css", url.AsByteArray() } };
 
             await adjuster.ExecuteAsync(context.Object);
-            string result = context.Object.Content.First().Value;
+            string result = context.Object.Content.First().Value.AsString();
 
             Assert.Equal(newUrl, result);
             Assert.Equal("", adjuster.CacheKey(new DefaultHttpContext()));

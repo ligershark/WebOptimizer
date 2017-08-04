@@ -34,18 +34,18 @@ namespace WebOptimizer
         /// </summary>
         public Task ExecuteAsync(IAssetContext config)
         {
-            var content = new Dictionary<string, string>();
+            var content = new Dictionary<string, byte[]>();
 
             foreach (string key in config.Content.Keys)
             {
                 if (key.EndsWith(".min.css"))
                     continue;
 
-                UglifyResult minified = Uglify.Css(config.Content[key], Settings);
+                UglifyResult minified = Uglify.Css(config.Content[key].AsString(), Settings);
 
                 if (!minified.HasErrors)
                 {
-                    content[key] = minified.Code;
+                    content[key] = minified.Code.AsByteArray();
                 }
             }
 

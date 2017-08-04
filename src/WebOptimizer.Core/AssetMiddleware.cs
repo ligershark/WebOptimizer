@@ -53,17 +53,17 @@ namespace WebOptimizer
             if (IsConditionalGet(context, cacheKey))
             {
                 context.Response.StatusCode = 304;
-                await WriteOutputAsync(context, asset, string.Empty, cacheKey).ConfigureAwait(false);
+                await WriteOutputAsync(context, asset, new byte[0], cacheKey).ConfigureAwait(false);
             }
-            else if (_cache.TryGetValue(cacheKey, out string value))
+            else if (_cache.TryGetValue(cacheKey, out byte[] value))
             {
                 await WriteOutputAsync(context, asset, value, cacheKey).ConfigureAwait(false);
             }
             else
             {
-                string result = await asset.ExecuteAsync(context).ConfigureAwait(false);
+                byte[] result = await asset.ExecuteAsync(context).ConfigureAwait(false);
 
-                if (string.IsNullOrEmpty(result))
+                if (result.Length == 0)
                 {
                     await _next(context);
                     return;
@@ -75,7 +75,7 @@ namespace WebOptimizer
             }
         }
 
-        private void AddToCache(string cacheKey, string value, IEnumerable<string> files)
+        private void AddToCache(string cacheKey, byte[] value, IEnumerable<string> files)
         {
             if (_options.EnableCaching == true)
             {
@@ -100,7 +100,7 @@ namespace WebOptimizer
             return false;
         }
 
-        private async Task WriteOutputAsync(HttpContext context, IAsset asset, string content, string cacheKey)
+        private async Task WriteOutputAsync(HttpContext context, IAsset asset, byte[] content, string cacheKey)
         {
             context.Response.ContentType = asset.ContentType;
 
@@ -109,10 +109,9 @@ namespace WebOptimizer
                 context.Response.Headers["Cache-Control"] = $"max-age=31536000"; // 1 year
                 context.Response.Headers["ETag"] = $"\"{cacheKey}\"";
             }
-
-            if (!string.IsNullOrEmpty(content))
+            if (content.Length > 0)
             {
-                await context.Response.WriteAsync(content).ConfigureAwait(false);
+                await context.Response.Body.WriteAsync(content, 0, content.Length);
             }
         }
     }

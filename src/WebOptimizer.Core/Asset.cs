@@ -57,7 +57,7 @@ namespace WebOptimizer
         /// <summary>
         /// Executes the bundle and returns the processed output.
         /// </summary>
-        public async Task<string> ExecuteAsync(HttpContext context)
+        public async Task<byte[]> ExecuteAsync(HttpContext context)
         {
             var pipeline = (IAssetPipeline)context.RequestServices.GetService(typeof(IAssetPipeline));
             var config = new AssetContext(context, this);
@@ -68,9 +68,11 @@ namespace WebOptimizer
 
                 if (file.Exists)
                 {
-                    using (var reader = new StreamReader(file.CreateReadStream()))
+                    using (var ms = new MemoryStream())
+                    using (Stream fs = file.CreateReadStream())
                     {
-                        config.Content.Add(sourceFile, await reader.ReadToEndAsync());
+                        await fs.CopyToAsync(ms);
+                        config.Content.Add(sourceFile, ms.ToArray());
                     }
                 }
             }

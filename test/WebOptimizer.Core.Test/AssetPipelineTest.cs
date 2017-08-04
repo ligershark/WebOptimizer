@@ -102,7 +102,7 @@ namespace WebOptimizer.Test
             var asset = pipeline.AddJavaScriptBundle("/foo.js", "file1.js", "file2.js");
 
             Assert.Equal("/foo.js", asset.Route);
-            Assert.Equal("application/javascript", asset.ContentType);
+            Assert.Equal("application/javascript; charset=UTF-8", asset.ContentType);
             Assert.Equal(2, asset.SourceFiles.Count());
             Assert.Equal(2, asset.Processors.Count);
         }
@@ -115,7 +115,7 @@ namespace WebOptimizer.Test
             var asset = pipeline.AddJavaScriptBundle("/foo.js", settings, "file1.js", "file2.js");
 
             Assert.Equal("/foo.js", asset.Route);
-            Assert.Equal("application/javascript", asset.ContentType);
+            Assert.Equal("application/javascript; charset=UTF-8", asset.ContentType);
             Assert.Equal(2, asset.SourceFiles.Count());
             Assert.Equal(2, asset.Processors.Count);
 
@@ -128,7 +128,7 @@ namespace WebOptimizer.Test
             var asset = pipeline.AddCssBundle("/foo.css", "file1.css", "file2.css");
 
             Assert.Equal("/foo.css", asset.Route);
-            Assert.Equal("text/css", asset.ContentType);
+            Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
             Assert.Equal(2, asset.SourceFiles.Count());
             Assert.Equal(4, asset.Processors.Count);
         }
@@ -141,7 +141,7 @@ namespace WebOptimizer.Test
             var asset = pipeline.AddCssBundle("/foo.css", settings, "file1.css", "file2.css");
 
             Assert.Equal("/foo.css", asset.Route);
-            Assert.Equal("text/css", asset.ContentType);
+            Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
             Assert.Equal(2, asset.SourceFiles.Count());
             Assert.Equal(4, asset.Processors.Count);
         }

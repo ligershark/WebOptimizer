@@ -16,7 +16,7 @@ namespace WebOptimizer
         /// <summary>
         /// Gets or sets the content of the response.
         /// </summary>
-        IDictionary<string, string> Content { get; set; }
+        IDictionary<string, byte[]> Content { get; set; }
 
         /// <summary>
         /// Gets the HTTP context.

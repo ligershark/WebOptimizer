@@ -13,7 +13,7 @@ namespace WebOptimizer
         /// </summary>
         public AssetContext(HttpContext httpContext, IAsset asset)
         {
-            Content = new Dictionary<string, string>();
+            Content = new Dictionary<string, byte[]>();
             HttpContext = httpContext;
             Asset = asset;
         }
@@ -21,7 +21,7 @@ namespace WebOptimizer
         /// <summary>
         /// Gets or sets the content of the response.
         /// </summary>
-        public IDictionary<string, string> Content { get; set; }
+        public IDictionary<string, byte[]> Content { get; set; }
 
         /// <summary>
         /// Gets the HTTP context.

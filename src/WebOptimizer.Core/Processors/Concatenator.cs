@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -21,17 +22,18 @@ namespace WebOptimizer
         /// </summary>
         public Task ExecuteAsync(IAssetContext context)
         {
-            var sb = new StringBuilder();
+            //var sb = new StringBuilder();
 
-            foreach (string content in context.Content.Values)
-            {
-                sb.AppendLine(content);
-            }
+            //foreach (string content in context.Content.Values)
+            //{
+            //    sb.AppendLine(content);
+            //}
 
-            context.Content = new Dictionary<string, string>
+            context.Content = new Dictionary<string, byte[]>
             {
-                { Guid.NewGuid().ToString(), sb.ToString() }
+                { Guid.NewGuid().ToString(), context.Content.Values.SelectMany(x => x).ToArray() }
             };
+
 
             return Task.CompletedTask;
         }

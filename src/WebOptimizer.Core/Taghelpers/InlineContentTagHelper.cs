@@ -83,18 +83,19 @@ namespace WebOptimizer.Taghelpers
                 cacheKey = asset.GenerateCacheKey(ViewContext.HttpContext);
             }
 
-            if (Cache.TryGetValue(cacheKey, out string value))
+            if (Cache.TryGetValue(cacheKey, out byte[] value))
             {
-                return value;
+                return value.AsString();
             }
 
             if (asset != null)
             {
-                string contents = await asset.ExecuteAsync(ViewContext.HttpContext);
+                byte[] contents = await asset.ExecuteAsync(ViewContext.HttpContext);
 
                 AddToCache(cacheKey, contents, asset.SourceFiles.ToArray());
+                string s = contents.AsString();
 
-                return contents ?? $"/* File '{route}' not found */";
+                return s ?? $"/* File '{route}' not found */";
             }
             else
             {
@@ -102,17 +103,20 @@ namespace WebOptimizer.Taghelpers
 
                 if (File.Exists(file))
                 {
-                    string contents = File.ReadAllText(file);
-                    AddToCache(cacheKey, contents, file);
+                    using (FileStream fs = File.OpenRead(file))
+                    {
+                        byte[] content = await fs.AsBytesAsync();
+                        AddToCache(cacheKey, content, file);
 
-                    return contents;
+                        return content.AsString();
+                    }
                 }
             }
 
             throw new FileNotFoundException("File or bundle doesn't exist", route);
         }
 
-        private void AddToCache(string cacheKey, string value, params string[] files)
+        private void AddToCache(string cacheKey, byte[] value, params string[] files)
         {
             var cacheOptions = new MemoryCacheEntryOptions();
 

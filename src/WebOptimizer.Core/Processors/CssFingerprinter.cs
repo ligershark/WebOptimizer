@@ -27,7 +27,7 @@ namespace WebOptimizer
         /// </summary>
         public Task ExecuteAsync(IAssetContext config)
         {
-            var content = new Dictionary<string, string>();
+            var content = new Dictionary<string, byte[]>();
             var pipeline = (IAssetPipeline)config.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
 
             foreach (string key in config.Content.Keys)
@@ -35,7 +35,7 @@ namespace WebOptimizer
                 IFileInfo input = pipeline.FileProvider.GetFileInfo(key);
                 IFileInfo output = pipeline.FileProvider.GetFileInfo(config.Asset.Route);
 
-                content[key] = Adjust(config.Content[key], input, output);
+                content[key] = Adjust(config.Content[key].AsString(), input, output);
             }
 
             config.Content = content;
@@ -43,7 +43,7 @@ namespace WebOptimizer
             return Task.CompletedTask;
         }
 
-        private static string Adjust(string content, IFileInfo input, IFileInfo output)
+        private static byte[] Adjust(string content, IFileInfo input, IFileInfo output)
         {
             MatchCollection matches = _rxUrl.Matches(content);
 
@@ -84,7 +84,7 @@ namespace WebOptimizer
                 }
             }
 
-            return content;
+            return content.AsByteArray();
         }
 
         private static string GenerateHash(string content)

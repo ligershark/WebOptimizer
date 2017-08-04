@@ -13,9 +13,9 @@ namespace WebOptimizer.Test.Processors
         {
             var processor = new Concatenator();
             var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = new Dictionary<string, string> {
-                { "/route1", "content" },
-                { "/route2", "content" }
+            context.Object.Content = new Dictionary<string, byte[]> {
+                { "/route1", "content".AsByteArray() },
+                { "/route2", "content".AsByteArray() }
             };
 
             await processor.ExecuteAsync(context.Object);
@@ -28,7 +28,7 @@ namespace WebOptimizer.Test.Processors
         {
             var processor = new Concatenator();
             var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = new Dictionary<string, string>();
+            context.Object.Content = new Dictionary<string, byte[]>();
 
             await processor.ExecuteAsync(context.Object);
 

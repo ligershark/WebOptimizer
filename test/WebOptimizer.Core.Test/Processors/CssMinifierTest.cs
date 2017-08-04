@@ -15,11 +15,11 @@ namespace WebOptimizer.Test.Processors
         {
             var minifier = new CssMinifier(new CssSettings());
             var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = new Dictionary<string, string> { { "", "body { color: yellow; }" } };
+            context.Object.Content = new Dictionary<string, byte[]> { { "", "body { color: yellow; }".AsByteArray() } };
 
             await minifier.ExecuteAsync(context.Object);
 
-            Assert.Equal("body{color:#ff0}", context.Object.Content.First().Value);
+            Assert.Equal("body{color:#ff0}", context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
         }
 
@@ -33,11 +33,11 @@ namespace WebOptimizer.Test.Processors
         {
             var minifier = new CssMinifier(new CssSettings());
             var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = new Dictionary<string, string> { { "", input } };
+            context.Object.Content = new Dictionary<string, byte[]> { { "", input.AsByteArray() } };
 
             await minifier.ExecuteAsync(context.Object);
 
-            Assert.Equal("", context.Object.Content.First().Value);
+            Assert.Equal("", context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
         }
 
@@ -47,11 +47,11 @@ namespace WebOptimizer.Test.Processors
             var settings = new CssSettings { TermSemicolons = true, ColorNames = CssColor.NoSwap };
             var minifier = new CssMinifier(settings);
             var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = new Dictionary<string, string> { { "", "body { color: yellow; }" } };
+            context.Object.Content = new Dictionary<string, byte[]> { { "", "body { color: yellow; }".AsByteArray() } };
 
             await minifier.ExecuteAsync(context.Object);
 
-            Assert.Equal("body{color:yellow;}", context.Object.Content.First().Value);
+            Assert.Equal("body{color:yellow;}", context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
         }
     }

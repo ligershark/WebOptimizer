@@ -163,7 +163,7 @@ namespace WebOptimizer
         /// </summary>
         public static IAsset MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings)
         {
-            return pipeline.AddFileExtension(".js", "application/javascript")
+            return pipeline.AddFileExtension(".js", "application/javascript; charset=UTF-8")
                            .MinifyJavaScript(settings);
         }
 
@@ -180,7 +180,7 @@ namespace WebOptimizer
         /// </summary>
         public static IAsset AddJavaScriptBundle(this IAssetPipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
         {
-            return pipeline.AddBundle(route, "application/javascript", sourceFiles)
+            return pipeline.AddBundle(route, "application/javascript; charset=UTF-8", sourceFiles)
                            .Concatinate()
                            .MinifyJavaScript(settings);
         }
@@ -196,7 +196,7 @@ namespace WebOptimizer
         /// </summary>
         public static IAsset MinifyCssFiles(this IAssetPipeline pipeline, CssSettings settings)
         {
-            return pipeline.AddFileExtension(".css", "text/css")
+            return pipeline.AddFileExtension(".css", "text/css; charset=UTF-8")
                            .FingerprintUrls()
                            .MinifyCss(settings);
         }
@@ -214,7 +214,7 @@ namespace WebOptimizer
         /// </summary>
         public static IAsset AddCssBundle(this IAssetPipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
         {
-            return pipeline.AddBundle(route, "text/css", sourceFiles)
+            return pipeline.AddBundle(route, "text/css; charset=UTF-8", sourceFiles)
                            .AdjustRelativePaths()
                            .Concatinate()
                            .FingerprintUrls()
