@@ -168,6 +168,23 @@ namespace WebOptimizer
         }
 
         /// <summary>
+        /// Minifies the specified .js files
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline, params string[] sourceFiles)
+        {
+            return pipeline.MinifyJsFiles(new CodeSettings(), sourceFiles);
+        }
+
+        /// <summary>
+        /// Minifies the specified .js files
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings, params string[] sourceFiles)
+        {
+            return pipeline.AddFiles("application/javascript; charset=UTF-8", sourceFiles)
+                           .MinifyJavaScript(settings);
+        }
+
+        /// <summary>
         /// Creates a JavaScript bundle on the specified route and minifies the output.
         /// </summary>
         public static IAsset AddJavaScriptBundle(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
@@ -201,6 +218,25 @@ namespace WebOptimizer
                            .MinifyCss(settings);
         }
 
+
+        /// <summary>
+        /// Minifies the specified .css files
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyCssFiles(this IAssetPipeline pipeline, params string[] sourceFiles)
+        {
+            return pipeline.MinifyCssFiles(new CssSettings(), sourceFiles);
+        }
+
+        /// <summary>
+        /// Minifies the specified .css files
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyCssFiles(this IAssetPipeline pipeline, CssSettings settings, params string[] sourceFiles)
+        {
+            return pipeline.AddFiles("text/css; charset=UTF-8", sourceFiles)
+                           .FingerprintUrls()
+                           .MinifyCss(settings);
+        }
+
         /// <summary>
         /// Creates a CSS bundle on the specified route and minifies the output.
         /// </summary>
@@ -219,6 +255,26 @@ namespace WebOptimizer
                            .Concatinate()
                            .FingerprintUrls()
                            .MinifyCss(settings);
+        }
+
+        /// <summary>
+        /// Compiles the specified .scss files into CSS and makes them servable in the browser.
+        /// </summary>
+        /// <param name="pipeline">The pipeline object.</param>
+        /// <param name="contentType">The content type of the response. Example: text/css or application/javascript.</param>
+        /// <param name="sourceFiles">A list of relative file names of the sources to compile.</param>
+        public static IEnumerable<IAsset> AddFiles(this IAssetPipeline pipeline, string contentType, params string[] sourceFiles)
+        {
+            var list = new List<IAsset>();
+
+            foreach (string file in sourceFiles)
+            {
+                IAsset asset = pipeline.AddBundle(file, contentType, new[] { file });
+
+                list.Add(asset);
+            }
+
+            return list;
         }
 
         /// <summary>
