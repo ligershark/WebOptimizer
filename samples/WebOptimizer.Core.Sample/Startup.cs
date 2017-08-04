@@ -35,6 +35,8 @@ namespace BundlerSample
                 pipeline.AddBundle("/demo.txt", "text/plain", "js/site.js", "js/b.js")
                       .Concatinate();
 
+                pipeline.AddBundle("/foo.css", "text/css", "css/test.scss").MinifyCss();
+
                 pipeline.AddScssBundle("/scss.css", "css/test.scss", "css/test2.scss");
 
                 pipeline.MinifyCssFiles().FingerprintUrls();
@@ -46,7 +48,6 @@ namespace BundlerSample
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IAssetPipeline pipeline)
         {
-            env.EnvironmentName = "Production";
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

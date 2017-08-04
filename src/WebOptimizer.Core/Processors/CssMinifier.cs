@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NUglify;
@@ -41,12 +42,15 @@ namespace WebOptimizer
                 if (key.EndsWith(".min.css"))
                     continue;
 
-                UglifyResult minified = Uglify.Css(config.Content[key].AsString(), Settings);
+                UglifyResult result = Uglify.Css(config.Content[key].AsString(), Settings);
+                string minified = result.Code;
 
-                if (!minified.HasErrors)
+                if (result.HasErrors)
                 {
-                    content[key] = minified.Code.AsByteArray();
+                    minified = $"/* {string.Join("\r\n", result.Errors)} */";
                 }
+
+                content[key] = minified.AsByteArray();
             }
 
             config.Content = content;
