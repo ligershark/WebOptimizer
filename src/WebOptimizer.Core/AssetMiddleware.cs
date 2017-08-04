@@ -63,7 +63,7 @@ namespace WebOptimizer
             {
                 byte[] result = await asset.ExecuteAsync(context).ConfigureAwait(false);
 
-                if (result.Length == 0)
+                if (result == null || result.Length == 0)
                 {
                     await _next(context);
                     return;
@@ -109,7 +109,7 @@ namespace WebOptimizer
                 context.Response.Headers["Cache-Control"] = $"max-age=31536000"; // 1 year
                 context.Response.Headers["ETag"] = $"\"{cacheKey}\"";
             }
-            if (content.Length > 0)
+            if (content?.Length > 0)
             {
                 await context.Response.Body.WriteAsync(content, 0, content.Length);
             }
