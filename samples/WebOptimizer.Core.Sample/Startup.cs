@@ -25,26 +25,27 @@ namespace BundlerSample
             //services.AddWebOptimizer()
             //        .AddScss();
 
-            services.AddWebOptimizer(assets =>
+            services.AddWebOptimizer(pipeline =>
             {
-                assets.EnableTagHelperBundling = true;
-                assets.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
+                pipeline.EnableTagHelperBundling = true;
 
-                assets.AddJs("/all.js", "js/site.js", "js/b.js")
+                pipeline.AddCss("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
+
+                pipeline.AddJs("/all.js", "js/site.js", "js/b.js")
                       .Localize<Strings>();
 
-                assets.Add("/test.js", "application/javascript", "js/site.js", "js/b.js")
+                pipeline.Add("/test.js", "application/javascript", "js/site.js", "js/b.js")
                       .Concatinate()
                       .MinifyJavaScript()
                       .Localize<Strings>();
 
-                assets.AddScss("/scss.css", "css/test.scss", "css/test2.scss")
+                pipeline.AddScss("/scss.css", "css/test.scss", "css/test2.scss")
                       .Localize<Strings>()
                       .MinifyCss();
 
-                assets.AddCss();
-                assets.AddJs();
-                assets.AddScss();
+                pipeline.AddCss();
+                pipeline.AddJs();
+                pipeline.AddScss();
             });
         }
 
@@ -73,7 +74,6 @@ namespace BundlerSample
                 SupportedUICultures = cultures
             });
 
-            pipeline.FileProvider = env.WebRootFileProvider;
             app.UseWebOptimizer(options =>
             {
                 //options.EnableCaching = true;

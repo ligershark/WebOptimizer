@@ -61,7 +61,6 @@ namespace WebOptimizer
         {
             var pipeline = (IAssetPipeline)context.RequestServices.GetService(typeof(IAssetPipeline));
             var config = new AssetContext(context, this);
-            bool isExtension = Route.StartsWith(".");
 
             foreach (string sourceFile in SourceFiles)
             {

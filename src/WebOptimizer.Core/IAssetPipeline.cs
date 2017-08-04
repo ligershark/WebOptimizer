@@ -15,6 +15,12 @@ namespace WebOptimizer
         bool? EnableTagHelperBundling { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether to base the source files of the content root folder
+        /// or the web root (wwroot folder).
+        /// </summary>
+        bool? UseContentRoot { get; set; }
+
+        /// <summary>
         /// Gets the assets registered on the pipeline.
         /// </summary>
         IReadOnlyList<IAsset> Assets { get; }

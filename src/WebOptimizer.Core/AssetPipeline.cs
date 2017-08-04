@@ -15,18 +15,12 @@ namespace WebOptimizer
 
         public bool? EnableTagHelperBundling { get; set; }
 
-        /// <summary>
-        /// Gets a list of transforms added.
-        /// </summary>
+        public bool? UseContentRoot { get; set; }
+
         public IReadOnlyList<IAsset> Assets => _assets;
 
         public IFileProvider FileProvider { get; set; }
 
-        /// <summary>
-        /// Gets the <see cref="IAsset" /> from the specified route.
-        /// </summary>
-        /// <param name="route">The route to find the asset by.</param>
-        /// <param name="asset">The asset matching the route.</param>
         public bool TryFromRoute(string route, out IAsset asset)
         {
             asset = null;
@@ -152,7 +146,7 @@ namespace WebOptimizer
         /// </summary>
         public static void EnsureDefaults(this IAssetPipeline pipeline, IHostingEnvironment env)
         {
-            pipeline.FileProvider = pipeline.FileProvider ?? env.WebRootFileProvider;
+            pipeline.FileProvider = pipeline.FileProvider ?? (pipeline.UseContentRoot == true ? env.ContentRootFileProvider : env.WebRootFileProvider);
             pipeline.EnableTagHelperBundling = pipeline.EnableTagHelperBundling ?? !env.IsDevelopment();
         }
 
