@@ -101,10 +101,10 @@ namespace WebOptimizer
                     return "image/gif";
                 case "png":
                     return "image/png";
-                case "svg":
-                    return "image/svg+xml";
                 case "webp":
                     return "image/webp";
+                case "svg":
+                    return "image/svg+xml";
                 case "ttf":
                     return "application/x-font-ttf";
                 case "otf":
