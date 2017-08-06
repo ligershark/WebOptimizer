@@ -65,6 +65,61 @@ namespace WebOptimizer
     public static partial class PipelineExtensions
     {
         /// <summary>
+        /// Minifies and fingerprints any .css file requested.
+        /// </summary>
+        public static IAsset MinifyCssFiles(this IAssetPipeline pipeline) =>
+            pipeline.MinifyCssFiles(new CssSettings());
+
+        /// <summary>
+        /// Minifies and fingerprints any .css file requested.
+        /// </summary>
+        public static IAsset MinifyCssFiles(this IAssetPipeline pipeline, CssSettings settings)
+        {
+            return pipeline.AddFileExtension(".css", "text/css; charset=UTF-8")
+                           .FingerprintUrls()
+                           .MinifyCss(settings);
+        }
+
+
+        /// <summary>
+        /// Minifies the specified .css files
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyCssFiles(this IAssetPipeline pipeline, params string[] sourceFiles)
+        {
+            return pipeline.MinifyCssFiles(new CssSettings(), sourceFiles);
+        }
+
+        /// <summary>
+        /// Minifies the specified .css files
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyCssFiles(this IAssetPipeline pipeline, CssSettings settings, params string[] sourceFiles)
+        {
+            return pipeline.AddFiles("text/css; charset=UTF-8", sourceFiles)
+                           .FingerprintUrls()
+                           .MinifyCss(settings);
+        }
+
+        /// <summary>
+        /// Creates a CSS bundle on the specified route and minifies the output.
+        /// </summary>
+        public static IAsset AddCssBundle(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
+        {
+            return pipeline.AddCssBundle(route, new CssSettings(), sourceFiles);
+        }
+
+        /// <summary>
+        /// Creates a CSS bundle on the specified route and minifies the output.
+        /// </summary>
+        public static IAsset AddCssBundle(this IAssetPipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
+        {
+            return pipeline.AddBundle(route, "text/css; charset=UTF-8", sourceFiles)
+                           .AdjustRelativePaths()
+                           .Concatinate()
+                           .FingerprintUrls()
+                           .MinifyCss(settings);
+        }
+
+        /// <summary>
         /// Runs the CSS minifier on the content.
         /// </summary>
         public static IAsset MinifyCss(this IAsset bundle)
@@ -84,7 +139,7 @@ namespace WebOptimizer
         }
 
         /// <summary>
-        /// Runs the JavaScript minifier on the content.
+        /// Runs the CSS minifier on the content.
         /// </summary>
         public static IEnumerable<IAsset> MinifyCss(this IEnumerable<IAsset> assets)
         {
@@ -92,7 +147,7 @@ namespace WebOptimizer
         }
 
         /// <summary>
-        /// Runs the JavaScript minifier on the content.
+        /// Runs the CSS minifier on the content.
         /// </summary>
         public static IEnumerable<IAsset> MinifyCss(this IEnumerable<IAsset> assets, CssSettings settings)
         {

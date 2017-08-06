@@ -4,8 +4,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using NUglify.Css;
-using NUglify.JavaScript;
 
 namespace WebOptimizer
 {
@@ -178,113 +176,6 @@ namespace WebOptimizer
         {
             pipeline.FileProvider = pipeline.FileProvider ?? (pipeline.UseContentRoot == true ? env.ContentRootFileProvider : env.WebRootFileProvider);
             pipeline.EnableTagHelperBundling = pipeline.EnableTagHelperBundling ?? !env.IsDevelopment();
-        }
-
-        /// <summary>
-        /// Dynamically adds all requested .css files to the pipeline.
-        /// </summary>
-        public static IAsset MinifyJsFiles(this IAssetPipeline pipeline)
-        {
-            return pipeline.MinifyJsFiles(new CodeSettings());
-        }
-
-        /// <summary>
-        /// Dynamically adds all requested .css files to the pipeline.
-        /// </summary>
-        public static IAsset MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings)
-        {
-            return pipeline.AddFileExtension(".js", "application/javascript; charset=UTF-8")
-                           .MinifyJavaScript(settings);
-        }
-
-        /// <summary>
-        /// Minifies the specified .js files
-        /// </summary>
-        public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline, params string[] sourceFiles)
-        {
-            return pipeline.MinifyJsFiles(new CodeSettings(), sourceFiles);
-        }
-
-        /// <summary>
-        /// Minifies the specified .js files
-        /// </summary>
-        public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings, params string[] sourceFiles)
-        {
-            return pipeline.AddFiles("application/javascript; charset=UTF-8", sourceFiles)
-                           .MinifyJavaScript(settings);
-        }
-
-        /// <summary>
-        /// Creates a JavaScript bundle on the specified route and minifies the output.
-        /// </summary>
-        public static IAsset AddJavaScriptBundle(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
-        {
-            return pipeline.AddJavaScriptBundle(route, new CodeSettings(), sourceFiles);
-        }
-
-        /// <summary>
-        /// Creates a JavaScript bundle on the specified route and minifies the output.
-        /// </summary>
-        public static IAsset AddJavaScriptBundle(this IAssetPipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
-        {
-            return pipeline.AddBundle(route, "application/javascript; charset=UTF-8", sourceFiles)
-                           .Concatinate()
-                           .MinifyJavaScript(settings);
-        }
-
-        /// <summary>
-        /// Minifies and fingerprints any .css file requested.
-        /// </summary>
-        public static IAsset MinifyCssFiles(this IAssetPipeline pipeline) =>
-            pipeline.MinifyCssFiles(new CssSettings());
-
-        /// <summary>
-        /// Minifies and fingerprints any .css file requested.
-        /// </summary>
-        public static IAsset MinifyCssFiles(this IAssetPipeline pipeline, CssSettings settings)
-        {
-            return pipeline.AddFileExtension(".css", "text/css; charset=UTF-8")
-                           .FingerprintUrls()
-                           .MinifyCss(settings);
-        }
-
-
-        /// <summary>
-        /// Minifies the specified .css files
-        /// </summary>
-        public static IEnumerable<IAsset> MinifyCssFiles(this IAssetPipeline pipeline, params string[] sourceFiles)
-        {
-            return pipeline.MinifyCssFiles(new CssSettings(), sourceFiles);
-        }
-
-        /// <summary>
-        /// Minifies the specified .css files
-        /// </summary>
-        public static IEnumerable<IAsset> MinifyCssFiles(this IAssetPipeline pipeline, CssSettings settings, params string[] sourceFiles)
-        {
-            return pipeline.AddFiles("text/css; charset=UTF-8", sourceFiles)
-                           .FingerprintUrls()
-                           .MinifyCss(settings);
-        }
-
-        /// <summary>
-        /// Creates a CSS bundle on the specified route and minifies the output.
-        /// </summary>
-        public static IAsset AddCssBundle(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
-        {
-            return pipeline.AddCssBundle(route, new CssSettings(), sourceFiles);
-        }
-
-        /// <summary>
-        /// Creates a CSS bundle on the specified route and minifies the output.
-        /// </summary>
-        public static IAsset AddCssBundle(this IAssetPipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
-        {
-            return pipeline.AddBundle(route, "text/css; charset=UTF-8", sourceFiles)
-                           .AdjustRelativePaths()
-                           .Concatinate()
-                           .FingerprintUrls()
-                           .MinifyCss(settings);
         }
     }
 }

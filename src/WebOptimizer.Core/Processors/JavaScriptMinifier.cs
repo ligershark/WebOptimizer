@@ -64,6 +64,58 @@ namespace WebOptimizer
     public static partial class PipelineExtensions
     {
         /// <summary>
+        /// Dynamically adds all requested .css files to the pipeline.
+        /// </summary>
+        public static IAsset MinifyJsFiles(this IAssetPipeline pipeline)
+        {
+            return pipeline.MinifyJsFiles(new CodeSettings());
+        }
+
+        /// <summary>
+        /// Dynamically adds all requested .css files to the pipeline.
+        /// </summary>
+        public static IAsset MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings)
+        {
+            return pipeline.AddFileExtension(".js", "application/javascript; charset=UTF-8")
+                           .MinifyJavaScript(settings);
+        }
+
+        /// <summary>
+        /// Minifies the specified .js files
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline, params string[] sourceFiles)
+        {
+            return pipeline.MinifyJsFiles(new CodeSettings(), sourceFiles);
+        }
+
+        /// <summary>
+        /// Minifies the specified .js files
+        /// </summary>
+        public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings, params string[] sourceFiles)
+        {
+            return pipeline.AddFiles("application/javascript; charset=UTF-8", sourceFiles)
+                           .MinifyJavaScript(settings);
+        }
+
+        /// <summary>
+        /// Creates a JavaScript bundle on the specified route and minifies the output.
+        /// </summary>
+        public static IAsset AddJavaScriptBundle(this IAssetPipeline pipeline, string route, params string[] sourceFiles)
+        {
+            return pipeline.AddJavaScriptBundle(route, new CodeSettings(), sourceFiles);
+        }
+
+        /// <summary>
+        /// Creates a JavaScript bundle on the specified route and minifies the output.
+        /// </summary>
+        public static IAsset AddJavaScriptBundle(this IAssetPipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
+        {
+            return pipeline.AddBundle(route, "application/javascript; charset=UTF-8", sourceFiles)
+                           .Concatinate()
+                           .MinifyJavaScript(settings);
+        }
+
+        /// <summary>
         /// Runs the JavaScript minifier on the content.
         /// </summary>
         public static IAsset MinifyJavaScript(this IAsset asset)
