@@ -84,7 +84,7 @@ namespace WebOptimizer.Taghelpers
         {
             string cacheKey = route;
 
-            if (Pipeline.TryFromRoute(route, out IAsset asset))
+            if (Pipeline.TryGetAssetFromRoute(route, out IAsset asset))
             {
                 cacheKey = asset.GenerateCacheKey(ViewContext.HttpContext);
             }

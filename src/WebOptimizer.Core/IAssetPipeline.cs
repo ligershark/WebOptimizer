@@ -60,6 +60,6 @@ namespace WebOptimizer
         /// </summary>
         /// <param name="route">The route to find the asset by.</param>
         /// <param name="asset">The asset matching the route.</param>
-        bool TryFromRoute(string route, out IAsset asset);
+        bool TryGetAssetFromRoute(string route, out IAsset asset);
     }
 }

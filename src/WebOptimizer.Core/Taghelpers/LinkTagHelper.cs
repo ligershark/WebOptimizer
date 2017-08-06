@@ -35,7 +35,7 @@ namespace WebOptimizer.Taghelpers
 
             string href = context.AllAttributes["href"].Value.ToString();
 
-            if (Pipeline.TryFromRoute(href, out IAsset asset) && !output.Attributes.ContainsName("inline"))
+            if (Pipeline.TryGetAssetFromRoute(href, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
                 Pipeline.EnsureDefaults(HostingEnvironment);
 

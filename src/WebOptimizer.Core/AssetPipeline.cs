@@ -22,7 +22,7 @@ namespace WebOptimizer
 
         public IFileProvider FileProvider { get; set; }
 
-        public bool TryFromRoute(string route, out IAsset asset)
+        public bool TryGetAssetFromRoute(string route, out IAsset asset)
         {
             asset = null;
             string cleanRoute = route.TrimStart('~');

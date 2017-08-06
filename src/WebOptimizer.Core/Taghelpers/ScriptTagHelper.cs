@@ -33,7 +33,7 @@ namespace WebOptimizer.Taghelpers
 
             string src = context.AllAttributes["src"].Value.ToString();
 
-            if (Pipeline.TryFromRoute(src, out IAsset asset) && !output.Attributes.ContainsName("inline"))
+            if (Pipeline.TryGetAssetFromRoute(src, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
                 Pipeline.EnsureDefaults(HostingEnvironment);
 

@@ -88,9 +88,9 @@ namespace WebOptimizer.Test
             var pipeline = new AssetPipeline();
             pipeline.AddBundle("/route1", "text/css", "file.css");
 
-            Assert.True(pipeline.TryFromRoute("/route1", out var a1));
-            Assert.True(pipeline.TryFromRoute("route1", out var a2));
-            Assert.True(pipeline.TryFromRoute("~/route1", out var a3));
+            Assert.True(pipeline.TryGetAssetFromRoute("/route1", out var a1));
+            Assert.True(pipeline.TryGetAssetFromRoute("route1", out var a2));
+            Assert.True(pipeline.TryGetAssetFromRoute("~/route1", out var a3));
         }
 
         [Theory2]
@@ -105,7 +105,7 @@ namespace WebOptimizer.Test
             var pipeline = new AssetPipeline();
             pipeline.AddFiles("text/css", pattern);
 
-            Assert.True(pipeline.TryFromRoute(path, out var a1));
+            Assert.True(pipeline.TryGetAssetFromRoute(path, out var a1));
             Assert.Equal($"/{path.TrimStart('/')}", a1.Route);
         }
 

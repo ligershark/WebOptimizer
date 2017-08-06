@@ -27,7 +27,7 @@ namespace WebOptimizer
 
         public Task InvokeAsync(HttpContext context)
         {
-            if (_pipeline.TryFromRoute(context.Request.Path, out IAsset asset))
+            if (_pipeline.TryGetAssetFromRoute(context.Request.Path, out IAsset asset))
             {
                 return HandleAssetAsync(context, asset);
             }
