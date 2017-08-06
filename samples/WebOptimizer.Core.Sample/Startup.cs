@@ -29,7 +29,9 @@ namespace BundlerSample
             {
                 pipeline.EnableTagHelperBundling = true;
 
-                pipeline.AddCssBundle("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css");
+                pipeline.AddCssBundle("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css")
+                        .InlineImages();
+
                 pipeline.AddJavaScriptBundle("/all.js", "js/site.js", "js/b.js");
 
                 pipeline.AddBundle("/demo.txt", "text/plain", "js/site.js", "js/b.js")
@@ -37,9 +39,10 @@ namespace BundlerSample
 
                 pipeline.AddScssBundle("/scss.css", "css/test.scss", "css/test2.scss");
 
-                pipeline.MinifyCssFiles().FingerprintUrls();
+                pipeline.MinifyCssFiles().InlineImages().FingerprintUrls();
                 pipeline.MinifyJsFiles();
                 pipeline.CompileScssFiles();
+                pipeline.ReplaceImages();
             });
         }
 

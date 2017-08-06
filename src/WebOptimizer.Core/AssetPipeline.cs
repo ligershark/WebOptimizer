@@ -96,6 +96,36 @@ namespace WebOptimizer
 
             return asset;
         }
+
+        /// <summary>
+        /// Compiles the specified .scss files into CSS and makes them servable in the browser.
+        /// </summary>
+        /// <param name="contentType">The content type of the response. Example: text/css or application/javascript.</param>
+        /// <param name="sourceFiles">A list of relative file names of the sources to compile.</param>
+        public IEnumerable<IAsset> AddFiles(string contentType, params string[] sourceFiles)
+        {
+            var list = new List<IAsset>();
+
+            foreach (string file in sourceFiles)
+            {
+                IAsset asset = AddBundle(file, contentType, new[] { file });
+
+                list.Add(asset);
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// Adds the file extension.
+        /// </summary>
+        /// <param name="extension">The extension to use. Example: .css or .js</param>
+        /// <param name="contentType">The content type of the response. Example: text/css or application/javascript.</param>
+        public IAsset AddFileExtension(string extension, string contentType)
+        {
+            IAsset asset = Asset.Create(extension, contentType, Enumerable.Empty<string>());
+            return AddBundle(asset);
+        }
     }
 
     /// <summary>
@@ -255,38 +285,6 @@ namespace WebOptimizer
                            .Concatinate()
                            .FingerprintUrls()
                            .MinifyCss(settings);
-        }
-
-        /// <summary>
-        /// Compiles the specified .scss files into CSS and makes them servable in the browser.
-        /// </summary>
-        /// <param name="pipeline">The pipeline object.</param>
-        /// <param name="contentType">The content type of the response. Example: text/css or application/javascript.</param>
-        /// <param name="sourceFiles">A list of relative file names of the sources to compile.</param>
-        public static IEnumerable<IAsset> AddFiles(this IAssetPipeline pipeline, string contentType, params string[] sourceFiles)
-        {
-            var list = new List<IAsset>();
-
-            foreach (string file in sourceFiles)
-            {
-                IAsset asset = pipeline.AddBundle(file, contentType, new[] { file });
-
-                list.Add(asset);
-            }
-
-            return list;
-        }
-
-        /// <summary>
-        /// Adds the file extension.
-        /// </summary>
-        /// <param name="pipeline">The pipeline.</param>
-        /// <param name="extension">The extension to use. Example: .css or .js</param>
-        /// <param name="contentType">The content type of the response. Example: text/css or application/javascript.</param>
-        public static IAsset AddFileExtension(this IAssetPipeline pipeline, string extension, string contentType)
-        {
-            IAsset asset = Asset.Create(extension, contentType, Enumerable.Empty<string>());
-            return pipeline.AddBundle(asset);
         }
     }
 }

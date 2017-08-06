@@ -60,7 +60,7 @@ namespace WebOptimizer
                     string urlValue = match.Groups[2].Value;
 
                     // Ignore root relative references
-                    if (urlValue.StartsWith("/", StringComparison.Ordinal))
+                    if (urlValue.StartsWith("/", StringComparison.Ordinal) || urlValue.StartsWith("data:"))
                         continue;
 
                     //prevent query string from causing error

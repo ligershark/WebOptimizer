@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System;
+using Microsoft.AspNetCore.Hosting;
 
 namespace WebOptimizer
 {
@@ -15,6 +16,7 @@ namespace WebOptimizer
         public AssetMiddlewareOptions(IHostingEnvironment env)
         {
             EnableCaching = !env.IsDevelopment();
+            SlidingExpiration = TimeSpan.FromHours(24);
         }
 
         /// <summary>
@@ -22,5 +24,11 @@ namespace WebOptimizer
         /// Default is <code>false</code> when running in a development environment.
         /// </summary>
         public bool? EnableCaching { get; set; }
+
+        /// <summary>
+        /// Gets or sets the time from last access to an asset until it is evicted from the cache.
+        /// Default it 24 hours.
+        /// </summary>
+        public TimeSpan SlidingExpiration { get; set; }
     }
 }

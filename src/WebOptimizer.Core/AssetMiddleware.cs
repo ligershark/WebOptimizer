@@ -80,6 +80,7 @@ namespace WebOptimizer
             if (_options.EnableCaching == true)
             {
                 var cacheOptions = new MemoryCacheEntryOptions();
+                cacheOptions.SetSlidingExpiration(_options.SlidingExpiration);
 
                 foreach (string file in files)
                 {

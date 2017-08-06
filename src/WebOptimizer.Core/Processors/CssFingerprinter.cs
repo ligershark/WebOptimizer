@@ -57,7 +57,7 @@ namespace WebOptimizer
                     string urlValue = match.Groups[2].Value;
 
                     // Ignore references with protocols
-                    if (urlValue.Contains("://") || urlValue.StartsWith("//"))
+                    if (urlValue.Contains("://") || urlValue.StartsWith("//") || urlValue.StartsWith("data:"))
                         continue;
 
                     //prevent query string from causing error
@@ -126,7 +126,7 @@ namespace WebOptimizer
 
             foreach (IAsset asset in assets)
             {
-                list.Add(asset.AdjustRelativePaths());
+                list.Add(asset.FingerprintUrls());
             }
 
             return list;

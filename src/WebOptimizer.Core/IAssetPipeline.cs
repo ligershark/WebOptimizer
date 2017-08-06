@@ -49,6 +49,20 @@ namespace WebOptimizer
         IAsset AddBundle(string route, string contentType, params string[] sourceFiles);
 
         /// <summary>
+        /// Compiles the specified .scss files into CSS and makes them servable in the browser.
+        /// </summary>
+        /// <param name="contentType">The content type of the response. Example: text/css or application/javascript.</param>
+        /// <param name="sourceFiles">A list of relative file names of the sources to compile.</param>
+        IEnumerable<IAsset> AddFiles(string contentType, params string[] sourceFiles);
+
+        /// <summary>
+        /// Adds the file extension.
+        /// </summary>
+        /// <param name="extension">The extension to use. Example: .css or .js</param>
+        /// <param name="contentType">The content type of the response. Example: text/css or application/javascript.</param>
+        IAsset AddFileExtension(string extension, string contentType);
+
+        /// <summary>
         /// Gets the <see cref="IAsset"/> from the specified route.
         /// </summary>
         /// <param name="route">The route to find the asset by.</param>

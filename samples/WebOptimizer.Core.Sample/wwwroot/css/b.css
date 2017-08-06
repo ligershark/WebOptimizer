@@ -1,3 +1,4 @@
 ﻿.foo {
     display: inline;
+    background: url(../images/logo.png);
 }
