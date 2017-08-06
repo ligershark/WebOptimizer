@@ -133,4 +133,5 @@ coming soon...
 ### Plugins
 
 - [Sass/Scss compiler](https://github.com/ligershark/WebOptimizer.Sass)
+- [Markdown parser](https://github.com/ligershark/WebOptimizer.Markdown)
 - [i18n (localization of .js files)](https://github.com/ligershark/WebOptimizer.i18n)
