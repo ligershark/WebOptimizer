@@ -1,7 +1,7 @@
 # ASP.NET Core Web Optimizer
 
 [![Build status](https://ci.appveyor.com/api/projects/status/twj2lkgnm4th6qh9?svg=true)](https://ci.appveyor.com/project/madskristensen/weboptimizer)
-[![NuGet](https://img.shields.io/nuget/dt/LigerShark.WebOptimizer.Core.svg)](https://nuget.org/packages/LigerShark.WebOptimizer.Core/)
+[![NuGet](https://img.shields.io/nuget/v/LigerShark.WebOptimizer.Core.svg)](https://nuget.org/packages/LigerShark.WebOptimizer.Core/)
 
 ASP.NET Core middleware for bundling, minification and localization of CSS and JavaScript files.
 
