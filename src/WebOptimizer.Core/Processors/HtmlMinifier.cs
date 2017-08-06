@@ -43,12 +43,13 @@ namespace WebOptimizer
                 if (key.EndsWith(".min.html"))
                     continue;
 
-                UglifyResult result = Uglify.Html(config.Content[key].AsString(), Settings);
+                string input = config.Content[key].AsString();
+                UglifyResult result = Uglify.Html(input, Settings);
                 string minified = result.Code;
 
                 if (result.HasErrors)
                 {
-                    minified = $"/* {string.Join("\r\n", result.Errors)} */";
+                    minified = $"<!-- {string.Join("\r\n", result.Errors)} -->\r\n" + input;
                 }
 
                 content[key] = minified.AsByteArray();
