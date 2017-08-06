@@ -64,7 +64,7 @@ namespace WebOptimizer
     public static partial class PipelineExtensions
     {
         /// <summary>
-        /// Dynamically adds all requested .css files to the pipeline.
+        /// Dynamically adds all requested .js files to the pipeline.
         /// </summary>
         public static IAsset MinifyJsFiles(this IAssetPipeline pipeline)
         {
@@ -72,7 +72,7 @@ namespace WebOptimizer
         }
 
         /// <summary>
-        /// Dynamically adds all requested .css files to the pipeline.
+        /// Dynamically adds all requested .js files to the pipeline.
         /// </summary>
         public static IAsset MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings)
         {
