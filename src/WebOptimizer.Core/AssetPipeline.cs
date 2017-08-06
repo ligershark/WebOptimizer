@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 
 namespace WebOptimizer
@@ -151,6 +153,7 @@ namespace WebOptimizer
                 pipeline.MinifyJsFiles();
             }
 
+            services.TryAddSingleton<IMemoryCache, MemoryCache>();
             services.AddSingleton<IAssetPipeline, AssetPipeline>(factory => pipeline);
 
             return pipeline;
@@ -164,6 +167,7 @@ namespace WebOptimizer
             var pipeline = new AssetPipeline();
             assetPipeline(pipeline);
 
+            services.TryAddSingleton<IMemoryCache, MemoryCache>();
             services.AddSingleton<IAssetPipeline, AssetPipeline>(factory => pipeline);
 
             return pipeline;

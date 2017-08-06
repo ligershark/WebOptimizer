@@ -73,11 +73,10 @@ namespace WebOptimizer
 
                 if (file.Exists)
                 {
-                    using (var ms = new MemoryStream())
                     using (Stream fs = file.CreateReadStream())
                     {
-                        await fs.CopyToAsync(ms);
-                        config.Content.Add(sourceFile, ms.ToArray());
+                        byte[] bytes = await fs.AsBytesAsync();
+                        config.Content.Add(sourceFile, bytes);
                     }
                 }
             }
