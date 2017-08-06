@@ -37,7 +37,7 @@ namespace BundlerSample
                 pipeline.AddBundle("/demo.txt", "text/plain", "js/site.js", "js/b.js")
                       .Concatinate();
 
-                pipeline.AddScssBundle("/scss.css", "css/test.scss", "css/test2.scss");
+                pipeline.AddScssBundle("/scss.css", "css/*.scss");
 
                 pipeline.MinifyCssFiles().InlineImages().FingerprintUrls();
                 pipeline.MinifyJsFiles();
