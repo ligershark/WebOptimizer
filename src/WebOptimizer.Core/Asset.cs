@@ -11,40 +11,19 @@ using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
 namespace WebOptimizer
 {
-    /// <summary>
-    /// A bundle of text based files
-    /// </summary>
     internal class Asset : IAsset
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="Asset"/> class.
-        /// </summary>
-        protected Asset()
+        private Asset()
         { }
 
-        /// <summary>
-        /// Gets the route to the bundle output.
-        /// </summary>
         public string Route { get; private set; }
 
-        /// <summary>
-        /// Gets the webroot relative source files.
-        /// </summary>
         public IEnumerable<string> SourceFiles { get; internal set; }
 
-        /// <summary>
-        /// Gets the content type produced by the transform.
-        /// </summary>
         public string ContentType { get; private set; }
 
-        /// <summary>
-        /// Gets a list of post processors
-        /// </summary>
         public IList<IProcessor> Processors { get; private set; }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Asset"/> class.
-        /// </summary>
         public static IAsset Create(string route, string contentType, IEnumerable<string> sourceFiles)
         {
             if (!route.StartsWith("/") && !route.StartsWith("."))
@@ -61,9 +40,6 @@ namespace WebOptimizer
             };
         }
 
-        /// <summary>
-        /// Executes the bundle and returns the processed output.
-        /// </summary>
         public async Task<byte[]> ExecuteAsync(HttpContext context)
         {
             var pipeline = (IAssetPipeline)context.RequestServices.GetService(typeof(IAssetPipeline));
@@ -99,19 +75,13 @@ namespace WebOptimizer
         {
             IFileInfo file = pipeline.FileProvider.GetFileInfo(sourceFile);
 
-            if (file.Exists)
+            using (Stream fs = file.CreateReadStream())
             {
-                using (Stream fs = file.CreateReadStream())
-                {
-                    byte[] bytes = await fs.AsBytesAsync();
-                    config.Content.Add(sourceFile, bytes);
-                }
+                byte[] bytes = await fs.AsBytesAsync();
+                config.Content.Add(sourceFile, bytes);
             }
         }
 
-        /// <summary>
-        /// Gets the cache key.
-        /// </summary>
         public string GenerateCacheKey(HttpContext context)
         {
             string cacheKey = Route;

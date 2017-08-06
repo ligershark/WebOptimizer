@@ -1,39 +1,22 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NUglify;
-using NUglify.Css;
 using NUglify.Html;
 
 namespace WebOptimizer
 {
-    /// <summary>
-    /// A processor that minifies JavaScript
-    /// </summary>
     internal class HtmlMinifier : IProcessor
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CssMinifier"/> class.
-        /// </summary>
         public HtmlMinifier(HtmlSettings settings)
         {
             Settings = settings;
         }
 
-        /// <summary>
-        /// Gets the custom key that should be used when calculating the memory cache key.
-        /// </summary>
         public string CacheKey(HttpContext context) => string.Empty;
 
-        /// <summary>
-        /// Gets or sets the settings.
-        /// </summary>
         public HtmlSettings Settings { get; set; }
 
-        /// <summary>
-        /// Executes the processor on the specified configuration.
-        /// </summary>
         public Task ExecuteAsync(IAssetContext config)
         {
             var content = new Dictionary<string, byte[]>();

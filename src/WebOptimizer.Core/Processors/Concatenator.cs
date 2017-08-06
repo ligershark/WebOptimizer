@@ -7,28 +7,12 @@ using Microsoft.AspNetCore.Http;
 
 namespace WebOptimizer
 {
-    /// <summary>
-    /// Concatinates multiple files into a single string.
-    /// </summary>
     internal class Concatenator : IProcessor
     {
-        /// <summary>
-        /// Gets the custom key that should be used when calculating the memory cache key.
-        /// </summary>
         public string CacheKey(HttpContext context) => string.Empty;
 
-        /// <summary>
-        /// Executes the processor on the specified configuration.
-        /// </summary>
         public Task ExecuteAsync(IAssetContext context)
         {
-            //var sb = new StringBuilder();
-
-            //foreach (string content in context.Content.Values)
-            //{
-            //    sb.AppendLine(content);
-            //}
-
             context.Content = new Dictionary<string, byte[]>
             {
                 { Guid.NewGuid().ToString(), context.Content.Values.SelectMany(x => x).ToArray() }

@@ -6,32 +6,17 @@ using NUglify.JavaScript;
 
 namespace WebOptimizer
 {
-    /// <summary>
-    /// A processor that minifies JavaScript
-    /// </summary>
     internal class JavaScriptMinifier : IProcessor
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="JavaScriptMinifier"/> class.
-        /// </summary>
         public JavaScriptMinifier(CodeSettings settings)
         {
             Settings = settings;
         }
 
-        /// <summary>
-        /// Gets the custom key that should be used when calculating the memory cache key.
-        /// </summary>
         public string CacheKey(HttpContext context) => string.Empty;
 
-        /// <summary>
-        /// Gets or sets the settings.
-        /// </summary>
         public CodeSettings Settings { get; set; }
 
-        /// <summary>
-        /// Executes the processor on the specified configuration.
-        /// </summary>
         public Task ExecuteAsync(IAssetContext config)
         {
             var content = new Dictionary<string, byte[]>();

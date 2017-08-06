@@ -8,22 +8,13 @@ using Microsoft.Extensions.FileProviders;
 
 namespace WebOptimizer
 {
-    /// <summary>
-    /// A processor that minifies JavaScript
-    /// </summary>
     internal class RelativePathAdjuster : IProcessor
     {
         private static readonly Regex _rxUrl = new Regex(@"url\s*\(\s*([""']?)([^:)]+)\1\s*\)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly string _protocol = "file:///";
 
-        /// <summary>
-        /// Gets the custom key that should be used when calculating the memory cache key.
-        /// </summary>
         public string CacheKey(HttpContext context) => string.Empty;
 
-        /// <summary>
-        /// Executes the processor on the specified configuration.
-        /// </summary>
         public Task ExecuteAsync(IAssetContext config)
         {
             var content = new Dictionary<string, byte[]>();

@@ -7,7 +7,7 @@ namespace WebOptimizer
     /// Options for the WebOptimizer middleware
     /// </summary>
     /// <seealso cref="WebOptimizer.IAssetMiddlewareOptions" />
-    public class AssetMiddlewareOptions : IAssetMiddlewareOptions
+    internal class AssetMiddlewareOptions : IAssetMiddlewareOptions
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AssetMiddlewareOptions"/> class.
