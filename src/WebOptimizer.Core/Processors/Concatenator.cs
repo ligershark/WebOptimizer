@@ -31,7 +31,7 @@ namespace WebOptimizer
         /// <summary>
         /// Adds the string content of all source files to the pipeline.
         /// </summary>
-        public static IAsset Concatinate(this IAsset asset)
+        public static IAsset Concatenate(this IAsset asset)
         {
             var reader = new Concatenator();
             asset.Processors.Add(reader);
@@ -42,13 +42,13 @@ namespace WebOptimizer
         /// <summary>
         /// Adds the string content of all source files to the pipeline.
         /// </summary>
-        public static IEnumerable<IAsset> Concatinate(this IEnumerable<IAsset> assets)
+        public static IEnumerable<IAsset> Concatenate(this IEnumerable<IAsset> assets)
         {
             var list = new List<IAsset>();
 
             foreach (IAsset asset in assets)
             {
-                list.Add(asset.Concatinate());
+                list.Add(asset.Concatenate());
             }
 
             return list;

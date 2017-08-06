@@ -52,15 +52,15 @@ namespace WebOptimizer
         /// <summary>
         /// Minifies and fingerprints any .html file requested.
         /// </summary>
-        public static IAsset MinifyHtmlFiles(this IAssetPipeline pipeline) =>
+        public static IEnumerable<IAsset> MinifyHtmlFiles(this IAssetPipeline pipeline) =>
             pipeline.MinifyHtmlFiles(new HtmlSettings());
 
         /// <summary>
         /// Minifies and fingerprints any .html file requested.
         /// </summary>
-        public static IAsset MinifyHtmlFiles(this IAssetPipeline pipeline, HtmlSettings settings)
+        public static IEnumerable<IAsset> MinifyHtmlFiles(this IAssetPipeline pipeline, HtmlSettings settings)
         {
-            return pipeline.AddFileExtension(".html", "text/html; charset=UTF-8")
+            return pipeline.AddFiles("text/html; charset=UTF-8", "**/*.html")
                            .MinifyHtml(settings);
         }
 
@@ -96,7 +96,7 @@ namespace WebOptimizer
         public static IAsset AddHtmlBundle(this IAssetPipeline pipeline, string route, HtmlSettings settings, params string[] sourceFiles)
         {
             return pipeline.AddBundle(route, "text/html; charset=UTF-8", sourceFiles)
-                           .Concatinate()
+                           .Concatenate()
                            .MinifyHtml(settings);
         }
 

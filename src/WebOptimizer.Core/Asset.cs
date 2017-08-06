@@ -26,14 +26,9 @@ namespace WebOptimizer
 
         public static IAsset Create(string route, string contentType, IEnumerable<string> sourceFiles)
         {
-            if (!route.StartsWith("/") && !route.StartsWith("."))
-            {
-                route = "/" + route;
-            }
-
             return new Asset
             {
-                Route = route,
+                Route = $"/{route.TrimStart('/')}",
                 ContentType = contentType,
                 SourceFiles = sourceFiles,
                 Processors = new List<IProcessor>(),

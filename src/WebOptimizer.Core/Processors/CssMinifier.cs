@@ -52,15 +52,17 @@ namespace WebOptimizer
         /// <summary>
         /// Minifies and fingerprints any .css file requested.
         /// </summary>
-        public static IAsset MinifyCssFiles(this IAssetPipeline pipeline) =>
-            pipeline.MinifyCssFiles(new CssSettings());
+        public static IEnumerable<IAsset> MinifyCssFiles(this IAssetPipeline pipeline)
+        {
+            return pipeline.MinifyCssFiles(new CssSettings());
+        }
 
         /// <summary>
         /// Minifies and fingerprints any .css file requested.
         /// </summary>
-        public static IAsset MinifyCssFiles(this IAssetPipeline pipeline, CssSettings settings)
+        public static IEnumerable<IAsset> MinifyCssFiles(this IAssetPipeline pipeline, CssSettings settings)
         {
-            return pipeline.AddFileExtension(".css", "text/css; charset=UTF-8")
+            return pipeline.AddFiles("text/css; charset=UTF-8", "**/*.css")
                            .FingerprintUrls()
                            .MinifyCss(settings);
         }
@@ -99,7 +101,7 @@ namespace WebOptimizer
         {
             return pipeline.AddBundle(route, "text/css; charset=UTF-8", sourceFiles)
                            .AdjustRelativePaths()
-                           .Concatinate()
+                           .Concatenate()
                            .FingerprintUrls()
                            .MinifyCss(settings);
         }

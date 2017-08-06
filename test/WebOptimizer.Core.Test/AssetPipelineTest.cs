@@ -89,8 +89,24 @@ namespace WebOptimizer.Test
             pipeline.AddBundle("/route1", "text/css", "file.css");
 
             Assert.True(pipeline.TryFromRoute("/route1", out var a1));
-            Assert.False(pipeline.TryFromRoute("route1", out var a2));
+            Assert.True(pipeline.TryFromRoute("route1", out var a2));
             Assert.True(pipeline.TryFromRoute("~/route1", out var a3));
+        }
+
+        [Theory2]
+        [InlineData("css/*.css", "/css/ost.css")]
+        [InlineData("css/**/*.css", "/css/a/b/c/ost.css")]
+        [InlineData("css/**/*.css", "css/a/b/c/ost.css")]
+        [InlineData("**/*.css", "/css/a/b/c/ost.css")]
+        [InlineData("*.css", "foo.css")]
+        [InlineData("*.css", "/foo.css")]
+        public void FromRoute_Globbing_Success(string pattern, string path)
+        {
+            var pipeline = new AssetPipeline();
+            pipeline.AddFiles("text/css", pattern);
+
+            Assert.True(pipeline.TryFromRoute(path, out var a1));
+            Assert.Equal($"/{path.TrimStart('/')}", a1.Route);
         }
 
         [Fact2]

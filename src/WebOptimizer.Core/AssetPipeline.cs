@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace WebOptimizer
 {
@@ -26,6 +27,7 @@ namespace WebOptimizer
             asset = null;
             string cleanRoute = route.TrimStart('~');
 
+            // First check direct matches
             foreach (IAsset existing in Assets)
             {
                 if (existing.Route.Equals(cleanRoute, StringComparison.OrdinalIgnoreCase))
@@ -35,19 +37,26 @@ namespace WebOptimizer
                 }
             }
 
-            foreach (IAsset existing in Assets.Where(a => a.Route[0] == '.'))
+            // Then check globbing matches
+            if (route != "/")
             {
-                if (route.EndsWith(existing.Route, StringComparison.OrdinalIgnoreCase))
+                foreach (IAsset existing in Assets)
                 {
-                    asset = Asset.Create(cleanRoute, existing.ContentType, new[] { cleanRoute });
+                    var matcher = new Matcher();
+                    matcher.AddInclude(existing.Route);
 
-                    foreach (IProcessor processor in existing.Processors)
+                    if (matcher.Match(cleanRoute.TrimStart('/')).HasMatches)
                     {
-                        asset.Processors.Add(processor);
-                    }
+                        asset = Asset.Create(cleanRoute, existing.ContentType, new[] { cleanRoute });
 
-                    _assets.Add(asset);
-                    return true;
+                        foreach (IProcessor processor in existing.Processors)
+                        {
+                            asset.Processors.Add(processor);
+                        }
+
+                        _assets.Add(asset);
+                        return true;
+                    }
                 }
             }
 
@@ -74,9 +83,9 @@ namespace WebOptimizer
 
         public IAsset AddBundle(string route, string contentType, params string[] sourceFiles)
         {
-            if (!route.StartsWith("/") && !route.StartsWith("."))
+            if (!route.StartsWith("/"))
             {
-                throw new ArgumentException($"The route \"{route}\" must start with a / or a .", nameof(route));
+                throw new ArgumentException($"The route \"{route}\" must start with a /", nameof(route));
             }
 
             if (Assets.Any(a => a.Route.Equals(route, StringComparison.OrdinalIgnoreCase)))
@@ -86,7 +95,7 @@ namespace WebOptimizer
 
             string[] sources = sourceFiles;
 
-            if (!route.StartsWith(".") && sourceFiles.Length == 0)
+            if (sourceFiles.Length == 0)
             {
                 sources = new[] { route };
             }
@@ -108,23 +117,12 @@ namespace WebOptimizer
 
             foreach (string file in sourceFiles)
             {
-                IAsset asset = AddBundle(file, contentType, new[] { file });
+                IAsset asset = AddBundle($"/{file.TrimStart('/')}", contentType, new[] { file });
 
                 list.Add(asset);
             }
 
             return list;
-        }
-
-        /// <summary>
-        /// Adds the file extension.
-        /// </summary>
-        /// <param name="extension">The extension to use. Example: .css or .js</param>
-        /// <param name="contentType">The content type of the response. Example: text/css or application/javascript.</param>
-        public IAsset AddFileExtension(string extension, string contentType)
-        {
-            IAsset asset = Asset.Create(extension, contentType, Enumerable.Empty<string>());
-            return AddBundle(asset);
         }
     }
 

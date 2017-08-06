@@ -44,7 +44,7 @@ namespace WebOptimizer.Test.Processors
             var pipeline = new AssetPipeline();
             var assets = pipeline.AddBundle(new[] { asset1, asset2 });
 
-            assets = assets.Concatinate();
+            assets = assets.Concatenate();
 
             Assert.Equal(2, assets.Count());
 

@@ -22,8 +22,6 @@ namespace BundlerSample
         {
             services.AddMvc()
                 .AddViewLocalization(options => options.ResourcesPath = "Resources");
-            //services.AddWebOptimizer()
-            //        .AddScss();
 
             services.AddWebOptimizer(pipeline =>
             {
@@ -35,12 +33,13 @@ namespace BundlerSample
                 pipeline.AddJavaScriptBundle("/all.js", "js/site.js", "js/b.js");
 
                 pipeline.AddBundle("/demo.txt", "text/plain", "js/site.js", "js/b.js")
-                      .Concatinate();
+                      .Concatenate();
+
+                pipeline.MinifyJsFiles("**/*.jsx");
 
                 pipeline.AddScssBundle("/scss.css", "css/*.scss");
 
-                pipeline.MinifyCssFiles().InlineImages().FingerprintUrls();
-                pipeline.MinifyJsFiles();
+                pipeline.MinifyCssFiles().InlineImages();
                 pipeline.CompileScssFiles();
                 pipeline.ReplaceImages();
             });

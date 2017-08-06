@@ -51,7 +51,7 @@ namespace WebOptimizer
         /// <summary>
         /// Dynamically adds all requested .js files to the pipeline.
         /// </summary>
-        public static IAsset MinifyJsFiles(this IAssetPipeline pipeline)
+        public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline)
         {
             return pipeline.MinifyJsFiles(new CodeSettings());
         }
@@ -59,9 +59,9 @@ namespace WebOptimizer
         /// <summary>
         /// Dynamically adds all requested .js files to the pipeline.
         /// </summary>
-        public static IAsset MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings)
+        public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings)
         {
-            return pipeline.AddFileExtension(".js", "application/javascript; charset=UTF-8")
+            return pipeline.AddFiles("application/javascript; charset=UTF-8", "**/*.js")
                            .MinifyJavaScript(settings);
         }
 
@@ -96,7 +96,7 @@ namespace WebOptimizer
         public static IAsset AddJavaScriptBundle(this IAssetPipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
         {
             return pipeline.AddBundle(route, "application/javascript; charset=UTF-8", sourceFiles)
-                           .Concatinate()
+                           .Concatenate()
                            .MinifyJavaScript(settings);
         }
 

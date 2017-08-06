@@ -57,14 +57,14 @@ namespace BundlerSample
             return pipeline.AddBundle(route, "text/css; charset=UTF-8", sourceFiles)
                            .CompileScss()
                            .AdjustRelativePaths()
-                           .Concatinate()
+                           .Concatenate()
                            .FingerprintUrls()
                            .MinifyCss();
         }
 
-        public static IAsset CompileScssFiles(this IAssetPipeline pipeline)
+        public static IEnumerable<IAsset> CompileScssFiles(this IAssetPipeline pipeline)
         {
-            return pipeline.AddFileExtension(".scss", "text/css; charset=UTF-8")
+            return pipeline.AddFiles("text/css; charset=UTF-8", "**/*.scss")
                            .CompileScss()
                            .AdjustRelativePaths()
                            .FingerprintUrls()

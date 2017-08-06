@@ -8,9 +8,6 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace WebOptimizer
 {
-    /// <summary>
-    /// Middleware for setting up bundles
-    /// </summary>
     internal class AssetMiddleware
     {
         private readonly RequestDelegate _next;
@@ -19,9 +16,6 @@ namespace WebOptimizer
         private readonly IAssetPipeline _pipeline;
         private readonly IAssetMiddlewareOptions _options;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AssetMiddleware"/> class.
-        /// </summary>
         public AssetMiddleware(RequestDelegate next, IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IAssetMiddlewareOptions options)
         {
             _next = next;
@@ -31,9 +25,6 @@ namespace WebOptimizer
             _options = options;
         }
 
-        /// <summary>
-        /// Invokes the middleware
-        /// </summary>
         public Task InvokeAsync(HttpContext context)
         {
             if (_pipeline.TryFromRoute(context.Request.Path, out IAsset asset))

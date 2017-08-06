@@ -57,9 +57,9 @@ namespace BundlerSample
                            .ReplaceImages();
         }
 
-        public static IAsset ReplaceImages(this IAssetPipeline pipeline)
+        public static IEnumerable<IAsset> ReplaceImages(this IAssetPipeline pipeline)
         {
-            return pipeline.AddFileExtension(".png", "image/png")
+            return pipeline.AddFiles("image/png", "**/*.png")
                            .ReplaceImages();
         }
     }
