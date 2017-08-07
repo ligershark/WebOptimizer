@@ -25,7 +25,7 @@ namespace WebOptimizer
         public bool TryGetAssetFromRoute(string route, out IAsset asset)
         {
             asset = null;
-            string cleanRoute = route.TrimStart('~');
+            string cleanRoute = NormalizeRoute(route);
 
             // First check direct matches
             foreach (IAsset existing in Assets)
@@ -83,10 +83,7 @@ namespace WebOptimizer
 
         public IAsset AddBundle(string route, string contentType, params string[] sourceFiles)
         {
-            if (!route.StartsWith("/"))
-            {
-                throw new ArgumentException($"The route \"{route}\" must start with a /", nameof(route));
-            }
+            route = NormalizeRoute(route);
 
             if (Assets.Any(a => a.Route.Equals(route, StringComparison.OrdinalIgnoreCase)))
             {
@@ -106,11 +103,6 @@ namespace WebOptimizer
             return asset;
         }
 
-        /// <summary>
-        /// Compiles the specified .scss files into CSS and makes them servable in the browser.
-        /// </summary>
-        /// <param name="contentType">The content type of the response. Example: text/css or application/javascript.</param>
-        /// <param name="sourceFiles">A list of relative file names of the sources to compile.</param>
         public IEnumerable<IAsset> AddFiles(string contentType, params string[] sourceFiles)
         {
             var list = new List<IAsset>();
@@ -123,6 +115,11 @@ namespace WebOptimizer
             }
 
             return list;
+        }
+
+        private string NormalizeRoute(string route)
+        {
+            return "/" + route.TrimStart('~', '/');
         }
     }
 

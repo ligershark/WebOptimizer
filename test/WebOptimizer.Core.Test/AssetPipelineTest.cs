@@ -18,7 +18,7 @@ namespace WebOptimizer.Test
         }
 
         [Fact2]
-        public void AddSingeAsset_Succes()
+        public void AddSingeAsset_Success()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
             var asset = Asset.Create("/route", "text/css", new[] { "file.css" });
@@ -28,6 +28,19 @@ namespace WebOptimizer.Test
             pipeline.AddBundle(asset);
 
             Assert.Equal(1, pipeline.Assets.Count);
+        }
+
+        [Theory2]
+        [InlineData("route", "/route")]
+        [InlineData("/route", "/route")]
+        [InlineData("~/route", "/route")]
+        public void AddBundle_Success(string inputRoute, string normalizedRoute)
+        {
+            var asset = Asset.Create(inputRoute, "text/css", new[] { "file.css" });
+            var pipeline = new AssetPipeline();
+            pipeline.AddBundle(asset);
+
+            Assert.Equal(normalizedRoute, pipeline.Assets.First().Route);
         }
 
         [Fact2]
@@ -82,15 +95,40 @@ namespace WebOptimizer.Test
             Assert.Equal(asset.Route, asset.SourceFiles.First());
         }
 
-        [Fact2]
-        public void FromRoute_MixedSlashes_Success()
+        [Theory2]
+        [InlineData("~/slash", "/slash")]
+        [InlineData("~/slash", "slash")]
+        [InlineData("~/slash", "~/slash")]
+        [InlineData("/slash", "/slash")]
+        [InlineData("/slash", "slash")]
+        [InlineData("/slash", "~/slash")]
+        [InlineData("noslash", "/noslash")]
+        [InlineData("noslash", "noslash")]
+        [InlineData("noslash", "~/noslash")]
+        public void FromRoute_MixedSlashes_Success(string routeToAdd, string routeToCheck)
         {
             var pipeline = new AssetPipeline();
-            pipeline.AddBundle("/route1", "text/css", "file.css");
+            pipeline.AddBundle(routeToAdd, "text/css", "file.css");
 
-            Assert.True(pipeline.TryGetAssetFromRoute("/route1", out var a1));
-            Assert.True(pipeline.TryGetAssetFromRoute("route1", out var a2));
-            Assert.True(pipeline.TryGetAssetFromRoute("~/route1", out var a3));
+            Assert.True(pipeline.TryGetAssetFromRoute(routeToCheck, out var a1), routeToCheck);
+        }
+
+        [Theory2]
+        [InlineData("~/1", "/2")]
+        [InlineData("~/1", "2")]
+        [InlineData("~/1", "~/2")]
+        [InlineData("/1", "/2")]
+        [InlineData("/1", "2")]
+        [InlineData("/1", "~/2")]
+        [InlineData("1", "/2")]
+        [InlineData("1", "2")]
+        [InlineData("1", "~/2")]
+        public void FromRoute_NotFound(string routeToAdd, string routeToCheck)
+        {
+            var pipeline = new AssetPipeline();
+            pipeline.AddBundle(routeToAdd, "text/css", "file.css");
+
+            Assert.False(pipeline.TryGetAssetFromRoute(routeToCheck, out var a1), routeToCheck);
         }
 
         [Theory2]

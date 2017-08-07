@@ -66,7 +66,14 @@ namespace BundlerSample
         {
             return pipeline.AddFiles("text/css; charset=UTF-8", "**/*.scss")
                            .CompileScss()
-                           .AdjustRelativePaths()
+                           .FingerprintUrls()
+                           .MinifyCss();
+        }
+
+        public static IEnumerable<IAsset> CompileScssFiles(this IAssetPipeline pipeline, params string[] sourceFiles)
+        {
+            return pipeline.AddFiles("text/css; charset=UFT-8", sourceFiles)
+                           .CompileScss()
                            .FingerprintUrls()
                            .MinifyCss();
         }
