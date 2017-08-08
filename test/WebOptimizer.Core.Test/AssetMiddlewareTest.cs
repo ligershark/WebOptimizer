@@ -54,6 +54,39 @@ namespace WebOptimizer.Test
         }
 
         [Fact2]
+        public async Task AssetMiddleware_NoCache_EmptyResponse()
+        {
+            var pipeline = new AssetPipeline();
+            var asset = new Mock<IAsset>().SetupAllProperties();
+            asset.SetupGet(a => a.ContentType).Returns("text/css");
+            asset.SetupGet(a => a.Route).Returns("/file.css");
+            asset.Setup(a => a.ExecuteAsync(It.IsAny<HttpContext>()))
+                 .Returns(Task.FromResult(new byte[0]));
+
+            StringValues values;
+            var context = new Mock<HttpContext>().SetupAllProperties();
+            context.Setup(s => s.Request.Headers.TryGetValue("Accept-Encoding", out values))
+                   .Returns(false);
+
+            context.Setup(c => c.Request.Path).Returns("/file.css");
+
+            var next = new Mock<RequestDelegate>();
+            var env = new HostingEnvironment();
+            var cache = new Mock<IMemoryCache>();
+
+            var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
+            member.SetValue(pipeline, new List<IAsset> { asset.Object });
+
+            var options = new AssetMiddlewareOptions(env) { EnableCaching = false };
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, options);
+            var stream = new MemoryStream();
+
+            await middleware.InvokeAsync(context.Object);
+
+            next.Verify(n => n(context.Object), Times.Once);
+        }
+
+        [Fact2]
         public async Task AssetMiddleware_Cache()
         {
             var cssContent = "*{color:red}".AsByteArray();
@@ -142,6 +175,30 @@ namespace WebOptimizer.Test
             Assert.Equal("text/css", context.Object.Response.ContentType);
             Assert.Equal(0, stream.Length);
             Assert.Equal(304, response.Object.StatusCode);
+        }
+
+        [Fact2]
+        public async Task AssetMiddleware_NoAssetMatch()
+        {
+            IAsset asset;
+            var pipeline = new Mock<IAssetPipeline>();
+            pipeline.Setup(p => p.TryGetAssetFromRoute(It.IsAny<string>(), out asset))
+                    .Returns(false);
+
+            var context = new Mock<HttpContext>();
+            context.Setup(c => c.Request.Path).Returns("/file.css");
+
+            var next = new Mock<RequestDelegate>();
+            var env = new HostingEnvironment();
+            var cache = new Mock<IMemoryCache>();
+
+            var options = new AssetMiddlewareOptions(env) { EnableCaching = false };
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline.Object, options);
+
+            await middleware.InvokeAsync(context.Object);
+
+            next.Verify(n => n(context.Object), Times.Once);
+
         }
     }
 }
