@@ -119,7 +119,7 @@ namespace WebOptimizer
 
         private string NormalizeRoute(string route)
         {
-            return "/" + route.TrimStart('~', '/');
+            return "/" + route.Trim().TrimStart('~', '/');
         }
     }
 

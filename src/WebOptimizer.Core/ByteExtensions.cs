@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace WebOptimizer
@@ -13,7 +14,7 @@ namespace WebOptimizer
         /// </summary>
         public static string AsString(this byte[] bytes)
         {
-            return System.Text.Encoding.UTF8.GetString(bytes);
+            return Encoding.UTF8.GetString(bytes);
         }
 
         /// <summary>
@@ -21,7 +22,7 @@ namespace WebOptimizer
         /// </summary>
         public static byte[] AsByteArray(this string s)
         {
-            return System.Text.Encoding.UTF8.GetBytes(s);
+            return Encoding.UTF8.GetBytes(s);
         }
 
         /// <summary>

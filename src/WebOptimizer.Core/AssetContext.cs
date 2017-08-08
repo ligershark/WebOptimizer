@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 
 namespace WebOptimizer
@@ -8,8 +9,8 @@ namespace WebOptimizer
         public AssetContext(HttpContext httpContext, IAsset asset)
         {
             Content = new Dictionary<string, byte[]>();
-            HttpContext = httpContext;
-            Asset = asset;
+            HttpContext = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
+            Asset = asset ?? throw new ArgumentNullException(nameof(asset)); ;
         }
 
         public IDictionary<string, byte[]> Content { get; set; }

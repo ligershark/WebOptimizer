@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -28,9 +29,9 @@ namespace WebOptimizer
         {
             return new Asset
             {
-                Route = $"/{route.TrimStart('/')}",
-                ContentType = contentType,
-                SourceFiles = sourceFiles,
+                Route = route ?? throw new ArgumentNullException(nameof(route)),
+                ContentType = contentType ?? throw new ArgumentNullException(nameof(ContentType)),
+                SourceFiles = sourceFiles ?? throw new ArgumentNullException(nameof(sourceFiles)),
                 Processors = new List<IProcessor>(),
             };
         }

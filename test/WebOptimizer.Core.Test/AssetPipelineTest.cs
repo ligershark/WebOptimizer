@@ -34,6 +34,9 @@ namespace WebOptimizer.Test
         [InlineData("route", "/route")]
         [InlineData("/route", "/route")]
         [InlineData("~/route", "/route")]
+        [InlineData("~/route ", "/route")]
+        [InlineData(" ~/route", "/route")]
+        [InlineData(" ~/route ", "/route")]
         public void AddBundle_Success(string inputRoute, string normalizedRoute)
         {
             var asset = Asset.Create(inputRoute, "text/css", new[] { "file.css" });
@@ -73,16 +76,7 @@ namespace WebOptimizer.Test
         }
 
         [Fact2]
-        public void AddRouteWithNoLeadingSlash_Success()
-        {
-            var env = new HostingEnvironment { EnvironmentName = "Development" };
-            var asset1 = Asset.Create("route", "text/css", new[] { "file.css" });
-
-            Assert.Equal("/route", asset1.Route);
-        }
-
-        [Fact2]
-        public void AddZeroSourceFiles_Success()
+        public void AddZeroSourceFiles_Fail()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
             var asset = Asset.Create("/file.css", "text/css", new string[0]);
@@ -170,7 +164,6 @@ namespace WebOptimizer.Test
             Assert.Equal("application/javascript; charset=UTF-8", asset.ContentType);
             Assert.Equal(2, asset.SourceFiles.Count());
             Assert.Equal(2, asset.Processors.Count);
-
         }
 
         [Fact2]
