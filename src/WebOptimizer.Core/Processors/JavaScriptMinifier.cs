@@ -132,14 +132,7 @@ namespace WebOptimizer
         /// </summary>
         public static IEnumerable<IAsset> MinifyJavaScript(this IEnumerable<IAsset> assets, CodeSettings settings)
         {
-            var list = new List<IAsset>();
-
-            foreach (IAsset asset in assets)
-            {
-                list.Add(asset.MinifyJavaScript(settings));
-            }
-
-            return list;
+            return assets.AddProcessor(asset => asset.MinifyJavaScript(settings));
         }
     }
 }

@@ -138,14 +138,7 @@ namespace WebOptimizer
         /// </summary>
         public static IEnumerable<IAsset> MinifyCss(this IEnumerable<IAsset> assets, CssSettings settings)
         {
-            var list = new List<IAsset>();
-
-            foreach (IAsset asset in assets)
-            {
-                list.Add(asset.MinifyCss(settings));
-            }
-
-            return list;
+            return assets.AddProcessor(asset => asset.MinifyCss(settings));
         }
     }
 }

@@ -113,14 +113,7 @@ namespace WebOptimizer
         /// </summary>
         public static IEnumerable<IAsset> FingerprintUrls(this IEnumerable<IAsset> assets)
         {
-            var list = new List<IAsset>();
-
-            foreach (IAsset asset in assets)
-            {
-                list.Add(asset.FingerprintUrls());
-            }
-
-            return list;
+            return assets.AddProcessor(asset => asset.FingerprintUrls());
         }
     }
 }

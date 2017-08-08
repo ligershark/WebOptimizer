@@ -132,14 +132,7 @@ namespace WebOptimizer
         /// </summary>
         public static IEnumerable<IAsset> MinifyHtml(this IEnumerable<IAsset> assets, HtmlSettings settings)
         {
-            var list = new List<IAsset>();
-
-            foreach (IAsset asset in assets)
-            {
-                list.Add(asset.MinifyHtml(settings));
-            }
-
-            return list;
+            return assets.AddProcessor(asset => asset.MinifyHtml(settings));
         }
     }
 }

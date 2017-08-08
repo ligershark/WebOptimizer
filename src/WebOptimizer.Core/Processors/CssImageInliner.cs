@@ -119,19 +119,10 @@ namespace WebOptimizer
     /// </summary>
     public static partial class PipelineExtensions
     {
-
-        /// <summary>
-        /// Inlines url() references as base64 encoded strings if the image size is below 5 kilobytes.
-        /// </summary>
-        public static IAsset InlineImages(this IAsset bundle)
-        {
-            return bundle.InlineImages(5 * 1024);
-        }
-
         /// <summary>
         /// Inlines url() references as base64 encoded strings if the image size is below <paramref name="maxFileSize"/>.
         /// </summary>
-        public static IAsset InlineImages(this IAsset bundle, int maxFileSize)
+        public static IAsset InlineImages(this IAsset bundle, int maxFileSize = 5120)
         {
             var minifier = new CssImageInliner(maxFileSize);
             bundle.Processors.Add(minifier);
@@ -143,32 +134,9 @@ namespace WebOptimizer
         /// Adds a fingerprint to local url() references.
         /// NOTE: Make sure to call Concatinate() before this method
         /// </summary>
-        public static IEnumerable<IAsset> InlineImages(this IEnumerable<IAsset> assets)
+        public static IEnumerable<IAsset> InlineImages(this IEnumerable<IAsset> assets, int maxFileSize = 5120)
         {
-            var list = new List<IAsset>();
-
-            foreach (IAsset asset in assets)
-            {
-                list.Add(asset.InlineImages());
-            }
-
-            return list;
-        }
-
-        /// <summary>
-        /// Adds a fingerprint to local url() references.
-        /// NOTE: Make sure to call Concatinate() before this method
-        /// </summary>
-        public static IEnumerable<IAsset> InlineImages(this IEnumerable<IAsset> assets, int maxFileSize)
-        {
-            var list = new List<IAsset>();
-
-            foreach (IAsset asset in assets)
-            {
-                list.Add(asset.InlineImages(maxFileSize));
-            }
-
-            return list;
+            return assets.AddProcessor(asset => asset.InlineImages(maxFileSize));
         }
     }
 }

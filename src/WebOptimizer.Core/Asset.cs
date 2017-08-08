@@ -105,4 +105,22 @@ namespace WebOptimizer
             return Route;
         }
     }
+
+    /// <summary>
+    /// Extension methods for <see cref="IAssetPipeline"/>.
+    /// </summary>
+    internal  static class AssetExtensions
+    {
+        internal static IEnumerable<IAsset> AddProcessor(this IEnumerable<IAsset> assets, Func<IAsset, IAsset> processor)
+        {
+            var list = new List<IAsset>();
+
+            foreach (IAsset asset in assets)
+            {
+                list.Add(processor(asset));
+            }
+
+            return list;
+        }
+    }
 }

@@ -44,14 +44,7 @@ namespace WebOptimizer
         /// </summary>
         public static IEnumerable<IAsset> Concatenate(this IEnumerable<IAsset> assets)
         {
-            var list = new List<IAsset>();
-
-            foreach (IAsset asset in assets)
-            {
-                list.Add(asset.Concatenate());
-            }
-
-            return list;
+            return assets.AddProcessor(asset => asset.Concatenate());
         }
     }
 }
