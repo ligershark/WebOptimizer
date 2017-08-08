@@ -32,6 +32,7 @@ namespace WebOptimizer
         {
             using (var ms = new MemoryStream())
             {
+                stream.Position = 0;
                 await stream.CopyToAsync(ms);
                 return ms.ToArray();
             }
