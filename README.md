@@ -10,6 +10,7 @@ ASP.NET Core middleware for bundling, minification and localization of CSS and J
 - [Install](#install)
 - [Configure](#configure)
 - [Use](#use)
+- [Options](#options)
 - [API reference](#api-reference)
 - [Extend the pipeline](#extend)
 - [Plugins](#plugins)

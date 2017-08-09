@@ -15,7 +15,10 @@ namespace WebOptimizer
         }
         public void Configure(WebOptimizerOptions options)
         {
-            _config.GetReloadToken().RegisterChangeCallback(a => { _options.TryRemove(Options.DefaultName); }, null);
+            _config.GetReloadToken().RegisterChangeCallback(_ =>
+            {
+                _options.TryRemove(Options.DefaultName);
+            }, null);
             ConfigurationBinder.Bind(_config.GetSection("WebOptimizer"), options);
         }
     }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 
 namespace WebOptimizer
 {
@@ -84,7 +85,7 @@ namespace WebOptimizer
 
         private bool IsConditionalGet(HttpContext context, string cacheKey)
         {
-            if (context.Request.Headers.TryGetValue("If-None-Match", out var inm))
+            if (context.Request.Headers.TryGetValue(HeaderNames.IfNoneMatch, out var inm))
             {
                 return cacheKey == inm.ToString().Trim('"');
             }
@@ -98,8 +99,8 @@ namespace WebOptimizer
 
             if (options.EnableCaching == true && !string.IsNullOrEmpty(cacheKey))
             {
-                context.Response.Headers["Cache-Control"] = $"max-age=31536000"; // 1 year
-                context.Response.Headers["ETag"] = $"\"{cacheKey}\"";
+                context.Response.Headers[HeaderNames.CacheControl] = $"max-age=31536000"; // 1 year
+                context.Response.Headers[HeaderNames.ETag] = $"\"{cacheKey}\"";
             }
 
             if (content?.Length > 0)
