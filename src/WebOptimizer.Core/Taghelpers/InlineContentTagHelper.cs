@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace WebOptimizer.Taghelpers
 {
@@ -22,8 +23,8 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Tag helper for inlining content
         /// </summary>
-        public InlineContentTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline)
-            : base(env, cache, pipeline)
+        public InlineContentTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptions<Options> options)
+            : base(env, cache, pipeline, options)
         { }
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace WebOptimizer.Taghelpers
                 output.Attributes.RemoveAll("defer");
             }
 
-            Pipeline.EnsureDefaults(HostingEnvironment);
+            Pipeline.EnsureDefaults(HostingEnvironment, Options);
             string content = await GetFileContentAsync(_route);
 
             output.Content.SetHtmlContent(content);

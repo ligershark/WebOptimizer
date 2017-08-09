@@ -20,13 +20,12 @@ namespace BundlerSample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions();
             services.AddMvc()
                 .AddViewLocalization(options => options.ResourcesPath = "Resources");
 
             services.AddWebOptimizer(pipeline =>
             {
-                pipeline.EnableTagHelperBundling = true;
-
                 pipeline.AddCssBundle("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css")
                         .InlineImages();
 
@@ -69,10 +68,7 @@ namespace BundlerSample
                 SupportedUICultures = cultures
             });
 
-            app.UseWebOptimizer(options =>
-            {
-                //options.EnableCaching = true;
-            });
+            app.UseWebOptimizer();
 
             app.UseStaticFiles();
 

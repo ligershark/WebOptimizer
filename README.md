@@ -25,7 +25,7 @@ Consider a scenario where you have 3 JavaScript files in the `wwwroot` folder:
 
 Those files can be dynamically bundled, minified and served up from a new route called `/all.js` simply by registrating it in `Startup.cs`:
 
-```c#
+```csharp
 pipeline.AddJsBundle("/all.js", "a.js", "b.js", "c.js");
 ```
 
@@ -49,9 +49,11 @@ First you need to configure Web Optimizer in `Startup.cs` and then register the 
 
 ### Step 1
 
-In the `ConfigureServices` method, add a call to `Services.AddWebOptimizer` and create the assets (or bundles) for your application.
+In the `ConfigureServices` method, add a call to `services.AddWebOptimizer` and add the bundles for your application.
 
-```c#
+```csharp
+using WebOptimizer.Core;
+
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddMvc();
@@ -66,7 +68,7 @@ public void ConfigureServices(IServiceCollection services)
 ### Step 2
 Then register the middleware in the `Configure` method:
 
-```c#
+```csharp
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 {
     if (env.IsDevelopment())
@@ -126,6 +128,35 @@ To do this, simply add the attribute `inline` to any `<link>` or `<script>` elem
 <link rel="stylesheet" href="/a/bundle.css" inline />
 <scrpt src="/any/file.js" inline></script>
 ```
+
+### Options
+You can control the options from the appsettings.json file.
+
+```json
+{
+  "WebOptimizer": {
+    "EnableCaching": true,
+    "EnableTagHelperBundling": true,
+    "UseContentRoot":  false
+  }
+}
+
+```
+
+#### EnableCaching  
+Determines if the `cache-control` HTTP headers should be set and if conditional GET (304) requests should be supported. This could be helpful to disable while in development mode.
+
+Default: **true**
+
+#### EnableTagHelperBundling  
+Determines if `<script>` and `<link>` elements should point to the bundled path or a reference per source file should be created. This is helpful to disable when in development mode.
+
+Default: **true**
+
+#### UseContentRoot  
+This setting allows you to use files from behind the `wwwroot` folder as source files to bundles.
+
+Default: **false**
 
 ### API reference
 coming soon...

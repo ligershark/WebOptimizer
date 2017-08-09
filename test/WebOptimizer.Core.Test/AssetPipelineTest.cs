@@ -7,21 +7,11 @@ namespace WebOptimizer.Test
     public class AssetPipelineTest
     {
         [Fact2]
-        public void DefaultValuesAsExpected()
-        {
-            var pipeline = new AssetPipeline();
-
-            Assert.Equal(false, pipeline.EnableTagHelperBundling.HasValue);
-            Assert.Null(pipeline.FileProvider);
-        }
-
-        [Fact2]
         public void AddSingeAsset_Success()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
             var asset = new Asset("/route", "text/css", new[] { "file.css" });
             var pipeline = new AssetPipeline();
-            pipeline.EnsureDefaults(env);
 
             pipeline.AddBundle(asset);
 
@@ -51,7 +41,6 @@ namespace WebOptimizer.Test
             var asset1 = new Asset("/route1", "text/css", new[] { "file.css" });
             var asset2 = new Asset("/route2", "text/css", new[] { "file.css" });
             var pipeline = new AssetPipeline();
-            pipeline.EnsureDefaults(env);
 
             pipeline.AddBundle(new[] { asset1, asset2 });
 
@@ -65,7 +54,6 @@ namespace WebOptimizer.Test
             var asset1 = new Asset("/route", "text/css", new[] { "file.css" });
             var asset2 = new Asset("/route", "text/css", new[] { "file.css" });
             var pipeline = new AssetPipeline();
-            pipeline.EnsureDefaults(env);
 
             var ex = Assert.Throws<ArgumentException>(() => pipeline.AddBundle(new[] { asset1, asset2 }));
 
@@ -79,7 +67,6 @@ namespace WebOptimizer.Test
             var env = new HostingEnvironment { EnvironmentName = "Development" };
             IAsset asset = new Asset("/file.css", "text/css", new string[0]);
             var pipeline = new AssetPipeline();
-            pipeline.EnsureDefaults(env);
 
             asset = pipeline.AddBundle(asset);
 

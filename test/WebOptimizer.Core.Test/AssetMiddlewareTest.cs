@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Xunit;
@@ -41,8 +42,10 @@ namespace WebOptimizer.Test
             var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
             member.SetValue(pipeline, new List<IAsset> { asset.Object });
 
-            var options = new AssetMiddlewareOptions(env) { EnableCaching = false };
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, options);
+            var options = new Options() { EnableCaching = false };
+            var amo = new Mock<IOptions<Options>>();
+            amo.SetupGet(a => a.Value).Returns(options);
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, amo.Object);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
@@ -77,8 +80,10 @@ namespace WebOptimizer.Test
             var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
             member.SetValue(pipeline, new List<IAsset> { asset.Object });
 
-            var options = new AssetMiddlewareOptions(env) { EnableCaching = false };
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, options);
+            var options = new Options() { EnableCaching = false };
+            var amo = new Mock<IOptions<Options>>();
+            amo.SetupGet(a => a.Value).Returns(options);
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, amo.Object);
             var stream = new MemoryStream();
 
             await middleware.InvokeAsync(context.Object);
@@ -119,8 +124,10 @@ namespace WebOptimizer.Test
             var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
             member.SetValue(pipeline, new List<IAsset> { asset.Object });
 
-            var options = new AssetMiddlewareOptions(env) { EnableCaching = false };
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, options);
+            var options = new Options() { EnableCaching = false };
+            var amo = new Mock<IOptions<Options>>();
+            amo.SetupGet(a => a.Value).Returns(options);
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, amo.Object);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
@@ -165,8 +172,10 @@ namespace WebOptimizer.Test
             var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
             member.SetValue(pipeline, new List<IAsset> { asset.Object });
 
-            var options = new AssetMiddlewareOptions(env) { EnableCaching = false };
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, options);
+            var options = new Options() { EnableCaching = false };
+            var amo = new Mock<IOptions<Options>>();
+            amo.SetupGet(a => a.Value).Returns(options);
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, amo.Object);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
@@ -192,8 +201,10 @@ namespace WebOptimizer.Test
             var env = new HostingEnvironment();
             var cache = new Mock<IMemoryCache>();
 
-            var options = new AssetMiddlewareOptions(env) { EnableCaching = false };
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline.Object, options);
+            var options = new Options() { EnableCaching = false };
+            var amo = new Mock<IOptions<Options>>();
+            amo.SetupGet(a => a.Value).Returns(options);
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline.Object, amo.Object);
 
             await middleware.InvokeAsync(context.Object);
 

@@ -9,18 +9,6 @@ namespace WebOptimizer
     public interface IAssetPipeline
     {
         /// <summary>
-        /// Gets or sets a value indicating whether the TagHelpers should bundle or write out
-        /// tags for each source file. Default is false when in Development environment.
-        /// </summary>
-        bool? EnableTagHelperBundling { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to base the source files of the content root folder
-        /// or the web root (wwroot folder).
-        /// </summary>
-        bool? UseContentRoot { get; set; }
-
-        /// <summary>
         /// Gets the assets registered on the pipeline.
         /// </summary>
         IReadOnlyList<IAsset> Assets { get; }

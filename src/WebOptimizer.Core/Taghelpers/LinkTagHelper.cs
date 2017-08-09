@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace WebOptimizer.Taghelpers
 {
@@ -18,8 +19,8 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Initializes a new instance of the <see cref="LinkTagHelper"/> class.
         /// </summary>
-        public LinkTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline)
-            : base(env, cache, pipeline)
+        public LinkTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptions<Options> options)
+            : base(env, cache, pipeline, options)
         { }
 
         /// <summary>
@@ -37,9 +38,9 @@ namespace WebOptimizer.Taghelpers
 
             if (Pipeline.TryGetAssetFromRoute(href, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
-                Pipeline.EnsureDefaults(HostingEnvironment);
+                Pipeline.EnsureDefaults(HostingEnvironment, Options);
 
-                if (Pipeline.EnableTagHelperBundling == true)
+                if (Options.EnableTagHelperBundling == true)
                 {
                     href = GenerateHash(asset);
                     output.Attributes.SetAttribute("href", href);

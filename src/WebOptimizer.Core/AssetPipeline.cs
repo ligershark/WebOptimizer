@@ -7,16 +7,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.Options;
 
 namespace WebOptimizer
 {
     internal class AssetPipeline : IAssetPipeline
     {
         private List<IAsset> _assets = new List<IAsset>();
-
-        public bool? EnableTagHelperBundling { get; set; }
-
-        public bool? UseContentRoot { get; set; }
 
         public IReadOnlyList<IAsset> Assets => _assets;
 
@@ -164,6 +161,7 @@ namespace WebOptimizer
 
             services.TryAddSingleton<IMemoryCache, MemoryCache>();
             services.AddSingleton<IAssetPipeline, AssetPipeline>(factory => pipeline);
+            services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<Options>, WebOptimizerConfig>());
 
             return pipeline;
         }
@@ -171,10 +169,13 @@ namespace WebOptimizer
         /// <summary>
         /// Ensures that defaults are set
         /// </summary>
-        public static void EnsureDefaults(this IAssetPipeline pipeline, IHostingEnvironment env)
+        public static void EnsureDefaults(this IAssetPipeline pipeline, IHostingEnvironment env, Options options)
         {
-            pipeline.FileProvider = pipeline.FileProvider ?? (pipeline.UseContentRoot == true ? env.ContentRootFileProvider : env.WebRootFileProvider);
-            pipeline.EnableTagHelperBundling = pipeline.EnableTagHelperBundling ?? !env.IsDevelopment();
+            options.EnableCaching = options.EnableCaching ?? true;
+            options.EnableTagHelperBundling = options.EnableTagHelperBundling ?? true;
+            options.UseContentRoot = options.UseContentRoot ?? false;
+
+            pipeline.FileProvider = options.UseContentRoot == true ? env.ContentRootFileProvider : env.WebRootFileProvider;
         }
     }
 }

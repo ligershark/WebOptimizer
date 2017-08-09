@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace WebOptimizer
 {
@@ -14,15 +15,15 @@ namespace WebOptimizer
         private readonly IHostingEnvironment _env;
         private readonly IMemoryCache _cache;
         private readonly IAssetPipeline _pipeline;
-        private readonly IAssetMiddlewareOptions _options;
+        private readonly Options _options;
 
-        public AssetMiddleware(RequestDelegate next, IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IAssetMiddlewareOptions options)
+        public AssetMiddleware(RequestDelegate next, IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptions<Options> options)
         {
             _next = next;
             _env = env;
             _cache = cache;
             _pipeline = pipeline;
-            _options = options;
+            _options = options.Value;
         }
 
         public Task InvokeAsync(HttpContext context)
@@ -37,7 +38,7 @@ namespace WebOptimizer
 
         private async Task HandleAssetAsync(HttpContext context, IAsset asset)
         {
-            _pipeline.EnsureDefaults(_env);
+            _pipeline.EnsureDefaults(_env, _options);
 
             string cacheKey = asset.GenerateCacheKey(context);
 
@@ -71,7 +72,7 @@ namespace WebOptimizer
             if (_options.EnableCaching == true)
             {
                 var cacheOptions = new MemoryCacheEntryOptions();
-                cacheOptions.SetSlidingExpiration(_options.SlidingExpiration);
+                cacheOptions.SetSlidingExpiration(TimeSpan.FromHours(24));
 
                 foreach (string file in files)
                 {
@@ -119,19 +120,9 @@ namespace WebOptimizer
         /// </summary>
         public static void UseWebOptimizer(this IApplicationBuilder app)
         {
-            app.UseWebOptimizer(asset => { });
-        }
-
-        /// <summary>
-        /// Adds WebOptimizer to the <see cref="IApplicationBuilder"/> request execution pipeline
-        /// </summary>
-        public static void UseWebOptimizer(this IApplicationBuilder app, Action<IAssetMiddlewareOptions> assetMiddlewareOptions)
-        {
             var env = (IHostingEnvironment)app.ApplicationServices.GetService(typeof(IHostingEnvironment));
-            var options = new AssetMiddlewareOptions(env);
-            assetMiddlewareOptions(options);
 
-            app.UseMiddleware<AssetMiddleware>(options);
+            app.UseMiddleware<AssetMiddleware>();
         }
     }
 }
