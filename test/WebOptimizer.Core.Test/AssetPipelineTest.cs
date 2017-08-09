@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using NUglify.Css;
-using NUglify.JavaScript;
 using Xunit;
 
 namespace WebOptimizer.Test
@@ -21,7 +19,7 @@ namespace WebOptimizer.Test
         public void AddSingeAsset_Success()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            var asset = Asset.Create("/route", "text/css", new[] { "file.css" });
+            var asset = new Asset("/route", "text/css", new[] { "file.css" });
             var pipeline = new AssetPipeline();
             pipeline.EnsureDefaults(env);
 
@@ -39,7 +37,7 @@ namespace WebOptimizer.Test
         [InlineData(" ~/route ", "/route")]
         public void AddBundle_Success(string inputRoute, string normalizedRoute)
         {
-            var asset = Asset.Create(inputRoute, "text/css", new[] { "file.css" });
+            var asset = new Asset(inputRoute, "text/css", new[] { "file.css" });
             var pipeline = new AssetPipeline();
             pipeline.AddBundle(asset);
 
@@ -50,8 +48,8 @@ namespace WebOptimizer.Test
         public void AddTwoAsset_Succes()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            var asset1 = Asset.Create("/route1", "text/css", new[] { "file.css" });
-            var asset2 = Asset.Create("/route2", "text/css", new[] { "file.css" });
+            var asset1 = new Asset("/route1", "text/css", new[] { "file.css" });
+            var asset2 = new Asset("/route2", "text/css", new[] { "file.css" });
             var pipeline = new AssetPipeline();
             pipeline.EnsureDefaults(env);
 
@@ -64,8 +62,8 @@ namespace WebOptimizer.Test
         public void AddTwoSameRoutes_Throws()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            var asset1 = Asset.Create("/route", "text/css", new[] { "file.css" });
-            var asset2 = Asset.Create("/route", "text/css", new[] { "file.css" });
+            var asset1 = new Asset("/route", "text/css", new[] { "file.css" });
+            var asset2 = new Asset("/route", "text/css", new[] { "file.css" });
             var pipeline = new AssetPipeline();
             pipeline.EnsureDefaults(env);
 
@@ -79,7 +77,7 @@ namespace WebOptimizer.Test
         public void AddZeroSourceFiles_Fail()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            var asset = Asset.Create("/file.css", "text/css", new string[0]);
+            IAsset asset = new Asset("/file.css", "text/css", new string[0]);
             var pipeline = new AssetPipeline();
             pipeline.EnsureDefaults(env);
 
@@ -139,56 +137,6 @@ namespace WebOptimizer.Test
 
             Assert.True(pipeline.TryGetAssetFromRoute(path, out var a1));
             Assert.Equal($"/{path.TrimStart('/')}", a1.Route);
-        }
-
-        [Fact2]
-        public void AddJs_DefaultSettings_Success()
-        {
-            var pipeline = new AssetPipeline();
-            var asset = pipeline.AddJavaScriptBundle("/foo.js", "file1.js", "file2.js");
-
-            Assert.Equal("/foo.js", asset.Route);
-            Assert.Equal("application/javascript; charset=UTF-8", asset.ContentType);
-            Assert.Equal(2, asset.SourceFiles.Count());
-            Assert.Equal(2, asset.Processors.Count);
-        }
-
-        [Fact2]
-        public void AddJs_CustomSettings_Success()
-        {
-            var settings = new CodeSettings();
-            var pipeline = new AssetPipeline();
-            var asset = pipeline.AddJavaScriptBundle("/foo.js", settings, "file1.js", "file2.js");
-
-            Assert.Equal("/foo.js", asset.Route);
-            Assert.Equal("application/javascript; charset=UTF-8", asset.ContentType);
-            Assert.Equal(2, asset.SourceFiles.Count());
-            Assert.Equal(2, asset.Processors.Count);
-        }
-
-        [Fact2]
-        public void AddCss_DefaultSettings_Success()
-        {
-            var pipeline = new AssetPipeline();
-            var asset = pipeline.AddCssBundle("/foo.css", "file1.css", "file2.css");
-
-            Assert.Equal("/foo.css", asset.Route);
-            Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
-            Assert.Equal(2, asset.SourceFiles.Count());
-            Assert.Equal(4, asset.Processors.Count);
-        }
-
-        [Fact2]
-        public void AddCss_CustomSettings_Success()
-        {
-            var settings = new CssSettings();
-            var pipeline = new AssetPipeline();
-            var asset = pipeline.AddCssBundle("/foo.css", settings, "file1.css", "file2.css");
-
-            Assert.Equal("/foo.css", asset.Route);
-            Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
-            Assert.Equal(2, asset.SourceFiles.Count());
-            Assert.Equal(4, asset.Processors.Count);
         }
     }
 }

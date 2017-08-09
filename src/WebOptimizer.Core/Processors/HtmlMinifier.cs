@@ -52,8 +52,10 @@ namespace WebOptimizer
         /// <summary>
         /// Minifies and fingerprints any .html file requested.
         /// </summary>
-        public static IEnumerable<IAsset> MinifyHtmlFiles(this IAssetPipeline pipeline) =>
-            pipeline.MinifyHtmlFiles(new HtmlSettings());
+        public static IEnumerable<IAsset> MinifyHtmlFiles(this IAssetPipeline pipeline)
+        {
+            return pipeline.MinifyHtmlFiles(new HtmlSettings());
+        }
 
         /// <summary>
         /// Minifies and fingerprints any .html file requested.

@@ -55,5 +55,42 @@ namespace WebOptimizer.Test.Processors
             Assert.Equal("var i=0;", context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
         }
+
+        [Fact2]
+        public void AddJsBundle_DefaultSettings_Success()
+        {
+            var pipeline = new AssetPipeline();
+            var asset = pipeline.AddJavaScriptBundle("/foo.js", "file1.js", "file2.js");
+
+            Assert.Equal("/foo.js", asset.Route);
+            Assert.Equal("application/javascript; charset=UTF-8", asset.ContentType);
+            Assert.Equal(2, asset.SourceFiles.Count());
+            Assert.Equal(2, asset.Processors.Count);
+        }
+
+        [Fact2]
+        public void AddJsBundle_CustomSettings_Success()
+        {
+            var settings = new CodeSettings();
+            var pipeline = new AssetPipeline();
+            var asset = pipeline.AddJavaScriptBundle("/foo.js", settings, "file1.js", "file2.js");
+
+            Assert.Equal("/foo.js", asset.Route);
+            Assert.Equal("application/javascript; charset=UTF-8", asset.ContentType);
+            Assert.Equal(2, asset.SourceFiles.Count());
+            Assert.Equal(2, asset.Processors.Count);
+        }
+
+        [Fact2]
+        public void AddJsFiles_DefaultSettings_Success()
+        {
+            var pipeline = new AssetPipeline();
+            var asset = pipeline.MinifyJsFiles().First();
+
+            Assert.Equal("/**/*.js", asset.Route);
+            Assert.Equal("application/javascript; charset=UTF-8", asset.ContentType);
+            Assert.Equal(1, asset.SourceFiles.Count());
+            Assert.Equal(1, asset.Processors.Count);
+        }
     }
 }

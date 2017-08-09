@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
@@ -14,8 +15,13 @@ namespace WebOptimizer
 {
     internal class Asset : IAsset
     {
-        private Asset()
-        { }
+        public Asset(string route, string contentType, IEnumerable<string> sourceFiles)
+        {
+            Route = route ?? throw new ArgumentNullException(nameof(route));
+            ContentType = contentType ?? throw new ArgumentNullException(nameof(ContentType));
+            SourceFiles = sourceFiles ?? throw new ArgumentNullException(nameof(sourceFiles));
+            Processors = new List<IProcessor>();
+        }
 
         public string Route { get; private set; }
 
@@ -23,18 +29,7 @@ namespace WebOptimizer
 
         public string ContentType { get; private set; }
 
-        public IList<IProcessor> Processors { get; private set; }
-
-        public static IAsset Create(string route, string contentType, IEnumerable<string> sourceFiles)
-        {
-            return new Asset
-            {
-                Route = route ?? throw new ArgumentNullException(nameof(route)),
-                ContentType = contentType ?? throw new ArgumentNullException(nameof(ContentType)),
-                SourceFiles = sourceFiles ?? throw new ArgumentNullException(nameof(sourceFiles)),
-                Processors = new List<IProcessor>(),
-            };
-        }
+        public IList<IProcessor> Processors { get; }
 
         public async Task<byte[]> ExecuteAsync(HttpContext context)
         {
@@ -89,12 +84,12 @@ namespace WebOptimizer
 
             foreach (IProcessor processors in Processors)
             {
-                cacheKey += processors.CacheKey(context);
+                cacheKey += processors.CacheKey(context) ?? string.Empty;
             }
 
             using (var algo = SHA1.Create())
             {
-                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(cacheKey);
+                byte[] buffer = Encoding.UTF8.GetBytes(cacheKey);
                 byte[] hash = algo.ComputeHash(buffer);
                 return WebEncoders.Base64UrlEncode(hash);
             }
@@ -109,7 +104,7 @@ namespace WebOptimizer
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
-    internal  static class AssetExtensions
+    internal static class AssetExtensions
     {
         internal static IEnumerable<IAsset> AddProcessor(this IEnumerable<IAsset> assets, Func<IAsset, IAsset> processor)
         {

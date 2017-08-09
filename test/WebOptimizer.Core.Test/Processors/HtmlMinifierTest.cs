@@ -56,5 +56,42 @@ namespace WebOptimizer.Test.Processors
             Assert.Equal("<!-- foo -->", context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
         }
+
+        [Fact2]
+        public void AddHtmlBundle_DefaultSettings_Success()
+        {
+            var pipeline = new AssetPipeline();
+            var asset = pipeline.AddHtmlBundle("/foo.html", "file1.html", "file2.html");
+
+            Assert.Equal("/foo.html", asset.Route);
+            Assert.Equal("text/html; charset=UTF-8", asset.ContentType);
+            Assert.Equal(2, asset.SourceFiles.Count());
+            Assert.Equal(2, asset.Processors.Count);
+        }
+
+        [Fact2]
+        public void AddHtmlBundle_CustomSettings_Success()
+        {
+            var settings = new HtmlSettings();
+            var pipeline = new AssetPipeline();
+            var asset = pipeline.AddHtmlBundle("/foo.html", settings, "file1.css", "file2.css");
+
+            Assert.Equal("/foo.html", asset.Route);
+            Assert.Equal("text/html; charset=UTF-8", asset.ContentType);
+            Assert.Equal(2, asset.SourceFiles.Count());
+            Assert.Equal(2, asset.Processors.Count);
+        }
+
+        [Fact2]
+        public void AddHtmlFiles_DefaultSettings_Success()
+        {
+            var pipeline = new AssetPipeline();
+            var asset = pipeline.MinifyHtmlFiles().First();
+
+            Assert.Equal("/**/*.html", asset.Route);
+            Assert.Equal("text/html; charset=UTF-8", asset.ContentType);
+            Assert.Equal(1, asset.SourceFiles.Count());
+            Assert.Equal(1, asset.Processors.Count);
+        }
     }
 }

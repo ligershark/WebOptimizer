@@ -47,7 +47,7 @@ namespace WebOptimizer
 
                     if (matcher.Match(cleanRoute.TrimStart('/')).HasMatches)
                     {
-                        asset = Asset.Create(cleanRoute, existing.ContentType, new[] { cleanRoute });
+                        asset = new Asset(cleanRoute, existing.ContentType, new[] { cleanRoute });
 
                         foreach (IProcessor processor in existing.Processors)
                         {
@@ -97,7 +97,7 @@ namespace WebOptimizer
                 sources = new[] { route };
             }
 
-            IAsset asset = Asset.Create(route, contentType, sources);
+            IAsset asset = new Asset(route, contentType, sources);
             _assets.Add(asset);
 
             return asset;

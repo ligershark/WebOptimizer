@@ -39,8 +39,8 @@ namespace WebOptimizer.Test.Processors
         public void AddConcatinate_Assets_Success()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            var asset1 = Asset.Create("/file1", "text/css", new[] { "file.css" });
-            var asset2 = Asset.Create("/file2", "text/css", new[] { "file.css" });
+            var asset1 = new Asset("/file1", "text/css", new[] { "file.css" });
+            var asset2 = new Asset("/file2", "text/css", new[] { "file.css" });
             var pipeline = new AssetPipeline();
             var assets = pipeline.AddBundle(new[] { asset1, asset2 });
 

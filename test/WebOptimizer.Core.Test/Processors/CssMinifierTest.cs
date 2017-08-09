@@ -54,5 +54,42 @@ namespace WebOptimizer.Test.Processors
             Assert.Equal("body{color:yellow;}", context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
         }
+
+        [Fact2]
+        public void AddCssBundle_DefaultSettings_Success()
+        {
+            var pipeline = new AssetPipeline();
+            var asset = pipeline.AddCssBundle("/foo.css", "file1.css", "file2.css");
+
+            Assert.Equal("/foo.css", asset.Route);
+            Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
+            Assert.Equal(2, asset.SourceFiles.Count());
+            Assert.Equal(4, asset.Processors.Count);
+        }
+
+        [Fact2]
+        public void AddCssBundle_CustomSettings_Success()
+        {
+            var settings = new CssSettings();
+            var pipeline = new AssetPipeline();
+            var asset = pipeline.AddCssBundle("/foo.css", settings, "file1.css", "file2.css");
+
+            Assert.Equal("/foo.css", asset.Route);
+            Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
+            Assert.Equal(2, asset.SourceFiles.Count());
+            Assert.Equal(4, asset.Processors.Count);
+        }
+
+        [Fact2]
+        public void AddCssFiles_DefaultSettings_Success()
+        {
+            var pipeline = new AssetPipeline();
+            var asset = pipeline.MinifyCssFiles().First();
+
+            Assert.Equal("/**/*.css", asset.Route);
+            Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
+            Assert.Equal(1, asset.SourceFiles.Count());
+            Assert.Equal(2, asset.Processors.Count);
+        }
     }
 }

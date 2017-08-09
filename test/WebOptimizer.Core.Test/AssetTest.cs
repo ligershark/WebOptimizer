@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Xunit;
 
 namespace WebOptimizer.Test
@@ -12,7 +13,7 @@ namespace WebOptimizer.Test
             string contentType = "text/css";
             var sourcefiles = new[] { "file1.css" };
 
-            var asset = Asset.Create(route, contentType, sourcefiles);
+            var asset = new Asset(route, contentType, sourcefiles);
 
             Assert.Equal(route, asset.Route);
             Assert.Equal(contentType, asset.ContentType);
@@ -28,7 +29,7 @@ namespace WebOptimizer.Test
             var sourcefiles = new[] { "file1.css" };
             var context = new DefaultHttpContext();
 
-            var asset = Asset.Create(route, contentType, sourcefiles);
+            var asset = new Asset(route, contentType, sourcefiles);
 
 
             // Check non-gzip value
@@ -39,6 +40,14 @@ namespace WebOptimizer.Test
             context.Request.Headers["Accept-Encoding"] = "gzip, deflate";
             string gzipKey = asset.GenerateCacheKey(context);
             Assert.Equal("SvH6WGVAapgMXiPenaOGnKS_oMI", gzipKey);
+        }
+
+        [Fact2]
+        public void AssetToString()
+        {
+            var asset = new Asset("/route", "content/type", Enumerable.Empty<string>());
+
+            Assert.Equal(asset.Route, asset.ToString());
         }
     }
 }
