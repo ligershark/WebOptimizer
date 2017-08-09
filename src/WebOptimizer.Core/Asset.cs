@@ -18,7 +18,7 @@ namespace WebOptimizer
         public Asset(string route, string contentType, IEnumerable<string> sourceFiles)
         {
             Route = route ?? throw new ArgumentNullException(nameof(route));
-            ContentType = contentType ?? throw new ArgumentNullException(nameof(ContentType));
+            ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             SourceFiles = sourceFiles ?? throw new ArgumentNullException(nameof(sourceFiles));
             Processors = new List<IProcessor>();
         }
