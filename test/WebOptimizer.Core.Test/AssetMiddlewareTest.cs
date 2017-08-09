@@ -42,10 +42,12 @@ namespace WebOptimizer.Test
             var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
             member.SetValue(pipeline, new List<IAsset> { asset.Object });
 
-            var options = new Options() { EnableCaching = false };
-            var amo = new Mock<IOptions<Options>>();
+            var options = new WebOptimizerOptions() { EnableCaching = false };
+            var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, amo.Object);
+            context.Setup(s => s.RequestServices.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>)))
+                   .Returns(amo.Object);
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
@@ -80,10 +82,12 @@ namespace WebOptimizer.Test
             var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
             member.SetValue(pipeline, new List<IAsset> { asset.Object });
 
-            var options = new Options() { EnableCaching = false };
-            var amo = new Mock<IOptions<Options>>();
+            var options = new WebOptimizerOptions() { EnableCaching = false };
+            var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, amo.Object);
+            context.Setup(s => s.RequestServices.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>)))
+                   .Returns(amo.Object);
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline);
             var stream = new MemoryStream();
 
             await middleware.InvokeAsync(context.Object);
@@ -124,10 +128,12 @@ namespace WebOptimizer.Test
             var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
             member.SetValue(pipeline, new List<IAsset> { asset.Object });
 
-            var options = new Options() { EnableCaching = false };
-            var amo = new Mock<IOptions<Options>>();
+            var options = new WebOptimizerOptions() { EnableCaching = false };
+            var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, amo.Object);
+            context.Setup(s => s.RequestServices.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>)))
+                   .Returns(amo.Object);
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
@@ -172,10 +178,12 @@ namespace WebOptimizer.Test
             var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
             member.SetValue(pipeline, new List<IAsset> { asset.Object });
 
-            var options = new Options() { EnableCaching = false };
-            var amo = new Mock<IOptions<Options>>();
+            var options = new WebOptimizerOptions() { EnableCaching = false };
+            var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, amo.Object);
+            context.Setup(s => s.RequestServices.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>)))
+                   .Returns(amo.Object);
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
@@ -201,10 +209,12 @@ namespace WebOptimizer.Test
             var env = new HostingEnvironment();
             var cache = new Mock<IMemoryCache>();
 
-            var options = new Options() { EnableCaching = false };
-            var amo = new Mock<IOptions<Options>>();
+            var options = new WebOptimizerOptions() { EnableCaching = false };
+            var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline.Object, amo.Object);
+            context.Setup(s => s.RequestServices.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>)))
+                   .Returns(amo.Object);
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline.Object);
 
             await middleware.InvokeAsync(context.Object);
 

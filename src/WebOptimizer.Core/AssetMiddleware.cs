@@ -15,41 +15,40 @@ namespace WebOptimizer
         private readonly IHostingEnvironment _env;
         private readonly IMemoryCache _cache;
         private readonly IAssetPipeline _pipeline;
-        private readonly Options _options;
 
-        public AssetMiddleware(RequestDelegate next, IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptions<Options> options)
+        public AssetMiddleware(RequestDelegate next, IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline)
         {
             _next = next;
             _env = env;
             _cache = cache;
             _pipeline = pipeline;
-            _options = options.Value;
         }
 
         public Task InvokeAsync(HttpContext context)
         {
             if (_pipeline.TryGetAssetFromRoute(context.Request.Path, out IAsset asset))
             {
-                return HandleAssetAsync(context, asset);
+                var options = (IOptionsSnapshot<WebOptimizerOptions>)context.RequestServices.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>));
+                return HandleAssetAsync(context, asset, options.Value);
             }
 
             return _next(context);
         }
 
-        private async Task HandleAssetAsync(HttpContext context, IAsset asset)
+        private async Task HandleAssetAsync(HttpContext context, IAsset asset, WebOptimizerOptions options)
         {
-            _pipeline.EnsureDefaults(_env, _options);
+            _pipeline.EnsureDefaults(_env, options);
 
             string cacheKey = asset.GenerateCacheKey(context);
 
             if (IsConditionalGet(context, cacheKey))
             {
                 context.Response.StatusCode = 304;
-                await WriteOutputAsync(context, asset, new byte[0], cacheKey).ConfigureAwait(false);
+                await WriteOutputAsync(context, asset, new byte[0], cacheKey, options).ConfigureAwait(false);
             }
             else if (_cache.TryGetValue(cacheKey, out byte[] value))
             {
-                await WriteOutputAsync(context, asset, value, cacheKey).ConfigureAwait(false);
+                await WriteOutputAsync(context, asset, value, cacheKey, options).ConfigureAwait(false);
             }
             else
             {
@@ -61,15 +60,15 @@ namespace WebOptimizer
                     return;
                 }
 
-                AddToCache(cacheKey, result, asset.SourceFiles);
+                AddToCache(cacheKey, result, asset.SourceFiles, options);
 
-                await WriteOutputAsync(context, asset, result, cacheKey).ConfigureAwait(false);
+                await WriteOutputAsync(context, asset, result, cacheKey, options).ConfigureAwait(false);
             }
         }
 
-        private void AddToCache(string cacheKey, byte[] value, IEnumerable<string> files)
+        private void AddToCache(string cacheKey, byte[] value, IEnumerable<string> files, WebOptimizerOptions options)
         {
-            if (_options.EnableCaching == true)
+            if (options.EnableCaching == true)
             {
                 var cacheOptions = new MemoryCacheEntryOptions();
                 cacheOptions.SetSlidingExpiration(TimeSpan.FromHours(24));
@@ -93,11 +92,11 @@ namespace WebOptimizer
             return false;
         }
 
-        private async Task WriteOutputAsync(HttpContext context, IAsset asset, byte[] content, string cacheKey)
+        private async Task WriteOutputAsync(HttpContext context, IAsset asset, byte[] content, string cacheKey, WebOptimizerOptions options)
         {
             context.Response.ContentType = asset.ContentType;
 
-            if (_options.EnableCaching == true && !string.IsNullOrEmpty(cacheKey))
+            if (options.EnableCaching == true && !string.IsNullOrEmpty(cacheKey))
             {
                 context.Response.Headers["Cache-Control"] = $"max-age=31536000"; // 1 year
                 context.Response.Headers["ETag"] = $"\"{cacheKey}\"";

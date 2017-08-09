@@ -3,7 +3,7 @@
     /// <summary>
     /// Options for the Web Optimizer.
     /// </summary>
-    public class Options
+    public class WebOptimizerOptions
     {
         /// <summary>
         /// Gets or sets a value indicating whether server-side caching is enabled.

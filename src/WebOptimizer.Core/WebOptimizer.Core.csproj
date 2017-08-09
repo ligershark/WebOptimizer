@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard1.6</TargetFramework>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <DocumentationFile>bin\Debug\netstandard1.6\WebOptimizer.Core.xml</DocumentationFile>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <PackageTags>bundle, minify, optimize, asp.net core</PackageTags>
@@ -21,13 +21,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="1.1.2" />
-        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="1.1.2" />
-        <PackageReference Include="Microsoft.AspNetCore.Localization" Version="1.1.2" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers" Version="1.1.3" />
-        <PackageReference Include="Microsoft.AspNetCore.Razor.Runtime" Version="1.1.2" />
-        <PackageReference Include="Microsoft.AspNetCore.ResponseCaching.Abstractions" Version="1.1.2" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="1.1.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0-preview2-final" />
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.0-preview2-final" />
+        <PackageReference Include="Microsoft.AspNetCore.Localization" Version="2.0.0-preview2-final" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers" Version="2.0.0-preview2-final" />
+        <PackageReference Include="Microsoft.AspNetCore.Razor.Runtime" Version="2.0.0-preview2-final" />
+        <PackageReference Include="Microsoft.AspNetCore.ResponseCaching.Abstractions" Version="2.0.0-preview2-final" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.0-preview2-final" />
         <PackageReference Include="NUglify" Version="1.5.8" />
     </ItemGroup>
 

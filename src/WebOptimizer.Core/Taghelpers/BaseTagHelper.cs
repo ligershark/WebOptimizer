@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.TagHelpers.Internal;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -20,7 +19,7 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTagHelper"/> class.
         /// </summary>
-        public BaseTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptions<Options> options)
+        public BaseTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsSnapshot<WebOptimizerOptions> options)
         {
             HostingEnvironment = env;
             Cache = cache;
@@ -46,7 +45,7 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Gets the options.
         /// </summary>
-        protected Options Options { get; }
+        protected WebOptimizerOptions Options { get; }
 
         /// <summary>
         /// Makes sure this taghelper runs before the built in ones.

@@ -161,7 +161,7 @@ namespace WebOptimizer
 
             services.TryAddSingleton<IMemoryCache, MemoryCache>();
             services.AddSingleton<IAssetPipeline, AssetPipeline>(factory => pipeline);
-            services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<Options>, WebOptimizerConfig>());
+            services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<WebOptimizerOptions>, WebOptimizerConfig>());
 
             return pipeline;
         }
@@ -169,7 +169,7 @@ namespace WebOptimizer
         /// <summary>
         /// Ensures that defaults are set
         /// </summary>
-        public static void EnsureDefaults(this IAssetPipeline pipeline, IHostingEnvironment env, Options options)
+        public static void EnsureDefaults(this IAssetPipeline pipeline, IHostingEnvironment env, WebOptimizerOptions options)
         {
             options.EnableCaching = options.EnableCaching ?? true;
             options.EnableTagHelperBundling = options.EnableTagHelperBundling ?? true;

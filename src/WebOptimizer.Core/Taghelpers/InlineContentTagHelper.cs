@@ -23,7 +23,7 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Tag helper for inlining content
         /// </summary>
-        public InlineContentTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptions<Options> options)
+        public InlineContentTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsSnapshot<WebOptimizerOptions> options)
             : base(env, cache, pipeline, options)
         { }
 
