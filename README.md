@@ -53,21 +53,21 @@ First you need to configure Web Optimizer in `Startup.cs` and then register the 
 In the `ConfigureServices` method, add a call to `services.AddWebOptimizer` and add the bundles for your application.
 
 ```csharp
-using WebOptimizer.Core;
+using WebOptimizer;
 
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddMvc();
     services.AddWebOptimizer(pipeline =>
     {
-        pipeline.AddCssBundle("all.css", "a.css", "b.css");
-        pipeline.AddJsBundle("all.js", "a.js", "b.js", "c.js");
+        pipeline.AddCssBundle("/all.css", "a.css", "b.css");
+        pipeline.AddJsBundle("/all.js", "a.js", "b.js", "c.js");
     });
 }
 ```
 
 ### Step 2
-Then register the middleware in the `Configure` method:
+Then register the middleware in the `Configure` method by adding a call to `app.UseWebOptimizer()` like so:
 
 ```csharp
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
