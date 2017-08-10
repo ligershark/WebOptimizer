@@ -141,7 +141,6 @@ You can control the options from the appsettings.json file.
     "UseContentRoot":  false
   }
 }
-
 ```
 
 #### EnableCaching  
