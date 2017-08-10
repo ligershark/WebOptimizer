@@ -25,11 +25,10 @@ namespace WebOptimizer
             _pipeline = pipeline;
         }
 
-        public Task InvokeAsync(HttpContext context)
+        public Task InvokeAsync(HttpContext context, IOptionsSnapshot<WebOptimizerOptions> options)
         {
             if (_pipeline.TryGetAssetFromRoute(context.Request.Path, out IAsset asset))
             {
-                var options = (IOptionsSnapshot<WebOptimizerOptions>)context.RequestServices.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>));
                 return HandleAssetAsync(context, asset, options.Value);
             }
 
@@ -38,7 +37,7 @@ namespace WebOptimizer
 
         private async Task HandleAssetAsync(HttpContext context, IAsset asset, WebOptimizerOptions options)
         {
-            _pipeline.EnsureDefaults(_env, options);
+            options.EnsureDefaults(_env);
 
             string cacheKey = asset.GenerateCacheKey(context);
 
@@ -53,7 +52,7 @@ namespace WebOptimizer
             }
             else
             {
-                byte[] result = await asset.ExecuteAsync(context).ConfigureAwait(false);
+                byte[] result = await asset.ExecuteAsync(context, options).ConfigureAwait(false);
 
                 if (result == null || result.Length == 0)
                 {
@@ -76,7 +75,7 @@ namespace WebOptimizer
 
                 foreach (string file in files)
                 {
-                    cacheOptions.AddExpirationToken(_pipeline.FileProvider.Watch(file));
+                    cacheOptions.AddExpirationToken(options.FileProvider.Watch(file));
                 }
 
                 _cache.Set(cacheKey, value, cacheOptions);

@@ -11,7 +11,7 @@ namespace WebOptimizer
         /// <summary>
         /// Executes the processor on the specified configuration.
         /// </summary>
-        Task ExecuteAsync(IAssetContext context);
+        Task ExecuteAsync(IAssetContext context, WebOptimizerOptions options);
 
         /// <summary>
         /// Gets the custom key that should be used when calculating the memory cache key.

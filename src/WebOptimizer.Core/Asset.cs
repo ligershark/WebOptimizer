@@ -31,10 +31,9 @@ namespace WebOptimizer
 
         public IList<IProcessor> Processors { get; }
 
-        public async Task<byte[]> ExecuteAsync(HttpContext context)
+        public async Task<byte[]> ExecuteAsync(HttpContext context, WebOptimizerOptions options)
         {
-            var pipeline = (IAssetPipeline)context.RequestServices.GetService(typeof(IAssetPipeline));
-            string root = pipeline.FileProvider.GetFileInfo("/").PhysicalPath;
+            string root = options.FileProvider.GetFileInfo("/").PhysicalPath;
             var config = new AssetContext(context, this);
 
             // Handle globbing
@@ -49,22 +48,22 @@ namespace WebOptimizer
             {
                 if (!config.Content.ContainsKey(file))
                 {
-                    await LoadFileContentAsync(pipeline, config, file);
+                    await LoadFileContentAsync(options.FileProvider, config, file);
                 }
             }
 
             // Attach the processors
             foreach (IProcessor processor in Processors)
             {
-                await processor.ExecuteAsync(config).ConfigureAwait(false);
+                await processor.ExecuteAsync(config, options).ConfigureAwait(false);
             }
 
             return config.Content.FirstOrDefault().Value;
         }
 
-        private static async Task LoadFileContentAsync(IAssetPipeline pipeline, AssetContext config, string sourceFile)
+        private static async Task LoadFileContentAsync(IFileProvider fileProvider, AssetContext config, string sourceFile)
         {
-            IFileInfo file = pipeline.FileProvider.GetFileInfo(sourceFile);
+            IFileInfo file = fileProvider.GetFileInfo(sourceFile);
 
             using (Stream fs = file.CreateReadStream())
             {

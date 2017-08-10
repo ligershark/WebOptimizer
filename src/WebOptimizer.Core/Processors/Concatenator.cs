@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
@@ -11,7 +10,7 @@ namespace WebOptimizer
     {
         public string CacheKey(HttpContext context) => string.Empty;
 
-        public Task ExecuteAsync(IAssetContext context)
+        public Task ExecuteAsync(IAssetContext context, WebOptimizerOptions options)
         {
             context.Content = new Dictionary<string, byte[]>
             {

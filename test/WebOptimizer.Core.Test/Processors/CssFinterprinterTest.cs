@@ -40,13 +40,14 @@ namespace WebOptimizer.Test.Processors
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IAssetPipeline)))
                    .Returns(pipeline.Object);
 
-            pipeline.SetupSequence(s => s.FileProvider.GetFileInfo(It.IsAny<string>()))
+            var options = new Mock<WebOptimizerOptions>();
+            options.SetupSequence(s => s.FileProvider.GetFileInfo(It.IsAny<string>()))
                    .Returns(inputFile)
                    .Returns(outputFile);
 
             context.Object.Content = new Dictionary<string, byte[]> { { "css/site.css", url.AsByteArray() } };
 
-            await adjuster.ExecuteAsync(context.Object);
+            await adjuster.ExecuteAsync(context.Object, options.Object);
             string result = context.Object.Content.First().Value.AsString();
 
             Assert.Equal(newUrl, result);

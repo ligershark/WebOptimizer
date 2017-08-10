@@ -17,7 +17,7 @@ namespace WebOptimizer
 
         public CssSettings Settings { get; set; }
 
-        public Task ExecuteAsync(IAssetContext config)
+        public Task ExecuteAsync(IAssetContext config, WebOptimizerOptions options)
         {
             var content = new Dictionary<string, byte[]>();
 

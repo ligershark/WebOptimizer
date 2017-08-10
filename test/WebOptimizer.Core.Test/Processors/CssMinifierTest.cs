@@ -16,8 +16,9 @@ namespace WebOptimizer.Test.Processors
             var minifier = new CssMinifier(new CssSettings());
             var context = new Mock<IAssetContext>().SetupAllProperties();
             context.Object.Content = new Dictionary<string, byte[]> { { "", "body { color: yellow; }".AsByteArray() } };
+            var options = new Mock<WebOptimizerOptions>();
 
-            await minifier.ExecuteAsync(context.Object);
+            await minifier.ExecuteAsync(context.Object, options.Object);
 
             Assert.Equal("body{color:#ff0}", context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
@@ -34,8 +35,9 @@ namespace WebOptimizer.Test.Processors
             var minifier = new CssMinifier(new CssSettings());
             var context = new Mock<IAssetContext>().SetupAllProperties();
             context.Object.Content = new Dictionary<string, byte[]> { { "", input.AsByteArray() } };
+            var options = new Mock<WebOptimizerOptions>();
 
-            await minifier.ExecuteAsync(context.Object);
+            await minifier.ExecuteAsync(context.Object, options.Object);
 
             Assert.Equal("", context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
@@ -48,8 +50,9 @@ namespace WebOptimizer.Test.Processors
             var minifier = new CssMinifier(settings);
             var context = new Mock<IAssetContext>().SetupAllProperties();
             context.Object.Content = new Dictionary<string, byte[]> { { "", "body { color: yellow; }".AsByteArray() } };
+            var options = new Mock<WebOptimizerOptions>();
 
-            await minifier.ExecuteAsync(context.Object);
+            await minifier.ExecuteAsync(context.Object, options.Object);
 
             Assert.Equal("body{color:yellow;}", context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));

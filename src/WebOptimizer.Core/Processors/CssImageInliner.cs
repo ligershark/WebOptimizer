@@ -20,14 +20,14 @@ namespace WebOptimizer
 
         public string CacheKey(HttpContext context) => string.Empty;
 
-        public async Task ExecuteAsync(IAssetContext config)
+        public async Task ExecuteAsync(IAssetContext config, WebOptimizerOptions options)
         {
             var content = new Dictionary<string, byte[]>();
             var pipeline = (IAssetPipeline)config.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
 
             foreach (string key in config.Content.Keys)
             {
-                IFileInfo input = pipeline.FileProvider.GetFileInfo(key);
+                IFileInfo input = options.FileProvider.GetFileInfo(key);
 
                 content[key] = await InlineAsync(config.Content[key].AsString(), input);
             }

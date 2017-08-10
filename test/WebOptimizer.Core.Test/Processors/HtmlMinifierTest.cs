@@ -18,8 +18,9 @@ namespace WebOptimizer.Test.Processors
             var minifier = new HtmlMinifier(new HtmlSettings());
             var context = new Mock<IAssetContext>().SetupAllProperties();
             context.Object.Content = new Dictionary<string, byte[]> { { "", output.AsByteArray() } };
+            var options = new Mock<WebOptimizerOptions>();
 
-            await minifier.ExecuteAsync(context.Object);
+            await minifier.ExecuteAsync(context.Object, options.Object);
 
             Assert.Equal(output, context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
@@ -36,8 +37,9 @@ namespace WebOptimizer.Test.Processors
             var minifier = new HtmlMinifier(new HtmlSettings());
             var context = new Mock<IAssetContext>().SetupAllProperties();
             context.Object.Content = new Dictionary<string, byte[]> { { "", input.AsByteArray() } };
+            var options = new Mock<WebOptimizerOptions>();
 
-            await minifier.ExecuteAsync(context.Object);
+            await minifier.ExecuteAsync(context.Object, options.Object);
 
             Assert.Equal("", context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
@@ -50,8 +52,9 @@ namespace WebOptimizer.Test.Processors
             var minifier = new HtmlMinifier(settings);
             var context = new Mock<IAssetContext>().SetupAllProperties();
             context.Object.Content = new Dictionary<string, byte[]> { { "", "\r\n<!-- foo -->\r\n".AsByteArray() } };
+            var options = new Mock<WebOptimizerOptions>();
 
-            await minifier.ExecuteAsync(context.Object);
+            await minifier.ExecuteAsync(context.Object, options.Object);
 
             Assert.Equal("<!-- foo -->", context.Object.Content.First().Value.AsString());
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));

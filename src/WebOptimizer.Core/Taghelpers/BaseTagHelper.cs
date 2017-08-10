@@ -84,7 +84,7 @@ namespace WebOptimizer.Taghelpers
             if (_fileProvider == null)
             {
                 _fileProvider = new FileVersionProvider(
-                    Pipeline.FileProvider,
+                    Options.FileProvider,
                     Cache,
                     ViewContext.HttpContext.Request.PathBase);
             }

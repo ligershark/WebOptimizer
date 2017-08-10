@@ -60,7 +60,7 @@ namespace WebOptimizer.Taghelpers
                 output.Attributes.RemoveAll("defer");
             }
 
-            Pipeline.EnsureDefaults(HostingEnvironment, Options);
+            Options.EnsureDefaults(HostingEnvironment);
             string content = await GetFileContentAsync(_route);
 
             output.Content.SetHtmlContent(content);
@@ -97,7 +97,7 @@ namespace WebOptimizer.Taghelpers
 
             if (asset != null)
             {
-                byte[] contents = await asset.ExecuteAsync(ViewContext.HttpContext);
+                byte[] contents = await asset.ExecuteAsync(ViewContext.HttpContext, Options);
 
                 AddToCache(cacheKey, contents, asset.SourceFiles.ToArray());
                 string s = contents.AsString();
@@ -106,7 +106,7 @@ namespace WebOptimizer.Taghelpers
             }
             else
             {
-                string file = Pipeline.FileProvider.GetFileInfo(route.TrimStart('~')).PhysicalPath;
+                string file = Options.FileProvider.GetFileInfo(route.TrimStart('~')).PhysicalPath;
 
                 if (File.Exists(file))
                 {
@@ -129,7 +129,7 @@ namespace WebOptimizer.Taghelpers
 
             foreach (string file in files)
             {
-                cacheOptions.AddExpirationToken(Pipeline.FileProvider.Watch(file));
+                cacheOptions.AddExpirationToken(Options.FileProvider.Watch(file));
             }
 
             Cache.Set(cacheKey, value, cacheOptions);

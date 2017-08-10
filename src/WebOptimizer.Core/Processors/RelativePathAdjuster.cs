@@ -15,15 +15,15 @@ namespace WebOptimizer
 
         public string CacheKey(HttpContext context) => string.Empty;
 
-        public Task ExecuteAsync(IAssetContext config)
+        public Task ExecuteAsync(IAssetContext config, WebOptimizerOptions options)
         {
             var content = new Dictionary<string, byte[]>();
             var pipeline = (IAssetPipeline)config.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
 
             foreach (string key in config.Content.Keys)
             {
-                IFileInfo input = pipeline.FileProvider.GetFileInfo(key);
-                IFileInfo output = pipeline.FileProvider.GetFileInfo(config.Asset.Route);
+                IFileInfo input = options.FileProvider.GetFileInfo(key);
+                IFileInfo output = options.FileProvider.GetFileInfo(config.Asset.Route);
 
                 content[key] = Adjust(config.Content[key].AsString(), input.PhysicalPath, output.PhysicalPath);
             }

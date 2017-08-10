@@ -18,7 +18,9 @@ namespace WebOptimizer.Test.Processors
                 { "/route2", "content".AsByteArray() }
             };
 
-            await processor.ExecuteAsync(context.Object);
+            var options = new Mock<WebOptimizerOptions>();
+
+            await processor.ExecuteAsync(context.Object, options.Object);
 
             Assert.Equal(1, context.Object.Content.Count);
         }
@@ -29,8 +31,9 @@ namespace WebOptimizer.Test.Processors
             var processor = new Concatenator();
             var context = new Mock<IAssetContext>().SetupAllProperties();
             context.Object.Content = new Dictionary<string, byte[]>();
+            var options = new Mock<WebOptimizerOptions>();
 
-            await processor.ExecuteAsync(context.Object);
+            await processor.ExecuteAsync(context.Object, options.Object);
 
             Assert.Equal(1, context.Object.Content.Count);
         }

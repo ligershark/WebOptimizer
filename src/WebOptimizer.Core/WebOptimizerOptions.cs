@@ -1,4 +1,7 @@
-﻿namespace WebOptimizer
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.FileProviders;
+
+namespace WebOptimizer
 {
     /// <summary>
     /// Options for the Web Optimizer.
@@ -20,5 +23,22 @@
         /// Gets or sets a value indicating whether to use the content root instead of the webroot.
         /// </summary>
         public bool? UseContentRoot { get; set; }
+
+        /// <summary>
+        /// Gets the file provider.
+        /// </summary>
+        public virtual IFileProvider FileProvider { get; set; }
+
+        /// <summary>
+        /// Ensures that defaults are set
+        /// </summary>
+        public void EnsureDefaults(IHostingEnvironment env)
+        {
+            EnableCaching = EnableCaching ?? true;
+            EnableTagHelperBundling = EnableTagHelperBundling ?? true;
+            UseContentRoot = UseContentRoot ?? false;
+
+            FileProvider = UseContentRoot == true ? env.ContentRootFileProvider : env.WebRootFileProvider;
+        }
     }
 }

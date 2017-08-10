@@ -13,10 +13,10 @@ namespace WebOptimizer
         /// </summary>
         IReadOnlyList<IAsset> Assets { get; }
 
-        /// <summary>
-        /// Gets the file provider.
-        /// </summary>
-        IFileProvider FileProvider { get; set; }
+        ///// <summary>
+        ///// Gets the file provider.
+        ///// </summary>
+        //IFileProvider FileProvider { get; set; }
 
         /// <summary>
         /// Adds an <see cref="IAsset"/> to the optimization pipeline.

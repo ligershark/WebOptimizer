@@ -17,7 +17,7 @@ namespace WebOptimizer
 
         public IReadOnlyList<IAsset> Assets => _assets;
 
-        public IFileProvider FileProvider { get; set; }
+        //public IFileProvider FileProvider { get; set; }
 
         public bool TryGetAssetFromRoute(string route, out IAsset asset)
         {
@@ -164,18 +164,6 @@ namespace WebOptimizer
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<WebOptimizerOptions>, WebOptimizerConfig>());
 
             return pipeline;
-        }
-
-        /// <summary>
-        /// Ensures that defaults are set
-        /// </summary>
-        public static void EnsureDefaults(this IAssetPipeline pipeline, IHostingEnvironment env, WebOptimizerOptions options)
-        {
-            options.EnableCaching = options.EnableCaching ?? true;
-            options.EnableTagHelperBundling = options.EnableTagHelperBundling ?? true;
-            options.UseContentRoot = options.UseContentRoot ?? false;
-
-            pipeline.FileProvider = options.UseContentRoot == true ? env.ContentRootFileProvider : env.WebRootFileProvider;
         }
     }
 }

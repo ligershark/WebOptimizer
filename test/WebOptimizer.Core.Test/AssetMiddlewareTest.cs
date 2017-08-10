@@ -19,10 +19,11 @@ namespace WebOptimizer.Test
             string cssContent = "*{color:red}";
 
             var pipeline = new AssetPipeline();
+            var options = new WebOptimizerOptions() { EnableCaching = false };
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns("/file.css");
-            asset.Setup(a => a.ExecuteAsync(It.IsAny<HttpContext>()))
+            asset.Setup(a => a.ExecuteAsync(It.IsAny<HttpContext>(), options))
                  .Returns(Task.FromResult(cssContent.AsByteArray()));
 
             StringValues values;
@@ -42,16 +43,14 @@ namespace WebOptimizer.Test
             var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
             member.SetValue(pipeline, new List<IAsset> { asset.Object });
 
-            var options = new WebOptimizerOptions() { EnableCaching = false };
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
-            context.Setup(s => s.RequestServices.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>)))
-                   .Returns(amo.Object);
+
             var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
-            await middleware.InvokeAsync(context.Object);
+            await middleware.InvokeAsync(context.Object, amo.Object);
 
             Assert.Equal("text/css", context.Object.Response.ContentType);
             Assert.Equal(cssContent.AsByteArray(), await stream.AsBytesAsync());
@@ -62,10 +61,11 @@ namespace WebOptimizer.Test
         public async Task AssetMiddleware_NoCache_EmptyResponse()
         {
             var pipeline = new AssetPipeline();
+            var options = new WebOptimizerOptions() { EnableCaching = false };
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns("/file.css");
-            asset.Setup(a => a.ExecuteAsync(It.IsAny<HttpContext>()))
+            asset.Setup(a => a.ExecuteAsync(It.IsAny<HttpContext>(), options))
                  .Returns(Task.FromResult(new byte[0]));
 
             StringValues values;
@@ -82,15 +82,13 @@ namespace WebOptimizer.Test
             var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
             member.SetValue(pipeline, new List<IAsset> { asset.Object });
 
-            var options = new WebOptimizerOptions() { EnableCaching = false };
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
-            context.Setup(s => s.RequestServices.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>)))
-                   .Returns(amo.Object);
+
             var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline);
             var stream = new MemoryStream();
 
-            await middleware.InvokeAsync(context.Object);
+            await middleware.InvokeAsync(context.Object, amo.Object);
 
             next.Verify(n => n(context.Object), Times.Once);
         }
@@ -101,10 +99,11 @@ namespace WebOptimizer.Test
             var cssContent = "*{color:red}".AsByteArray();
 
             var pipeline = new AssetPipeline();
+            var options = new WebOptimizerOptions() { EnableCaching = false };
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns("/file.css");
-            asset.Setup(a => a.ExecuteAsync(It.IsAny<HttpContext>()))
+            asset.Setup(a => a.ExecuteAsync(It.IsAny<HttpContext>(), options))
                  .Returns(Task.FromResult(cssContent));
 
             StringValues values;
@@ -128,16 +127,14 @@ namespace WebOptimizer.Test
             var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
             member.SetValue(pipeline, new List<IAsset> { asset.Object });
 
-            var options = new WebOptimizerOptions() { EnableCaching = false };
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
-            context.Setup(s => s.RequestServices.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>)))
-                   .Returns(amo.Object);
+
             var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
-            await middleware.InvokeAsync(context.Object);
+            await middleware.InvokeAsync(context.Object, amo.Object);
 
             Assert.Equal("text/css", context.Object.Response.ContentType);
             Assert.Equal(cssContent, await stream.AsBytesAsync());
@@ -150,10 +147,11 @@ namespace WebOptimizer.Test
             var cssContent = "*{color:red}".AsByteArray();
 
             var pipeline = new AssetPipeline();
+            var options = new WebOptimizerOptions() { EnableCaching = false };
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns("/file.css");
-            asset.Setup(a => a.ExecuteAsync(It.IsAny<HttpContext>()))
+            asset.Setup(a => a.ExecuteAsync(It.IsAny<HttpContext>(), options))
                  .Returns(Task.FromResult(cssContent));
             asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>())).Returns("etag");
 
@@ -178,16 +176,14 @@ namespace WebOptimizer.Test
             var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
             member.SetValue(pipeline, new List<IAsset> { asset.Object });
 
-            var options = new WebOptimizerOptions() { EnableCaching = false };
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
-            context.Setup(s => s.RequestServices.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>)))
-                   .Returns(amo.Object);
+
             var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
-            await middleware.InvokeAsync(context.Object);
+            await middleware.InvokeAsync(context.Object, amo.Object);
 
             Assert.Equal("text/css", context.Object.Response.ContentType);
             Assert.Equal(0, stream.Length);
@@ -212,11 +208,10 @@ namespace WebOptimizer.Test
             var options = new WebOptimizerOptions() { EnableCaching = false };
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
-            context.Setup(s => s.RequestServices.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>)))
-                   .Returns(amo.Object);
+
             var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline.Object);
 
-            await middleware.InvokeAsync(context.Object);
+            await middleware.InvokeAsync(context.Object,amo.Object);
 
             next.Verify(n => n(context.Object), Times.Once);
 

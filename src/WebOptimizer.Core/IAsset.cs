@@ -32,7 +32,7 @@ namespace WebOptimizer
         /// <summary>
         /// Executes the processors and returns the modified content.
         /// </summary>
-        Task<byte[]> ExecuteAsync(HttpContext context);
+        Task<byte[]> ExecuteAsync(HttpContext context, WebOptimizerOptions options);
 
         /// <summary>
         /// Gets the cache key associated with this version of the asset.

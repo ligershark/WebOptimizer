@@ -25,6 +25,7 @@ namespace WebOptimizer.Test.Processors
             var pipeline = new Mock<IAssetPipeline>().SetupAllProperties();
             var inputFile = new PhysicalFileInfo(new FileInfo(@"c:\source\css\site.css"));
             var outputFile = new PhysicalFileInfo(new FileInfo(@"c:\source\dist\all.css"));
+            var options = new Mock<WebOptimizerOptions>().SetupAllProperties();
 
             context.SetupGet(s => s.Asset.Route)
                    .Returns("/my/route.css");
@@ -32,13 +33,13 @@ namespace WebOptimizer.Test.Processors
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IAssetPipeline)))
                    .Returns(pipeline.Object);
 
-            pipeline.SetupSequence(s => s.FileProvider.GetFileInfo(It.IsAny<string>()))
+            options.SetupSequence(s => s.FileProvider.GetFileInfo(It.IsAny<string>()))
                    .Returns(inputFile)
                    .Returns(outputFile);
 
             context.Object.Content = new Dictionary<string, byte[]> { { "css/site.css", url.AsByteArray() } };
 
-            await adjuster.ExecuteAsync(context.Object);
+            await adjuster.ExecuteAsync(context.Object, options.Object);
 
             Assert.Equal(newUrl, context.Object.Content.First().Value.AsString());
             Assert.Equal("", adjuster.CacheKey(new DefaultHttpContext()));
