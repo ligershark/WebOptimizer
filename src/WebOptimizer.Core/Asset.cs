@@ -43,6 +43,12 @@ namespace WebOptimizer
             PatternMatchingResult globbingResult = matcher.Execute(dir);
             IEnumerable<string> files = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
 
+            if (!files.Any())
+            {
+                string glob = string.Join(", ", SourceFiles);
+                throw new FileNotFoundException($"No files found matching \"{glob}\" exist in \"{dir.FullName}\"");
+            }
+
             // Read file content into memory
             foreach (string file in files)
             {

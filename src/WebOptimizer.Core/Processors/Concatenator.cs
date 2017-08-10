@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace WebOptimizer
@@ -9,11 +10,17 @@ namespace WebOptimizer
     {
         public override Task ExecuteAsync(IAssetContext context)
         {
+            var sb = new StringBuilder();
+
+            foreach (byte[] bytes in context.Content.Values)
+            {
+                sb.AppendLine(bytes.AsString());
+            }
+
             context.Content = new Dictionary<string, byte[]>
             {
-                { Guid.NewGuid().ToString(), context.Content.Values.SelectMany(x => x).ToArray() }
+                { Guid.NewGuid().ToString(), sb.ToString().AsByteArray() }
             };
-
 
             return Task.CompletedTask;
         }

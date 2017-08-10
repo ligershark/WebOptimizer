@@ -26,7 +26,7 @@ namespace BundlerSample
 
             services.AddWebOptimizer(pipeline =>
             {
-                pipeline.AddCssBundle("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css")
+                pipeline.AddCssBundle("/all.css", "css/site1.css", "lib/bootstrap/dist/css/bootstraps.css")
                         .InlineImages();
 
                 pipeline.AddJavaScriptBundle("/all.js", "js/site.js", "js/b.js");

@@ -41,7 +41,7 @@ Then simply reference the new bundle route from the HTML like any other file:
 Check out the [sample application](https://github.com/ligershark/WebOptimizer/blob/master/samples/WebOptimizer.Core.Sample/Startup.cs).
 
 ## Install
-Add the NuGet package [LigerShark.WebOptimizer.Core](https://nuget.org/packages/LigerShark.WebOptimizer.Core/) to any ASP.NET Core project supporting .NET Standard 1.6 or higher.
+Add the NuGet package [LigerShark.WebOptimizer.Core](https://nuget.org/packages/LigerShark.WebOptimizer.Core/) to any ASP.NET Core project supporting .NET Standard 2.0 or higher.
 
 > &gt; dotnet add package LigerShark.WebOptimizer.Core
 
