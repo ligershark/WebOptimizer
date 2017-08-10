@@ -8,7 +8,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace WebOptimizer
 {
-    internal class CssImageInliner : IProcessor
+    internal class CssImageInliner : Processor
     {
         private static readonly Regex _rxUrl = new Regex(@"url\s*\(\s*([""']?)([^:)]+)\1\s*\)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static int _maxFileSize;
@@ -18,16 +18,14 @@ namespace WebOptimizer
             _maxFileSize = maxFileSize;
         }
 
-        public string CacheKey(HttpContext context) => string.Empty;
-
-        public async Task ExecuteAsync(IAssetContext config, WebOptimizerOptions options)
+        public override async Task ExecuteAsync(IAssetContext config)
         {
             var content = new Dictionary<string, byte[]>();
             var pipeline = (IAssetPipeline)config.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
 
             foreach (string key in config.Content.Keys)
             {
-                IFileInfo input = options.FileProvider.GetFileInfo(key);
+                IFileInfo input = config.Options.FileProvider.GetFileInfo(key);
 
                 content[key] = await InlineAsync(config.Content[key].AsString(), input);
             }

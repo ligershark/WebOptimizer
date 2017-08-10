@@ -6,18 +6,16 @@ using NUglify.JavaScript;
 
 namespace WebOptimizer
 {
-    internal class JavaScriptMinifier : IProcessor
+    internal class JavaScriptMinifier : Processor
     {
         public JavaScriptMinifier(CodeSettings settings)
         {
             Settings = settings;
         }
 
-        public string CacheKey(HttpContext context) => string.Empty;
-
         public CodeSettings Settings { get; set; }
 
-        public Task ExecuteAsync(IAssetContext config, WebOptimizerOptions options)
+        public override Task ExecuteAsync(IAssetContext config)
         {
             var content = new Dictionary<string, byte[]>();
 

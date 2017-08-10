@@ -10,21 +10,19 @@ using Microsoft.Extensions.FileProviders;
 
 namespace WebOptimizer
 {
-    internal class CssFingerprinter : IProcessor
+    internal class CssFingerprinter : Processor
     {
         private static readonly Regex _rxUrl = new Regex(@"url\s*\(\s*([""']?)([^:)]+)\1\s*\)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        public string CacheKey(HttpContext context) => string.Empty;
-
-        public Task ExecuteAsync(IAssetContext config, WebOptimizerOptions options)
+        public override Task ExecuteAsync(IAssetContext config)
         {
             var content = new Dictionary<string, byte[]>();
             var pipeline = (IAssetPipeline)config.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
 
             foreach (string key in config.Content.Keys)
             {
-                IFileInfo input = options.FileProvider.GetFileInfo(key);
-                IFileInfo output = options.FileProvider.GetFileInfo(config.Asset.Route);
+                IFileInfo input = config.Options.FileProvider.GetFileInfo(key);
+                IFileInfo output = config.Options.FileProvider.GetFileInfo(config.Asset.Route);
 
                 content[key] = Adjust(config.Content[key].AsString(), input, output);
             }

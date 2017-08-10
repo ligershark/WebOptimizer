@@ -31,10 +31,10 @@ namespace WebOptimizer
 
         public IList<IProcessor> Processors { get; }
 
-        public async Task<byte[]> ExecuteAsync(HttpContext context, WebOptimizerOptions options)
+        public async Task<byte[]> ExecuteAsync(HttpContext context, IWebOptimizerOptions options)
         {
             string root = options.FileProvider.GetFileInfo("/").PhysicalPath;
-            var config = new AssetContext(context, this);
+            var config = new AssetContext(context, this, options);
 
             // Handle globbing
             var dir = new DirectoryInfoWrapper(new DirectoryInfo(root));
@@ -55,7 +55,7 @@ namespace WebOptimizer
             // Attach the processors
             foreach (IProcessor processor in Processors)
             {
-                await processor.ExecuteAsync(config, options).ConfigureAwait(false);
+                await processor.ExecuteAsync(config).ConfigureAwait(false);
             }
 
             return config.Content.FirstOrDefault().Value;

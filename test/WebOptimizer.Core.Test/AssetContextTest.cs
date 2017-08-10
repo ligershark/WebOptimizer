@@ -15,7 +15,7 @@ namespace WebOptimizer.Test
             var httpContext = new DefaultHttpContext();
 
             var asset = new Asset(route, contentType, sourcefiles);
-            var assetContext = new AssetContext(httpContext, asset);
+            var assetContext = new AssetContext(httpContext, asset, new WebOptimizerOptions());
 
             Assert.Equal(asset, assetContext.Asset);
             Assert.Equal(httpContext, assetContext.HttpContext);
@@ -27,7 +27,7 @@ namespace WebOptimizer.Test
         {
             var httpContext = new DefaultHttpContext();
 
-            Assert.Throws<ArgumentNullException>(() => new AssetContext(httpContext, null));
+            Assert.Throws<ArgumentNullException>(() => new AssetContext(httpContext, null, null));
         }
 
         [Fact2]
@@ -40,7 +40,7 @@ namespace WebOptimizer.Test
 
             var asset = new Asset(route, contentType, sourcefiles);
 
-            Assert.Throws<ArgumentNullException>(() => new AssetContext(null, asset));
+            Assert.Throws<ArgumentNullException>(() => new AssetContext(null, asset, null));
         }
     }
 }

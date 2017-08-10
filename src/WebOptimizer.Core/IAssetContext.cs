@@ -22,5 +22,10 @@ namespace WebOptimizer
         /// Gets the HTTP context.
         /// </summary>
         HttpContext HttpContext { get; }
+
+        /// <summary>
+        /// Gets the global options for WebOptimizer.
+        /// </summary>
+        IWebOptimizerOptions Options { get; }
     }
 }

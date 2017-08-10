@@ -45,9 +45,12 @@ namespace WebOptimizer.Test.Processors
                    .Returns(inputFile)
                    .Returns(outputFile);
 
+            context.SetupGet(s => s.Options)
+                   .Returns(options.Object);
+
             context.Object.Content = new Dictionary<string, byte[]> { { "css/site.css", url.AsByteArray() } };
 
-            await adjuster.ExecuteAsync(context.Object, options.Object);
+            await adjuster.ExecuteAsync(context.Object);
             string result = context.Object.Content.First().Value.AsString();
 
             Assert.Equal(newUrl, result);

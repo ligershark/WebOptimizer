@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace WebOptimizer
 {
-    internal class Concatenator : IProcessor
+    internal class Concatenator : Processor
     {
-        public string CacheKey(HttpContext context) => string.Empty;
-
-        public Task ExecuteAsync(IAssetContext context, WebOptimizerOptions options)
+        public override Task ExecuteAsync(IAssetContext context)
         {
             context.Content = new Dictionary<string, byte[]>
             {

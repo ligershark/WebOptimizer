@@ -20,7 +20,7 @@ namespace WebOptimizer.Test.Processors
 
             var options = new Mock<WebOptimizerOptions>();
 
-            await processor.ExecuteAsync(context.Object, options.Object);
+            await processor.ExecuteAsync(context.Object);
 
             Assert.Equal(1, context.Object.Content.Count);
         }
@@ -33,7 +33,7 @@ namespace WebOptimizer.Test.Processors
             context.Object.Content = new Dictionary<string, byte[]>();
             var options = new Mock<WebOptimizerOptions>();
 
-            await processor.ExecuteAsync(context.Object, options.Object);
+            await processor.ExecuteAsync(context.Object);
 
             Assert.Equal(1, context.Object.Content.Count);
         }

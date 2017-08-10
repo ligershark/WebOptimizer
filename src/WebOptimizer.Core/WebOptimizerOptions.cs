@@ -6,7 +6,7 @@ namespace WebOptimizer
     /// <summary>
     /// Options for the Web Optimizer.
     /// </summary>
-    public class WebOptimizerOptions
+    public class WebOptimizerOptions : IWebOptimizerOptions
     {
         /// <summary>
         /// Gets or sets a value indicating whether server-side caching is enabled.
@@ -27,7 +27,7 @@ namespace WebOptimizer
         /// <summary>
         /// Gets the file provider.
         /// </summary>
-        public virtual IFileProvider FileProvider { get; set; }
+        public virtual IFileProvider FileProvider { get; private set; }
 
         /// <summary>
         /// Ensures that defaults are set

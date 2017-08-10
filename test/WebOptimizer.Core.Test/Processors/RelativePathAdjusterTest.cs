@@ -30,6 +30,9 @@ namespace WebOptimizer.Test.Processors
             context.SetupGet(s => s.Asset.Route)
                    .Returns("/my/route.css");
 
+            context.SetupGet(s => s.Options)
+                   .Returns(options.Object);
+
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IAssetPipeline)))
                    .Returns(pipeline.Object);
 
@@ -39,7 +42,7 @@ namespace WebOptimizer.Test.Processors
 
             context.Object.Content = new Dictionary<string, byte[]> { { "css/site.css", url.AsByteArray() } };
 
-            await adjuster.ExecuteAsync(context.Object, options.Object);
+            await adjuster.ExecuteAsync(context.Object);
 
             Assert.Equal(newUrl, context.Object.Content.First().Value.AsString());
             Assert.Equal("", adjuster.CacheKey(new DefaultHttpContext()));

@@ -11,11 +11,11 @@ namespace BundlerSample
     {
         public string CacheKey(HttpContext context) => string.Empty;
 
-        public async Task ExecuteAsync(IAssetContext context, WebOptimizerOptions options)
+        public async Task ExecuteAsync(IAssetContext context)
         {
             var pipeline = (IAssetPipeline)context.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
             var content = new Dictionary<string, byte[]>();
-            IFileInfo file = options.FileProvider.GetFileInfo("/images/logo.png");
+            IFileInfo file = context.Options.FileProvider.GetFileInfo("/images/logo.png");
 
             using (Stream fs = file.CreateReadStream())
             {

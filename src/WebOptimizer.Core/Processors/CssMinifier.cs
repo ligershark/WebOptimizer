@@ -6,18 +6,16 @@ using NUglify.Css;
 
 namespace WebOptimizer
 {
-    internal class CssMinifier : IProcessor
+    internal class CssMinifier : Processor
     {
         public CssMinifier(CssSettings settings)
         {
             Settings = settings;
         }
 
-        public string CacheKey(HttpContext context) => string.Empty;
-
         public CssSettings Settings { get; set; }
 
-        public Task ExecuteAsync(IAssetContext config, WebOptimizerOptions options)
+        public override Task ExecuteAsync(IAssetContext config)
         {
             var content = new Dictionary<string, byte[]>();
 
