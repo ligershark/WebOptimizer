@@ -191,7 +191,7 @@ You can string together the various components of the pipeline yourself. This is
 
 Imaging you had a bunch of `.txt` files that contained CSS and you wanted to bundle that up as a single CSS output file on the URL `http://localhost/bundle.css`. Here's what that could look like:
 
-```c#
+```csharp
 services.AddWebOptimizer(pipeline =>
 {
     pipeline.AddBundle("/bundle.css", "text/css; charset=utf-8", "/dir/*.txt")

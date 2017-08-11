@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Options;
 
@@ -22,6 +20,13 @@ namespace WebOptimizer
         public bool TryGetAssetFromRoute(string route, out IAsset asset)
         {
             asset = null;
+
+            // Bail if this is an absolute path
+            if (route.StartsWith("//") || route.Contains("://"))
+            {
+                return false;
+            }
+
             string cleanRoute = NormalizeRoute(route);
 
             // First check direct matches

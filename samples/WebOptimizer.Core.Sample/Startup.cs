@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,6 +21,7 @@ namespace BundlerSample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddResponseCaching();
             services.AddOptions();
             services.AddMvc()
                 .AddViewLocalization(options => options.ResourcesPath = "Resources");
@@ -47,9 +49,9 @@ namespace BundlerSample
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IAssetPipeline pipeline)
         {
+                app.UseDeveloperExceptionPage();
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
             }
             else
             {
@@ -62,15 +64,23 @@ namespace BundlerSample
                 new CultureInfo("da")
             };
 
-            app.UseRequestLocalization(new RequestLocalizationOptions
-            {
-                SupportedCultures = cultures,
-                SupportedUICultures = cultures
-            });
+            //app.UseRequestLocalization(new RequestLocalizationOptions
+            //{
+            //    SupportedCultures = cultures,
+            //    SupportedUICultures = cultures
+            //});
 
+            app.UseResponseCaching();
             app.UseWebOptimizer();
 
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                OnPrepareResponse = context =>
+                {
+                    context.Context.Response.Headers["Cache-Control"] = $"public, max-age={TimeSpan.FromDays(365).TotalSeconds}";
+                    context.Context.Response.Headers["Expires"] = DateTime.Now.AddYears(1).ToString("R");
+                }
+            });
 
             app.UseMvc(routes =>
             {
