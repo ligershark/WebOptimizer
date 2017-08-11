@@ -57,7 +57,7 @@ namespace WebOptimizer.Test
 
             var ex = Assert.Throws<ArgumentException>(() => pipeline.AddBundle(new[] { asset1, asset2 }));
 
-            Assert.Equal(ex.ParamName, "route");
+            Assert.Equal("route", ex.ParamName);
             Assert.Equal(1, pipeline.Assets.Count);
         }
 

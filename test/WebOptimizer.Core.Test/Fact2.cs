@@ -57,7 +57,7 @@ public class Fact2 : Xunit.FactAttribute
 ///     </para>
 /// </summary>
 [Xunit.Sdk.XunitTestCaseDiscoverer("Xunit.Sdk.TheoryDiscoverer", "xunit.execution.{Platform}")]
-public class Theory2 : Fact2
+public class Theory2 : Xunit.TheoryAttribute
 {
     /// <summary>
     ///     <para>
@@ -88,8 +88,11 @@ public class Theory2 : Fact2
     ///     This is automatically set to the name of the current method;
     ///     there's no need to set a value for this parameter.
     /// </param>
-    public Theory2(string charsToReplace = "_",
-string replacementChars = " ",
-[CallerMemberName] string testMethodName = "")
-: base(charsToReplace, replacementChars, testMethodName) { }
+    public Theory2(string charsToReplace = "_", string replacementChars = " ", [CallerMemberName] string testMethodName = "")
+    {
+        if (charsToReplace != null)
+        {
+            base.DisplayName = testMethodName?.Replace(charsToReplace, replacementChars);
+        }
+    }
 }
