@@ -107,20 +107,20 @@ namespace WebOptimizer
         /// <summary>
         /// Runs the CSS minifier on the content.
         /// </summary>
-        public static IAsset MinifyCss(this IAsset bundle)
+        public static IAsset MinifyCss(this IAsset asset)
         {
-            return bundle.MinifyCss(new CssSettings());
+            return asset.MinifyCss(new CssSettings());
         }
 
         /// <summary>
         /// Runs the CSS minifier on the content.
         /// </summary>
-        public static IAsset MinifyCss(this IAsset bundle, CssSettings settings)
+        public static IAsset MinifyCss(this IAsset asset, CssSettings settings)
         {
             var minifier = new CssMinifier(settings);
-            bundle.Processors.Add(minifier);
+            asset.Processors.Add(minifier);
 
-            return bundle;
+            return asset;
         }
 
         /// <summary>

@@ -38,7 +38,7 @@ namespace BundlerSample
 
                 pipeline.AddScssBundle("/scss.css", "css/test2.scss", "css/test.scss");
 
-                pipeline.MinifyCssFiles().InlineImages();
+                pipeline.MinifyCssFiles("css/site.css").InlineImages();
                 pipeline.CompileScssFiles();
                 pipeline.ReplaceImages();
             });
