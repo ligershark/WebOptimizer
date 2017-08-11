@@ -22,9 +22,7 @@ namespace BundlerSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddResponseCaching();
-            services.AddOptions();
-            services.AddMvc()
-                .AddViewLocalization(options => options.ResourcesPath = "Resources");
+            services.AddMvc();
 
             services.AddWebOptimizer(pipeline =>
             {
@@ -49,26 +47,14 @@ namespace BundlerSample
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IAssetPipeline pipeline)
         {
-                app.UseDeveloperExceptionPage();
             if (env.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
             }
             else
             {
                 app.UseExceptionHandler("/Error");
             }
-
-            var cultures = new List<CultureInfo>
-            {
-                new CultureInfo("en"),
-                new CultureInfo("da")
-            };
-
-            //app.UseRequestLocalization(new RequestLocalizationOptions
-            //{
-            //    SupportedCultures = cultures,
-            //    SupportedUICultures = cultures
-            //});
 
             app.UseResponseCaching();
             app.UseWebOptimizer();
@@ -77,8 +63,9 @@ namespace BundlerSample
             {
                 OnPrepareResponse = context =>
                 {
-                    context.Context.Response.Headers["Cache-Control"] = $"public, max-age={TimeSpan.FromDays(365).TotalSeconds}";
-                    context.Context.Response.Headers["Expires"] = DateTime.Now.AddYears(1).ToString("R");
+                    var expires = TimeSpan.FromDays(365);
+                    context.Context.Response.Headers["Cache-Control"] = $"public, max-age={expires.TotalSeconds}";
+                    context.Context.Response.Headers["Expires"] = DateTime.Now.Add(expires).ToString("R");
                 }
             });
 
@@ -91,12 +78,4 @@ namespace BundlerSample
         }
     }
 
-}
-
-namespace BundlerSample
-{
-    public class Strings
-    {
-
-    }
 }

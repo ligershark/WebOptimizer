@@ -3,7 +3,7 @@ version: 1.0.{build}
 
 install:
    # .NET Core SDK binaries
-  - ps: $urlCurrent = "https://download.microsoft.com/download/F/A/A/FAAE9280-F410-458E-8819-279C5A68EDCF/dotnet-sdk-2.0.0-preview2-006497-win-x64.zip"
+  - ps: $urlCurrent = "https://aka.ms/dotnet-sdk-2.0.0-win-x64"
   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
   - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
   - ps: $tempFileCurrent = [System.IO.Path]::GetTempFileName()

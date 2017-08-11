@@ -6,9 +6,9 @@ namespace WebOptimizer
     internal class WebOptimizerConfig : IConfigureOptions<WebOptimizerOptions>
     {
         private IConfiguration _config;
-        private IOptionsCache<WebOptimizerOptions> _options;
+        private IOptionsMonitorCache<WebOptimizerOptions> _options;
 
-        public WebOptimizerConfig(IConfiguration config, IOptionsCache<WebOptimizerOptions> options)
+        public WebOptimizerConfig(IConfiguration config, IOptionsMonitorCache<WebOptimizerOptions> options)
         {
             _config = config;
             _options = options;
