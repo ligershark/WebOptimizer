@@ -63,12 +63,12 @@ public void ConfigureServices(IServiceCollection services)
 
 That's it. You have now enabled automatic CSS and JavaScript minification. No other code changes are needed for enabling this. 
 
-Any static .css and .js file reqested by the browser is now automatically minified and cached - both client-side and server-side caching.
+Any static .css and .js file requested by the browser is now automatically minified and cached - both client-side and server-side caching.
 
 ## Minification
 To control the minification in more detail, we must interact with the pipeline that manipulates the file content. 
 
-For example, perhaps we only want a few particular JavaScript files to be minified automatically. Then we would write something like this:
+For example, perhaps we only want a few certain JavaScript files to be minified automatically. Then we would write something like this:
 
 ```csharp
 public void ConfigureServices(IServiceCollection services)
