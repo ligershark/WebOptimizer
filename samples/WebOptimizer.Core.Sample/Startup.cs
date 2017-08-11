@@ -26,17 +26,17 @@ namespace BundlerSample
 
             services.AddWebOptimizer(pipeline =>
             {
-                pipeline.AddCssBundle("/all.css", "css/site1.css", "lib/bootstrap/dist/css/bootstraps.css")
+                pipeline.AddCssBundle("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css")
                         .InlineImages();
 
                 pipeline.AddJavaScriptBundle("/all.js", "js/site.js", "js/b.js");
 
                 pipeline.AddBundle("/demo.txt", "text/plain", "js/site.js", "js/b.js")
-                      .Concatenate();
+                        .Concatenate();
 
                 pipeline.MinifyJsFiles("**/*.jsx");
 
-                pipeline.AddScssBundle("/scss.css", "css/*.scss");
+                pipeline.AddScssBundle("/scss.css", "css/test2.scss", "css/test.scss");
 
                 pipeline.MinifyCssFiles().InlineImages();
                 pipeline.CompileScssFiles();

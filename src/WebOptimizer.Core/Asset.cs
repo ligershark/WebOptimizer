@@ -38,12 +38,18 @@ namespace WebOptimizer
 
             // Handle globbing
             var dir = new DirectoryInfoWrapper(new DirectoryInfo(root));
-            var matcher = new Matcher();
-            matcher.AddIncludePatterns(SourceFiles);
-            PatternMatchingResult globbingResult = matcher.Execute(dir);
-            IEnumerable<string> files = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
+            var files = new List<string>();
 
-            if (!files.Any())
+            foreach (string sourceFile in SourceFiles)
+            {
+                var matcher = new Matcher();
+                matcher.AddInclude(sourceFile);
+                PatternMatchingResult globbingResult = matcher.Execute(dir);
+                IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
+                files.AddRange(fileMatches.Where(f => !files.Contains(f)));
+            }
+
+            if (files.Count == 0)
             {
                 string glob = string.Join(", ", SourceFiles);
                 throw new FileNotFoundException($"No files found matching \"{glob}\" exist in \"{dir.FullName}\"");
