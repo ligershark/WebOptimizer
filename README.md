@@ -22,14 +22,13 @@ Add the NuGet package [LigerShark.WebOptimizer.Core](https://nuget.org/packages/
 
 > &gt; dotnet add package LigerShark.WebOptimizer.Core
 
-Then in **Startup.cs**, add two using statements:
+Then in **Startup.cs**, add the following using statements:
 
 ```csharp
 using WebOptimizer;
-using WebOptimizer.Sass;
 ```
 
-...and add `app.UseWebOptimizer()` to the `Configure` method anywhere before `app.UseStaticFiles`, like so:
+...then add `app.UseWebOptimizer()` to the `Configure` method anywhere before `app.UseStaticFiles`, like so:
 
 ```csharp
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -107,7 +106,7 @@ services.AddWebOptimizer(pipeline =>
 });
 ```
 
-The `AddCssBundle` method will combine the two source files in the order they are listed and then minify the resulting output file. The file `/css/bundle.css` lives in memory only and not as a file on disk.
+The `AddCssBundle` method will combine the two source files in the order they are listed and then minify the resulting output file. The output file `/css/bundle.css` is created and kept in memory and not as a file on disk.
 
 To bundle all files from a particular folder, we can use globbing patterns like this:
 
