@@ -19,6 +19,7 @@ namespace WebOptimizer
             {
                 _options.TryRemove(Options.DefaultName);
             }, null);
+
             ConfigurationBinder.Bind(_config.GetSection("WebOptimizer"), options);
         }
     }

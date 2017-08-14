@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
 
 namespace WebOptimizer
@@ -34,6 +35,11 @@ namespace WebOptimizer
         /// </summary>
         public void EnsureDefaults(IHostingEnvironment env)
         {
+            if (env == null)
+            {
+                throw new ArgumentNullException(nameof(env));
+            }
+
             EnableCaching = EnableCaching ?? true;
             EnableTagHelperBundling = EnableTagHelperBundling ?? true;
             UseContentRoot = UseContentRoot ?? false;

@@ -126,6 +126,11 @@ namespace WebOptimizer
         /// </summary>
         public static void UseWebOptimizer(this IApplicationBuilder app)
         {
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
+
             var env = (IHostingEnvironment)app.ApplicationServices.GetService(typeof(IHostingEnvironment));
 
             app.UseMiddleware<AssetMiddleware>();

@@ -136,6 +136,11 @@ namespace WebOptimizer
         /// <param name="minifyCss">If <code>true</code>; calls <code>AddCss()</code> on the pipeline.</param>
         public static IAssetPipeline AddWebOptimizer(this IServiceCollection services, bool minifyJavaScript = true, bool minifyCss = true)
         {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
             var pipeline = new AssetPipeline();
 
             if (minifyCss)
@@ -159,6 +164,16 @@ namespace WebOptimizer
         /// </summary>
         public static IAssetPipeline AddWebOptimizer(this IServiceCollection services, Action<IAssetPipeline> assetPipeline)
         {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            if (assetPipeline == null)
+            {
+                throw new ArgumentNullException(nameof(assetPipeline));
+            }
+
             var pipeline = new AssetPipeline();
             assetPipeline(pipeline);
 
