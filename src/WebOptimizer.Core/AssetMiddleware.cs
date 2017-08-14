@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 
@@ -16,19 +17,22 @@ namespace WebOptimizer
         private readonly IHostingEnvironment _env;
         private readonly IMemoryCache _cache;
         private readonly IAssetPipeline _pipeline;
+        private readonly ILogger _logger;
 
-        public AssetMiddleware(RequestDelegate next, IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline)
+        public AssetMiddleware(RequestDelegate next, IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, ILogger<AssetMiddleware> logger)
         {
             _next = next;
             _env = env;
             _cache = cache;
             _pipeline = pipeline;
+            _logger = logger;
         }
 
         public Task InvokeAsync(HttpContext context, IOptionsSnapshot<WebOptimizerOptions> options)
         {
             if (_pipeline.TryGetAssetFromRoute(context.Request.Path, out IAsset asset))
             {
+                _logger.LogInformation(LoggingEvents.RequestForAssetStarted, "Request started for '{0}'", context.Request.Path);
                 return HandleAssetAsync(context, asset, options.Value);
             }
 
@@ -45,10 +49,12 @@ namespace WebOptimizer
             {
                 context.Response.StatusCode = 304;
                 await WriteOutputAsync(context, asset, new byte[0], cacheKey, options).ConfigureAwait(false);
+                _logger.LogInformation(LoggingEvents.ConditionalGet, "Responding with a conditional GET for '{0}'", context.Request.Path);
             }
             else if (_cache.TryGetValue(cacheKey, out byte[] value))
             {
                 await WriteOutputAsync(context, asset, value, cacheKey, options).ConfigureAwait(false);
+                _logger.LogInformation(LoggingEvents.ServedFromCache, "Responding from memory cache for '{0}'", context.Request.Path);
             }
             else
             {
@@ -63,6 +69,7 @@ namespace WebOptimizer
                 AddToCache(cacheKey, result, asset.SourceFiles, options);
 
                 await WriteOutputAsync(context, asset, result, cacheKey, options).ConfigureAwait(false);
+                _logger.LogInformation(LoggingEvents.GeneratedOutput, "Generated output and responded to request for '{0}'", context.Request.Path);
             }
         }
 

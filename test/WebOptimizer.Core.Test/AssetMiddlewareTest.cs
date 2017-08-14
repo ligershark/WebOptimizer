@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Moq;
@@ -46,7 +47,9 @@ namespace WebOptimizer.Test
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
 
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline);
+            var logger =  new Mock<ILogger<AssetMiddleware>>();
+
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, logger.Object);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
@@ -85,7 +88,9 @@ namespace WebOptimizer.Test
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
 
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline);
+            var logger = new Mock<ILogger<AssetMiddleware>>();
+
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, logger.Object);
             var stream = new MemoryStream();
 
             await middleware.InvokeAsync(context.Object, amo.Object);
@@ -130,7 +135,9 @@ namespace WebOptimizer.Test
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
 
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline);
+            var logger = new Mock<ILogger<AssetMiddleware>>();
+
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, logger.Object);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
@@ -179,7 +186,9 @@ namespace WebOptimizer.Test
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
 
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline);
+            var logger = new Mock<ILogger<AssetMiddleware>>();
+
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, logger.Object);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
@@ -209,7 +218,9 @@ namespace WebOptimizer.Test
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
 
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline.Object);
+            var logger = new Mock<ILogger<AssetMiddleware>>();
+
+            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline.Object, logger.Object);
 
             await middleware.InvokeAsync(context.Object,amo.Object);
 

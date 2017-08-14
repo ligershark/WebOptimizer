@@ -15,8 +15,6 @@ namespace WebOptimizer
 
         public IReadOnlyList<IAsset> Assets => _assets;
 
-        //public IFileProvider FileProvider { get; set; }
-
         public bool TryGetAssetFromRoute(string route, out IAsset asset)
         {
             asset = null;
