@@ -13,7 +13,7 @@ namespace BundlerSample
 
         public Task ExecuteAsync(IAssetContext context)
         {
-            context.HttpContext.Response.Headers["ost"] = "ost";
+            context.HttpContext.Response.Headers["Vary"] = "ost";
             var pipeline = (IAssetPipeline)context.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
             var content = new Dictionary<string, byte[]>();
 

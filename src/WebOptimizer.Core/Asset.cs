@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
+using Microsoft.Net.Http.Headers;
 
 namespace WebOptimizer
 {
@@ -55,13 +56,25 @@ namespace WebOptimizer
                 throw new FileNotFoundException($"No files found matching \"{glob}\" exist in \"{dir.FullName}\"");
             }
 
+            DateTime lastModified = DateTime.MinValue;
+
             // Read file content into memory
             foreach (string file in files)
             {
                 if (!config.Content.ContainsKey(file))
                 {
-                    await LoadFileContentAsync(options.FileProvider, config, file);
+                    DateTime date = await LoadFileContentAsync(options.FileProvider, config, file);
+
+                    if (date > lastModified)
+                    {
+                        lastModified = date;
+                    }
                 }
+            }
+
+            if (lastModified != DateTime.MinValue)
+            {
+                context.Response.Headers[HeaderNames.LastModified] = lastModified.ToString("R");
             }
 
             // Attach the processors
@@ -73,7 +86,7 @@ namespace WebOptimizer
             return config.Content.FirstOrDefault().Value;
         }
 
-        private static async Task LoadFileContentAsync(IFileProvider fileProvider, AssetContext config, string sourceFile)
+        private static async Task<DateTime> LoadFileContentAsync(IFileProvider fileProvider, AssetContext config, string sourceFile)
         {
             IFileInfo file = fileProvider.GetFileInfo(sourceFile);
 
@@ -82,6 +95,8 @@ namespace WebOptimizer
                 byte[] bytes = await fs.AsBytesAsync();
                 config.Content.Add(sourceFile, bytes);
             }
+
+            return file.LastModified.UtcDateTime;
         }
 
         public string GenerateCacheKey(HttpContext context)

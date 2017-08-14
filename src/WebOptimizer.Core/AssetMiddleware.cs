@@ -98,6 +98,14 @@ namespace WebOptimizer
                 return cacheKey == inm.ToString().Trim('"');
             }
 
+            if (context.Request.Headers.TryGetValue(HeaderNames.IfModifiedSince, out var ims))
+            {
+                if (context.Response.Headers.TryGetValue(HeaderNames.LastModified, out var lm))
+                {
+                    return ims == lm;
+                }
+            }
+
             return false;
         }
 
