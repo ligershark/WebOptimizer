@@ -45,36 +45,37 @@ namespace WebOptimizer
 
             string cacheKey = asset.GenerateCacheKey(context);
 
-            if (IsConditionalGet(context, cacheKey))
-            {
-                context.Response.StatusCode = 304;
-                await WriteOutputAsync(context, asset, new byte[0], cacheKey, options).ConfigureAwait(false);
-                _logger.LogConditionalGet(context.Request.Path);
-            }
-            else if (_cache.TryGetValue(cacheKey, out byte[] value))
+            if (_cache.TryGetValue(cacheKey, out MemoryCachedResponse value))
             {
                 await WriteOutputAsync(context, asset, value, cacheKey, options).ConfigureAwait(false);
                 _logger.LogServedFromCache(context.Request.Path);
             }
             else
             {
-                byte[] result = await asset.ExecuteAsync(context, options).ConfigureAwait(false);
+                byte[] bytes = await asset.ExecuteAsync(context, options).ConfigureAwait(false);
 
-                if (result == null || result.Length == 0)
+                var response = new MemoryCachedResponse(context.Response.StatusCode, bytes);
+
+                foreach (string name in context.Response.Headers.Keys)
+                {
+                    response.Headers.Add(name, context.Response.Headers[name]);
+                }
+
+                if (bytes == null || bytes.Length == 0)
                 {
                     _logger.LogZeroByteResponse(context.Request.Path);
                     await _next(context);
                     return;
                 }
 
-                AddToCache(cacheKey, result, asset.SourceFiles, options);
+                AddToCache(cacheKey, response, asset.SourceFiles, options);
 
-                await WriteOutputAsync(context, asset, result, cacheKey, options).ConfigureAwait(false);
+                await WriteOutputAsync(context, asset, response, cacheKey, options).ConfigureAwait(false);
                 _logger.LogGeneratedOutput(context.Request.Path);
             }
         }
 
-        private void AddToCache(string cacheKey, byte[] value, IEnumerable<string> files, WebOptimizerOptions options)
+        private void AddToCache(string cacheKey, MemoryCachedResponse value, IEnumerable<string> files, WebOptimizerOptions options)
         {
             if (options.EnableCaching == true)
             {
@@ -100,21 +101,47 @@ namespace WebOptimizer
             return false;
         }
 
-        private async Task WriteOutputAsync(HttpContext context, IAsset asset, byte[] content, string cacheKey, WebOptimizerOptions options)
+        private async Task WriteOutputAsync(HttpContext context, IAsset asset, MemoryCachedResponse cachedResponse, string cacheKey, WebOptimizerOptions options)
         {
             context.Response.ContentType = asset.ContentType;
+
+            foreach (string name in cachedResponse.Headers.Keys)
+            {
+                context.Response.Headers[name] = cachedResponse.Headers[name];
+            }
 
             if (options.EnableCaching == true && !string.IsNullOrEmpty(cacheKey))
             {
                 context.Response.Headers[HeaderNames.CacheControl] = $"max-age=31536000"; // 1 year
                 context.Response.Headers[HeaderNames.ETag] = $"\"{cacheKey}\"";
+
+                if (IsConditionalGet(context, cacheKey))
+                {
+                    context.Response.StatusCode = 304;
+                    return;
+                }
             }
 
-            if (content?.Length > 0)
+            if (cachedResponse?.Body?.Length > 0)
             {
-                await context.Response.Body.WriteAsync(content, 0, content.Length);
+                await context.Response.Body.WriteAsync(cachedResponse.Body, 0, cachedResponse.Body.Length);
             }
         }
+    }
+
+    internal class MemoryCachedResponse
+    {
+        public MemoryCachedResponse(int statusCode, byte[] body)
+        {
+            StatusCode = statusCode;
+            Body = body;
+        }
+
+        public int StatusCode { get; set; }
+
+        public IHeaderDictionary Headers { get; set; } = new HeaderDictionary();
+
+        public byte[] Body { get; set; }
     }
 
     /// <summary>

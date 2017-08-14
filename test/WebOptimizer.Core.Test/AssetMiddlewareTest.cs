@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -36,6 +37,9 @@ namespace WebOptimizer.Test
                    .Returns(response.Object);
 
             context.Setup(c => c.Request.Path).Returns("/file.css");
+
+            response.SetupGet(c => c.Headers)
+                   .Returns(new HeaderDictionary());
 
             var next = new Mock<RequestDelegate>();
             var env = new HostingEnvironment();
@@ -77,6 +81,9 @@ namespace WebOptimizer.Test
                    .Returns(false);
 
             context.Setup(c => c.Request.Path).Returns("/file.css");
+
+            context.SetupGet(c => c.Response.Headers)
+                   .Returns(new HeaderDictionary());
 
             var next = new Mock<RequestDelegate>();
             var env = new HostingEnvironment();
@@ -124,8 +131,9 @@ namespace WebOptimizer.Test
             var next = new Mock<RequestDelegate>();
             var env = new HostingEnvironment();
             var cache = new Mock<IMemoryCache>();
+            var mcr = new MemoryCachedResponse(200, cssContent);
 
-            object bytes = cssContent;
+            object bytes = mcr;
             cache.Setup(c => c.TryGetValue(It.IsAny<string>(), out bytes))
                  .Returns(true);
 
@@ -154,7 +162,7 @@ namespace WebOptimizer.Test
             var cssContent = "*{color:red}".AsByteArray();
 
             var pipeline = new AssetPipeline();
-            var options = new WebOptimizerOptions() { EnableCaching = false };
+            var options = new WebOptimizerOptions() { EnableCaching = true };
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns("/file.css");
@@ -172,11 +180,15 @@ namespace WebOptimizer.Test
 
             context.Setup(c => c.Request.Path).Returns("/file.css");
 
+            response.SetupGet(c => c.Headers)
+                   .Returns(new HeaderDictionary());
+
             var next = new Mock<RequestDelegate>();
             var env = new HostingEnvironment();
             var cache = new Mock<IMemoryCache>();
+            var mcr = new MemoryCachedResponse(200, cssContent);
 
-            object bytes = cssContent;
+            object bytes = mcr;
             cache.Setup(c => c.TryGetValue(It.IsAny<string>(), out bytes))
                  .Returns(true);
 

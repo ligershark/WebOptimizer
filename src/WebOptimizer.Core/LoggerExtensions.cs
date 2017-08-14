@@ -9,30 +9,22 @@ namespace WebOptimizer
             logLevel: LogLevel.Information,
             eventId: 1000,
             formatString: "Request started for '{Path}'");
-        private static Action<ILogger, string, Exception> _logConditionalGet = LoggerMessage.Define<string>(
-            logLevel: LogLevel.Information,
-            eventId: 1001,
-            formatString: "Responding with a conditional GET for '{Path}'");
         private static Action<ILogger, string, Exception> _logServedFromCache = LoggerMessage.Define<string>(
             logLevel: LogLevel.Information,
-            eventId: 1002,
+            eventId: 1001,
             formatString: "Responding from memory cache for '{Path}'");
         private static Action<ILogger, string, Exception> _logGeneratedOutput = LoggerMessage.Define<string>(
             logLevel: LogLevel.Information,
-            eventId: 1003,
+            eventId: 1002,
             formatString: "Generated output and responded to request for '{Path}'");
         private static Action<ILogger, string, Exception> _logZeroByteResponse = LoggerMessage.Define<string>(
             logLevel: LogLevel.Information,
-            eventId: 1004,
+            eventId: 1003,
             formatString: "No response generated for '{Path}'. Passing on to next middleware.");
 
         public static void LogRequestForAssetStarted(this ILogger logger, string path)
         {
             _logRequestForAssetStarted(logger, path, null);
-        }
-        public static void LogConditionalGet(this ILogger logger, string path)
-        {
-            _logConditionalGet(logger, path, null);
         }
         public static void LogServedFromCache(this ILogger logger, string path)
         {
