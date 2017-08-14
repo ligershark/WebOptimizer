@@ -56,8 +56,8 @@ namespace BundlerSample
                 app.UseExceptionHandler("/Error");
             }
 
-            app.UseResponseCaching();
             app.UseWebOptimizer();
+            app.UseResponseCaching();
 
             app.UseStaticFiles(new StaticFileOptions()
             {

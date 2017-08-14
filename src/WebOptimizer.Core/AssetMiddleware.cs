@@ -32,7 +32,7 @@ namespace WebOptimizer
         {
             if (_pipeline.TryGetAssetFromRoute(context.Request.Path, out IAsset asset))
             {
-                _logger.LogInformation(LoggingEvents.RequestForAssetStarted, "Request started for '{0}'", context.Request.Path);
+                _logger.LogRequestForAssetStarted(context.Request.Path);
                 return HandleAssetAsync(context, asset, options.Value);
             }
 
@@ -49,12 +49,12 @@ namespace WebOptimizer
             {
                 context.Response.StatusCode = 304;
                 await WriteOutputAsync(context, asset, new byte[0], cacheKey, options).ConfigureAwait(false);
-                _logger.LogInformation(LoggingEvents.ConditionalGet, "Responding with a conditional GET for '{0}'", context.Request.Path);
+                _logger.LogConditionalGet(context.Request.Path);
             }
             else if (_cache.TryGetValue(cacheKey, out byte[] value))
             {
                 await WriteOutputAsync(context, asset, value, cacheKey, options).ConfigureAwait(false);
-                _logger.LogInformation(LoggingEvents.ServedFromCache, "Responding from memory cache for '{0}'", context.Request.Path);
+                _logger.LogServedFromCache(context.Request.Path);
             }
             else
             {
@@ -69,7 +69,7 @@ namespace WebOptimizer
                 AddToCache(cacheKey, result, asset.SourceFiles, options);
 
                 await WriteOutputAsync(context, asset, result, cacheKey, options).ConfigureAwait(false);
-                _logger.LogInformation(LoggingEvents.GeneratedOutput, "Generated output and responded to request for '{0}'", context.Request.Path);
+                _logger.LogGeneratedOutput(context.Request.Path);
             }
         }
 
