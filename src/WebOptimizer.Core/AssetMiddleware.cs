@@ -62,6 +62,7 @@ namespace WebOptimizer
 
                 if (result == null || result.Length == 0)
                 {
+                    _logger.LogZeroByteResponse(context.Request.Path);
                     await _next(context);
                     return;
                 }

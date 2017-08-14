@@ -21,6 +21,10 @@ namespace WebOptimizer
             logLevel: LogLevel.Information,
             eventId: 1003,
             formatString: "Generated output and responded to request for '{Path}'");
+        private static Action<ILogger, string, Exception> _logZeroByteResponse = LoggerMessage.Define<string>(
+            logLevel: LogLevel.Information,
+            eventId: 1004,
+            formatString: "No response generated for '{Path}'. Passing on to next middleware.");
 
         public static void LogRequestForAssetStarted(this ILogger logger, string path)
         {
@@ -37,6 +41,10 @@ namespace WebOptimizer
         public static void LogGeneratedOutput(this ILogger logger, string path)
         {
             _logGeneratedOutput(logger, path, null);
+        }
+        public static void LogZeroByteResponse(this ILogger logger, string path)
+        {
+            _logZeroByteResponse(logger, path, null);
         }
     }
 }
