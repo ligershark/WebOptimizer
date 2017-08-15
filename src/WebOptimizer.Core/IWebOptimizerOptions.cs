@@ -22,5 +22,10 @@ namespace WebOptimizer
         /// Gets the file provider.
         /// </summary>
         IFileProvider FileProvider { get; }
+
+        /// <summary>
+        /// Gets the CDN url used for TagHelpers.
+        /// </summary>
+        string CdnUrl { get; }
     }
 }

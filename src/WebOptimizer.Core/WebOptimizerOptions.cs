@@ -31,6 +31,11 @@ namespace WebOptimizer
         public virtual IFileProvider FileProvider { get; private set; }
 
         /// <summary>
+        /// Gets the CDN url used for TagHelpers.
+        /// </summary>
+        public string CdnUrl { get; set; }
+
+        /// <summary>
         /// Ensures that defaults are set
         /// </summary>
         public void EnsureDefaults(IHostingEnvironment env)
