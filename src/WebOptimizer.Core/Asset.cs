@@ -63,11 +63,11 @@ namespace WebOptimizer
             {
                 if (!config.Content.ContainsKey(file))
                 {
-                    DateTime date = await LoadFileContentAsync(options.FileProvider, config, file);
+                    DateTime dateChanged = await LoadFileContentAsync(options.FileProvider, config, file);
 
-                    if (date > lastModified)
+                    if (dateChanged > lastModified)
                     {
-                        lastModified = date;
+                        lastModified = dateChanged;
                     }
                 }
             }
