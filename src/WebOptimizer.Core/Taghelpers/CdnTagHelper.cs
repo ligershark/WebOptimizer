@@ -54,7 +54,7 @@ namespace WebOptimizer.Taghelpers
                 return;
             }
 
-            string value = attr?.Value?.ToString();
+            string value = output.Attributes[attr.Name]?.Value as string ?? attr.Value.ToString();
 
             // Don't modify absolute paths
             if (string.IsNullOrWhiteSpace(value) || value.Contains("://") || value.StartsWith("//"))
