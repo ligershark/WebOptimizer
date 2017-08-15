@@ -72,7 +72,7 @@ namespace WebOptimizer.Taghelpers
             foreach (string file in asset.SourceFiles)
             {
                 string src = AddFileVersionToPath(file);
-                output.PostElement.AppendHtml($"<script src=\"{src}\" {string.Join(" ", attrs)}></script>");
+                output.PostElement.AppendHtml($"<script src=\"{src}\" {string.Join(" ", attrs)}></script>" + Environment.NewLine);
             }
         }
     }

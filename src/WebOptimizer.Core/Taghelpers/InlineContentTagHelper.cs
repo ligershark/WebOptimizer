@@ -90,9 +90,9 @@ namespace WebOptimizer.Taghelpers
                 cacheKey = asset.GenerateCacheKey(ViewContext.HttpContext);
             }
 
-            if (Cache.TryGetValue(cacheKey, out byte[] value))
+            if (Cache.TryGetValue(cacheKey, out MemoryCachedResponse response))
             {
-                return value.AsString();
+                return response.Body.AsString();
             }
 
             if (asset != null)
@@ -132,7 +132,9 @@ namespace WebOptimizer.Taghelpers
                 cacheOptions.AddExpirationToken(Options.FileProvider.Watch(file));
             }
 
-            Cache.Set(cacheKey, value, cacheOptions);
+            var response = new MemoryCachedResponse(200, value);
+
+            Cache.Set(cacheKey, response, cacheOptions);
         }
     }
 }
