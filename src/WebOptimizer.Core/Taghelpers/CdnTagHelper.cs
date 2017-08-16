@@ -7,15 +7,16 @@ namespace WebOptimizer.Taghelpers
     /// <summary>
     /// TagHelper for creating CDN urls.
     /// </summary>
-    [HtmlTargetElement("link", Attributes = "href")]
-    [HtmlTargetElement("img", Attributes = "src")]
-    [HtmlTargetElement("script", Attributes = "src")]
-    [HtmlTargetElement("source", Attributes = "src")]
-    [HtmlTargetElement("audio", Attributes = "src")]
-    [HtmlTargetElement("video", Attributes = "src")]
-    public class CdnTagHelper: TagHelper
+    [HtmlTargetElement("link")]
+    [HtmlTargetElement("img")]
+    [HtmlTargetElement("script")]
+    [HtmlTargetElement("source")]
+    [HtmlTargetElement("audio")]
+    [HtmlTargetElement("video")]
+    public class CdnTagHelper : TagHelper
     {
         private WebOptimizerOptions _options;
+        private static string[] _attributeNames = { "src", "srcset", "href" };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CdnTagHelper"/> class.
@@ -46,25 +47,51 @@ namespace WebOptimizer.Taghelpers
                 return;
             }
 
-            TagHelperAttribute attr = context.AllAttributes.FirstOrDefault(a => a.Name == "src" || a.Name == "href");
+            TagHelperAttribute CdnProp = context.AllAttributes.FirstOrDefault(a => a.Name == "cdn-prop") ??
+                                         output.Attributes.FirstOrDefault(a => a.Name == "cdn-prop");
 
-            // Only add CDN url if attribute is present at render time
-            if (!output.Attributes.ContainsName(attr.Name))
+            string[] attributes = _attributeNames;
+
+            if (CdnProp != null)
             {
-                return;
+                attributes = attributes.Union(new[] { CdnProp.Value.ToString() }).ToArray();
+
+                if (output.Attributes.ContainsName(CdnProp.Name))
+                {
+                    output.Attributes.Remove(CdnProp);
+                }
             }
 
-            string value = output.Attributes[attr.Name]?.Value as string ?? attr.Value.ToString();
-
-            // Don't modify absolute paths
-            if (string.IsNullOrWhiteSpace(value) || value.Contains("://") || value.StartsWith("//"))
+            foreach (string name in attributes)
             {
-                return;
+                TagHelperAttribute attr = context.AllAttributes.FirstOrDefault(a => a.Name == name) ??
+                                          output.Attributes.FirstOrDefault(a => a.Name == name);
+
+                // Only add CDN url if attribute is present at render time
+                if (attr == null || !output.Attributes.ContainsName(attr.Name))
+                {
+                    continue;
+                }
+
+                string attrValue = output.Attributes[attr.Name]?.Value as string ?? attr.Value.ToString();
+
+                // Don't modify absolute paths
+                if (string.IsNullOrWhiteSpace(attrValue) || attrValue.Contains("://") || attrValue.StartsWith("//"))
+                {
+                    continue;
+                }
+
+                string[] values = attrValue.Split(',');
+                string modifiedValue = null;
+
+                foreach (string value in values)
+                {
+                    string fullUrl = _options.CdnUrl.Trim().TrimEnd('/') + "/" + value.Trim().TrimStart('~', '/');
+                    modifiedValue += fullUrl + ", ";
+                }
+
+                output.Attributes.SetAttribute(attr.Name, (modifiedValue ?? attrValue).Trim(',', ' '));
             }
-
-            string cdnUrl = _options.CdnUrl.Trim().TrimEnd('/') + "/" + value.Trim().TrimStart('~', '/');
-
-            output.Attributes.SetAttribute(attr.Name, cdnUrl);
         }
     }
 }
