@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -150,26 +149,5 @@ namespace WebOptimizer
         public IHeaderDictionary Headers { get; set; } = new HeaderDictionary();
 
         public byte[] Body { get; set; }
-    }
-
-    /// <summary>
-    /// Extension methods for <see cref="IAssetPipeline"/>.
-    /// </summary>
-    public static partial class PipelineExtensions
-    {
-        /// <summary>
-        /// Adds WebOptimizer to the <see cref="IApplicationBuilder"/> request execution pipeline
-        /// </summary>
-        public static void UseWebOptimizer(this IApplicationBuilder app)
-        {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
-            var env = (IHostingEnvironment)app.ApplicationServices.GetService(typeof(IHostingEnvironment));
-
-            app.UseMiddleware<AssetMiddleware>();
-        }
     }
 }

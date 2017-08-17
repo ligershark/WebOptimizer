@@ -33,6 +33,7 @@ namespace WebOptimizer
                 throw new ArgumentNullException(nameof(text));
             }
 
+
             return Encoding.UTF8.GetBytes(text);
         }
 
@@ -50,6 +51,7 @@ namespace WebOptimizer
             {
                 stream.Position = 0;
                 await stream.CopyToAsync(ms);
+                ms.Position = 0;
                 return ms.ToArray();
             }
         }
