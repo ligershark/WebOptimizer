@@ -62,16 +62,13 @@ namespace WebOptimizer.Test
         }
 
         [Fact2]
-        public void AddZeroSourceFiles_Fail()
+        public void AddZeroSourceFilesToBundle_Fail()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
             IAsset asset = new Asset("/file.css", "text/css", new string[0]);
             var pipeline = new AssetPipeline();
 
-            asset = pipeline.AddBundle(asset);
-
-            Assert.Equal(1, asset.SourceFiles.Count());
-            Assert.Equal(asset.Route, asset.SourceFiles.First());
+            Assert.Throws<ArgumentException>(() => pipeline.AddBundle(asset));
         }
 
         [Theory2]

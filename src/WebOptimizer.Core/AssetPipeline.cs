@@ -83,6 +83,11 @@ namespace WebOptimizer
 
         public IAsset AddBundle(string route, string contentType, params string[] sourceFiles)
         {
+            if (sourceFiles.Length == 0)
+            {
+                throw new ArgumentException("At least one source file has to be specified", nameof(sourceFiles));
+            }
+
             route = NormalizeRoute(route);
 
             if (Assets.Any(a => a.Route.Equals(route, StringComparison.OrdinalIgnoreCase)))
@@ -90,14 +95,7 @@ namespace WebOptimizer
                 throw new ArgumentException($"The route \"{route}\" was already specified", nameof(route));
             }
 
-            string[] sources = sourceFiles;
-
-            if (sourceFiles.Length == 0)
-            {
-                sources = new[] { route };
-            }
-
-            IAsset asset = new Asset(route, contentType, sources);
+            IAsset asset = new Asset(route, contentType, sourceFiles);
             _assets.Add(asset);
 
             return asset;
