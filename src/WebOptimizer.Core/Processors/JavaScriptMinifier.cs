@@ -46,7 +46,7 @@ namespace WebOptimizer
     public static partial class PipelineExtensions
     {
         /// <summary>
-        /// Dynamically adds all requested .js files to the pipeline.
+        /// Minifies any .js file requested.
         /// </summary>
         public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline)
         {
@@ -54,7 +54,7 @@ namespace WebOptimizer
         }
 
         /// <summary>
-        /// Dynamically adds all requested .js files to the pipeline.
+        /// Minifies any .js file requested.
         /// </summary>
         public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings)
         {
@@ -63,7 +63,7 @@ namespace WebOptimizer
         }
 
         /// <summary>
-        /// Minifies the specified .js files
+        /// Minifies the specified .js files.
         /// </summary>
         public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline, params string[] sourceFiles)
         {
@@ -71,7 +71,7 @@ namespace WebOptimizer
         }
 
         /// <summary>
-        /// Minifies the specified .js files
+        /// Minifies tje specified .js files.
         /// </summary>
         public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings, params string[] sourceFiles)
         {

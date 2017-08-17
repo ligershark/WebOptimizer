@@ -47,7 +47,7 @@ namespace WebOptimizer
     public static partial class PipelineExtensions
     {
         /// <summary>
-        /// Minifies and fingerprints any .html file requested.
+        /// Minifies any .html file requested.
         /// </summary>
         public static IEnumerable<IAsset> MinifyHtmlFiles(this IAssetPipeline pipeline)
         {
@@ -55,7 +55,7 @@ namespace WebOptimizer
         }
 
         /// <summary>
-        /// Minifies and fingerprints any .html file requested.
+        /// Minifies any .html file requested.
         /// </summary>
         public static IEnumerable<IAsset> MinifyHtmlFiles(this IAssetPipeline pipeline, HtmlSettings settings)
         {
@@ -65,7 +65,7 @@ namespace WebOptimizer
 
 
         /// <summary>
-        /// Minifies the specified .html files
+        /// Minifies the specified .html files.
         /// </summary>
         public static IEnumerable<IAsset> MinifyHtmlFiles(this IAssetPipeline pipeline, params string[] sourceFiles)
         {
@@ -73,7 +73,7 @@ namespace WebOptimizer
         }
 
         /// <summary>
-        /// Minifies the specified .html files
+        /// Minifies the specified .html files.
         /// </summary>
         public static IEnumerable<IAsset> MinifyHtmlFiles(this IAssetPipeline pipeline, HtmlSettings settings, params string[] sourceFiles)
         {

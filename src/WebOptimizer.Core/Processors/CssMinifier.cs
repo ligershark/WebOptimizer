@@ -66,7 +66,7 @@ namespace WebOptimizer
 
 
         /// <summary>
-        /// Minifies the specified .css files
+        /// Minifies and fingerprints the specified .css files.
         /// </summary>
         public static IEnumerable<IAsset> MinifyCssFiles(this IAssetPipeline pipeline, params string[] sourceFiles)
         {
@@ -74,7 +74,7 @@ namespace WebOptimizer
         }
 
         /// <summary>
-        /// Minifies the specified .css files
+        /// Minifies and fingerprints the specified .css files.
         /// </summary>
         public static IEnumerable<IAsset> MinifyCssFiles(this IAssetPipeline pipeline, CssSettings settings, params string[] sourceFiles)
         {
