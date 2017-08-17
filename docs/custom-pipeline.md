@@ -1,4 +1,7 @@
-# Custom pipeline
+---
+title: Custom pipeline
+layout: post
+---
 
 You can string together the various components of the pipeline yourself. This is what methods like `AddJsBundle` and `MinifyCssFiles` are doing under the hood.
 
