@@ -211,7 +211,7 @@ Default: **false**
 **CdnUrl** is an absolute URL that, if present, is automatically addeda as a prefix to any script, stylesheet or media file on the page. A Tag Helper is adding the prefix automatically when the Tag Helpers have been registered. See how to [register the Tag Helpers here](#tag-helpers).
 
 ### Custom pipeline
-See more at the [wiki](https://github.com/ligershark/WebOptimizer/wiki/Custom-pipeline).
+Read more in the [custom pipeline documentation](/docs/custom-pipeline.md).
 
 ### Extend
 Extensions can hook up new transformations and consume existing ones. 
