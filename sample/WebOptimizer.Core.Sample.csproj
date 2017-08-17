@@ -21,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\WebOptimizer.Core\WebOptimizer.Core.csproj" />
+        <ProjectReference Include="..\src\WebOptimizer.Core\WebOptimizer.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

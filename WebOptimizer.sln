@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26719.2
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebOptimizer.Core.Sample", "samples\WebOptimizer.Core.Sample\WebOptimizer.Core.Sample.csproj", "{E48DE00D-27F3-417A-9EDF-277483474F49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebOptimizer.Core.Sample", "sample\WebOptimizer.Core.Sample.csproj", "{E48DE00D-27F3-417A-9EDF-277483474F49}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebOptimizer.Core", "src\WebOptimizer.Core\WebOptimizer.Core.csproj", "{FCB6608A-3219-44ED-A400-A735EEB33C40}"
 EndProject
