@@ -24,24 +24,24 @@ namespace BundlerSample
             services.AddResponseCaching();
             services.AddMvc();
 
-            //services.AddWebOptimizer(pipeline =>
-            //{
-            //    pipeline.AddCssBundle("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css")
-            //            .InlineImages();
+            services.AddWebOptimizer(pipeline =>
+            {
+                pipeline.AddCssBundle("/all.css", "css/site.css", "lib/bootstrap/dist/css/bootstrap.css")
+                        .InlineImages();
 
-            //    pipeline.AddJavaScriptBundle("/all.js", "js/site.js", "js/b.js");
+                pipeline.AddJavaScriptBundle("/all.js", "js/site.js", "js/b.js");
 
-            //    pipeline.AddBundle("/demo.txt", "text/plain", "js/site.js", "js/b.js")
-            //            .Concatenate();
+                pipeline.AddBundle("/demo.txt", "text/plain", "js/site.js", "js/b.js")
+                        .Concatenate();
 
-            //    pipeline.MinifyJsFiles("**/*.jsx");
+                pipeline.MinifyJsFiles("**/*.jsx");
 
-            //    pipeline.AddScssBundle("/scss.css", "css/test2.scss", "css/test.scss");
+                pipeline.AddScssBundle("/scss.css", "css/test2.scss", "css/test.scss");
 
-            //    pipeline.MinifyCssFiles("css/site.css").InlineImages();
-            //    pipeline.CompileScssFiles();
-            //    pipeline.ReplaceImages();
-            //});
+                pipeline.MinifyCssFiles("css/site.css").InlineImages();
+                pipeline.CompileScssFiles();
+                pipeline.ReplaceImages();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
