@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Extensions.FileProviders;
 
 namespace WebOptimizer
 {
@@ -37,10 +36,10 @@ namespace WebOptimizer
         IAsset AddBundle(string route, string contentType, params string[] sourceFiles);
 
         /// <summary>
-        /// Compiles the specified .scss files into CSS and makes them servable in the browser.
+        /// Adds an array of files to the optimization pipeline.
         /// </summary>
         /// <param name="contentType">The content type of the response. Example: text/css or application/javascript.</param>
-        /// <param name="sourceFiles">A list of relative file names of the sources to compile.</param>
+        /// <param name="sourceFiles">A list of relative file names or globbing patterns of the sources to add.</param>
         IEnumerable<IAsset> AddFiles(string contentType, params string[] sourceFiles);
 
         /// <summary>
