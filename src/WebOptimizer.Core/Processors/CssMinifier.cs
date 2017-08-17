@@ -47,7 +47,7 @@ namespace WebOptimizer
     public static partial class PipelineExtensions
     {
         /// <summary>
-        /// Minifies and fingerprints any .css file requested.
+        /// Minifies any .css file requested.
         /// </summary>
         public static IEnumerable<IAsset> MinifyCssFiles(this IAssetPipeline pipeline)
         {
@@ -55,7 +55,7 @@ namespace WebOptimizer
         }
 
         /// <summary>
-        /// Minifies and fingerprints any .css file requested.
+        /// Minifies any .css file requested.
         /// </summary>
         public static IEnumerable<IAsset> MinifyCssFiles(this IAssetPipeline pipeline, CssSettings settings)
         {
@@ -66,7 +66,7 @@ namespace WebOptimizer
 
 
         /// <summary>
-        /// Minifies and fingerprints the specified .css files.
+        /// Minifies the specified .css files.
         /// </summary>
         public static IEnumerable<IAsset> MinifyCssFiles(this IAssetPipeline pipeline, params string[] sourceFiles)
         {
@@ -74,7 +74,7 @@ namespace WebOptimizer
         }
 
         /// <summary>
-        /// Minifies and fingerprints the specified .css files.
+        /// Minifies the specified .css files.
         /// </summary>
         public static IEnumerable<IAsset> MinifyCssFiles(this IAssetPipeline pipeline, CssSettings settings, params string[] sourceFiles)
         {
