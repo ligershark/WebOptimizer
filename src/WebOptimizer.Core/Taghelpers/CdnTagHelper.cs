@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace WebOptimizer.Taghelpers
 {
@@ -15,15 +15,15 @@ namespace WebOptimizer.Taghelpers
     [HtmlTargetElement("video")]
     public class CdnTagHelper : TagHelper
     {
-        private WebOptimizerOptions _options;
+        private string _cdnUrl;
         private static string[] _attributeNames = { "src", "srcset", "href" };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CdnTagHelper"/> class.
         /// </summary>
-        public CdnTagHelper(IOptionsSnapshot<WebOptimizerOptions> options)
+        public CdnTagHelper(IConfiguration config)
         {
-            _options = options.Value;
+            _cdnUrl = config["WebOptimizer:CdnUrl"];
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace WebOptimizer.Taghelpers
         /// <param name="output">A stateful HTML element used to generate an HTML tag.</param>
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (string.IsNullOrWhiteSpace(_options.CdnUrl) || string.IsNullOrEmpty(output.TagName))
+            if (string.IsNullOrWhiteSpace(_cdnUrl) || string.IsNullOrEmpty(output.TagName))
             {
                 return;
             }
@@ -86,7 +86,7 @@ namespace WebOptimizer.Taghelpers
 
                 foreach (string value in values)
                 {
-                    string fullUrl = _options.CdnUrl.Trim().TrimEnd('/') + "/" + value.Trim().TrimStart('~', '/');
+                    string fullUrl = _cdnUrl.Trim().TrimEnd('/') + "/" + value.Trim().TrimStart('~', '/');
                     modifiedValue += fullUrl + ", ";
                 }
 
