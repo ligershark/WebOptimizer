@@ -88,6 +88,11 @@ namespace WebOptimizer
                 throw new ArgumentException("At least one source file has to be specified", nameof(sourceFiles));
             }
 
+            if (route.Contains("*") || route.Contains("[") && route.Contains("?"))
+            {
+                throw new ArgumentException($"The route \"{route}\" appears to be a globbing pattern which isn't supported for bundle routes.", nameof(route));
+            }
+
             route = NormalizeRoute(route);
 
             if (Assets.Any(a => a.Route.Equals(route, StringComparison.OrdinalIgnoreCase)))
@@ -103,14 +108,25 @@ namespace WebOptimizer
 
         public IEnumerable<IAsset> AddFiles(string contentType, params string[] sourceFiles)
         {
+            if (string.IsNullOrEmpty(contentType))
+            {
+                throw new ArgumentException("A valid content type must be specified", nameof(contentType));
+            }
+
+            if (sourceFiles.Length == 0)
+            {
+                throw new ArgumentException("At least one source file has to be specified", nameof(sourceFiles));
+            }
+
             var list = new List<IAsset>();
 
             foreach (string file in sourceFiles)
             {
-                IAsset asset = AddBundle($"/{file.TrimStart('/')}", contentType, new[] { file });
-
+                IAsset asset = new Asset(NormalizeRoute(file), contentType, new[] { file });
                 list.Add(asset);
             }
+
+            _assets.AddRange(list);
 
             return list;
         }

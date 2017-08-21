@@ -18,8 +18,14 @@ namespace WebOptimizer
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var response = context.Response;
-            var originalStream = response.Body;
+            if (context.Request.Method != "GET" && context.Request.Method != "HEAD")
+            {
+                await _next(context);
+                return;
+            }
+
+            HttpResponse response = context.Response;
+            Stream originalStream = response.Body;
 
             using (var ms = new MemoryStream())
             {

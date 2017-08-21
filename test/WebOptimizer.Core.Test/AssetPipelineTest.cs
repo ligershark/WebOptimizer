@@ -62,6 +62,17 @@ namespace WebOptimizer.Test
         }
 
         [Fact2]
+        public void AddBundleWithGlobRoute_Throws()
+        {
+            var pipeline = new AssetPipeline();
+
+            var ex = Assert.Throws<ArgumentException>(() => pipeline.AddBundle("/*.css", "text/css", new[] { "source.css" }));
+
+            Assert.Equal("route", ex.ParamName);
+            Assert.Equal(0, pipeline.Assets.Count);
+        }
+
+        [Fact2]
         public void AddZeroSourceFilesToBundle_Fail()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
@@ -121,6 +132,28 @@ namespace WebOptimizer.Test
 
             Assert.True(pipeline.TryGetAssetFromRoute(path, out var a1));
             Assert.Equal($"/{path.TrimStart('/')}", a1.Route);
+        }
+
+        [Fact2]
+        public void AddFilesNoContentType_Throws()
+        {
+            var pipeline = new AssetPipeline();
+
+            var ex = Assert.Throws<ArgumentException>(() => pipeline.AddFiles("", new[] { "file.css" }));
+
+            Assert.Equal("contentType", ex.ParamName);
+            Assert.Equal(0, pipeline.Assets.Count);
+        }
+
+        [Fact2]
+        public void AddFilesNoSourceFiles_Throws()
+        {
+            var pipeline = new AssetPipeline();
+
+            var ex = Assert.Throws<ArgumentException>(() => pipeline.AddFiles("text/css"));
+
+            Assert.Equal("sourceFiles", ex.ParamName);
+            Assert.Equal(0, pipeline.Assets.Count);
         }
     }
 }
