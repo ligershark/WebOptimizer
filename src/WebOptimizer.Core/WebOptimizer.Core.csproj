@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <DocumentationFile>bin\Debug\netstandard1.6\WebOptimizer.Core.xml</DocumentationFile>
+        <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\WebOptimizer.Core.xml</DocumentationFile>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <PackageTags>bundle, minify, optimize, asp.net core</PackageTags>
         <Version>1.0.0-alpha</Version>
@@ -27,6 +27,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Razor.Runtime" Version="2.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.0" />
         <PackageReference Include="NUglify" Version="1.5.8" />
+        <PackageReference Include="WebOptimizer.Analyzers" Version="1.0.0-beta" />
     </ItemGroup>
 
 </Project>
