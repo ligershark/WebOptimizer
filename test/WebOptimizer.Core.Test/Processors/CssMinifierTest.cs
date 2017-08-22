@@ -59,6 +59,20 @@ namespace WebOptimizer.Test.Processors
         }
 
         [Fact2]
+        public async Task MinifyCss_NullSettings_Success()
+        {
+            var minifier = new CssMinifier(null);
+            var context = new Mock<IAssetContext>().SetupAllProperties();
+            context.Object.Content = new Dictionary<string, byte[]> { { "", "body { color: yellow; }".AsByteArray() } };
+            var options = new Mock<WebOptimizerOptions>();
+
+            await minifier.ExecuteAsync(context.Object);
+
+            Assert.Equal("body{color:#ff0}", context.Object.Content.First().Value.AsString());
+            Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
+        }
+
+        [Fact2]
         public void AddCssBundle_DefaultSettings_Success()
         {
             var pipeline = new AssetPipeline();

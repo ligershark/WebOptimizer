@@ -65,8 +65,8 @@ namespace WebOptimizer.Test
         public void AddBundleWithGlobRoute_Throws()
         {
             var pipeline = new AssetPipeline();
-
-            var ex = Assert.Throws<ArgumentException>(() => pipeline.AddBundle("/*.css", "text/css", new[] { "source.css" }));
+            string route = "/*.css";
+            var ex = Assert.Throws<ArgumentException>(() => pipeline.AddBundle(route, "text/css", new[] { "source.css" }));
 
             Assert.Equal("route", ex.ParamName);
             Assert.Equal(0, pipeline.Assets.Count);
@@ -138,8 +138,8 @@ namespace WebOptimizer.Test
         public void AddFilesNoContentType_Throws()
         {
             var pipeline = new AssetPipeline();
-
-            var ex = Assert.Throws<ArgumentException>(() => pipeline.AddFiles("", new[] { "file.css" }));
+            string ct = null;
+            var ex = Assert.Throws<ArgumentException>(() => pipeline.AddFiles(ct, new[] { "file.css" }));
 
             Assert.Equal("contentType", ex.ParamName);
             Assert.Equal(0, pipeline.Assets.Count);
@@ -149,8 +149,8 @@ namespace WebOptimizer.Test
         public void AddFilesNoSourceFiles_Throws()
         {
             var pipeline = new AssetPipeline();
-
-            var ex = Assert.Throws<ArgumentException>(() => pipeline.AddFiles("text/css"));
+            var sourceFiles = new string[0];
+            var ex = Assert.Throws<ArgumentException>(() => pipeline.AddFiles("text/css", sourceFiles));
 
             Assert.Equal("sourceFiles", ex.ParamName);
             Assert.Equal(0, pipeline.Assets.Count);
