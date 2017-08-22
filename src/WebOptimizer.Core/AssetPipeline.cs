@@ -131,9 +131,18 @@ namespace WebOptimizer
             return list;
         }
 
-        private string NormalizeRoute(string route)
+        public static string NormalizeRoute(string route)
         {
-            return "/" + route.Trim().TrimStart('~', '/');
+            string cleanRoute = "/" + route.Trim().TrimStart('~', '/');
+
+            int index = cleanRoute.IndexOfAny(new[] { '?', '#' });
+
+            if (index > -1)
+            {
+                cleanRoute = cleanRoute.Substring(0, index);
+            }
+
+            return cleanRoute;
         }
     }
 

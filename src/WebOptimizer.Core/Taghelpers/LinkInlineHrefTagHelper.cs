@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -15,15 +14,12 @@ namespace WebOptimizer.Taghelpers
     /// Tag helper for inlining CSS
     /// </summary>
     [HtmlTargetElement("link", Attributes = "inline, href")]
-    [HtmlTargetElement("script", Attributes = "inline, src")]
-    public class InlineContentTagHelper : BaseTagHelper
+    public class LinkInlineHrefTagHelper : BaseTagHelper
     {
-        private string _route;
-
         /// <summary>
         /// Tag helper for inlining content
         /// </summary>
-        public InlineContentTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsSnapshot<WebOptimizerOptions> options)
+        public LinkInlineHrefTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsSnapshot<WebOptimizerOptions> options)
             : base(env, cache, pipeline, options)
         { }
 
@@ -31,6 +27,11 @@ namespace WebOptimizer.Taghelpers
         /// Makes sure this taghelper runs before the built in ones.
         /// </summary>
         public override int Order => base.Order + 1;
+
+        /// <summary>
+        /// Gets or sets the href attribute
+        /// </summary>
+        public string Href { get; set; }
 
         /// <summary>
         /// Creates a tag helper for inlining content
@@ -43,41 +44,17 @@ namespace WebOptimizer.Taghelpers
                 return;
             }
 
-            if (output.TagName.Equals("link", StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(Href))
             {
                 output.TagName = "style";
-                ParseRoute(context.AllAttributes["href"].Value.ToString());
                 output.Attributes.Clear();
-            }
-            else if (output.TagName.Equals("script", StringComparison.OrdinalIgnoreCase))
-            {
-                ParseRoute(context.AllAttributes["src"].Value.ToString());
-                output.Attributes.RemoveAll("inline");
-                output.Attributes.RemoveAll("integrity");
-                output.Attributes.RemoveAll("language");
-                output.Attributes.RemoveAll("src");
-                output.Attributes.RemoveAll("async");
-                output.Attributes.RemoveAll("defer");
-            }
 
-            Options.EnsureDefaults(HostingEnvironment);
-            string content = await GetFileContentAsync(_route);
+                Options.EnsureDefaults(HostingEnvironment);
+                string route = AssetPipeline.NormalizeRoute(Href);
+                string content = await GetFileContentAsync(route);
 
-            output.Content.SetHtmlContent(content);
-            output.TagMode = TagMode.StartTagAndEndTag;
-        }
-
-        private void ParseRoute(string route)
-        {
-            int index = route.IndexOfAny(new[] { '?', '#' });
-
-            if (index > -1)
-            {
-                _route = route.Substring(0, index);
-            }
-            else
-            {
-                _route = route;
+                output.Content.SetHtmlContent(content);
+                output.TagMode = TagMode.StartTagAndEndTag;
             }
         }
 
