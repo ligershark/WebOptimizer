@@ -47,13 +47,13 @@ namespace WebOptimizer
                 matcher.AddInclude(sourceFile);
                 PatternMatchingResult globbingResult = matcher.Execute(dir);
                 IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
-                files.AddRange(fileMatches.Where(f => !files.Contains(f)));
-            }
 
-            if (files.Count == 0)
-            {
-                string glob = string.Join(", ", SourceFiles);
-                throw new FileNotFoundException($"No files found matching \"{glob}\" exist in \"{dir.FullName}\"");
+                if (!fileMatches.Any())
+                {
+                    throw new FileNotFoundException($"No files found matching \"{sourceFile}\" exist in \"{dir.FullName}\"");
+                }
+
+                files.AddRange(fileMatches.Where(f => !files.Contains(f)));
             }
 
             DateTime lastModified = DateTime.MinValue;
