@@ -141,6 +141,23 @@ When using bundling, we have to update our `<script>` and `<link>` tags to point
 <link rel="stylesheet" href="/css/bundle.css" />
 ```
 
+### Content Root vs. Web Root
+By default, all bundle source files are relative to the Web Root (*wwwroot*) folder, but you can change it to be relative to the Content Root instead.
+
+> The Content Root folder is usually the project root directory, which is the parent directory of *wwwroot*.
+
+As an example, lets create a bundle of files found in a folder called node_modules that exist in the Content Root:
+
+```csharp
+services.AddWebOptimizer(pipeline =>
+{
+    pipeline.AddCssBundle("/css/bundle.css", "node_modules/jquery/dist/*.js")
+            .UseContentRoot();
+});
+```
+
+The `UseContentRoot()` method makes the bundle look for source files in the Content Root rather than in the Web Root.
+
 ## Tag Helpers
 WebOptimizer ships with a few [Tag Helpers](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/intro) that helps with a few important tasks.
 
