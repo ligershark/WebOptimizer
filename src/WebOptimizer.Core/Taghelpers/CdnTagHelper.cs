@@ -65,6 +65,12 @@ namespace WebOptimizer
                 return;
             }
 
+            if (output.Attributes.ContainsName("no-cdn"))
+            {
+                output.Attributes.RemoveAll("cdn-prop");
+                return;
+            }
+
             if (_attributes.TryGetValue(output.TagName, out var attributeNames))
             {
                 foreach (string attrName in attributeNames)
@@ -76,6 +82,7 @@ namespace WebOptimizer
             if (output.Attributes.TryGetAttribute("cdn-prop", out var prop))
             {
                 PrependCdnUrl(output, "cdn-prop");
+                output.Attributes.RemoveAll("cdn-prop");
             }
         }
 
