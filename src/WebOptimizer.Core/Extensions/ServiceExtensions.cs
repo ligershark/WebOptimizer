@@ -17,9 +17,9 @@ namespace WebOptimizer
         /// <param name="services">The service collection.</param>
         /// <param name="minifyJavaScript">If <code>true</code>; calls <code>AddJs()</code> on the pipeline.</param>
         /// <param name="minifyCss">If <code>true</code>; calls <code>AddCss()</code> on the pipeline.</param>
-        public static IAssetPipeline AddWebOptimizer(this IServiceCollection services, bool minifyJavaScript = true, bool minifyCss = true)
+        public static IServiceCollection AddWebOptimizer(this IServiceCollection services, bool minifyJavaScript = true, bool minifyCss = true)
         {
-            return services.AddWebOptimizer(pipeline =>
+            services.AddWebOptimizer(pipeline =>
             {
                 if (minifyCss)
                 {
@@ -31,12 +31,14 @@ namespace WebOptimizer
                     pipeline.MinifyJsFiles();
                 }
             });
+
+            return services;
         }
 
         /// <summary>
         /// Adds WebOptimizer to the specified <see cref="IServiceCollection"/>.
         /// </summary>
-        public static IAssetPipeline AddWebOptimizer(this IServiceCollection services, Action<IAssetPipeline> assetPipeline)
+        public static IServiceCollection AddWebOptimizer(this IServiceCollection services, Action<IAssetPipeline> assetPipeline)
         {
             if (services == null)
             {
@@ -55,7 +57,7 @@ namespace WebOptimizer
             services.AddSingleton<IAssetPipeline, AssetPipeline>(factory => pipeline);
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<WebOptimizerOptions>, WebOptimizerConfig>());
 
-            return pipeline;
+            return services;
         }
     }
 }

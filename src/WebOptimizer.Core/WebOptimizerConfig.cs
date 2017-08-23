@@ -13,6 +13,7 @@ namespace WebOptimizer
             _config = config;
             _options = options;
         }
+
         public void Configure(WebOptimizerOptions options)
         {
             _config.GetReloadToken().RegisterChangeCallback(_ =>

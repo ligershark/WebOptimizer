@@ -35,6 +35,7 @@ namespace BundlerSample
                         .Concatenate();
 
                 pipeline.MinifyJsFiles("**/*.jsx");
+                pipeline.AddBundle("test.res", "text/xml", "Resources/Strings.resx").UseContentRoot();
 
                 pipeline.AddScssBundle("/scss.css", "css/test2.scss", "css/test.scss");
 

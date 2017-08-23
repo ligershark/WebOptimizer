@@ -79,12 +79,12 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Generates a has of the file.
         /// </summary>
-        protected string AddFileVersionToPath(string fileName)
+        protected string AddFileVersionToPath(string fileName, IAsset asset)
         {
             if (_fileProvider == null)
             {
                 _fileProvider = new FileVersionProvider(
-                    Options.FileProvider,
+                    asset.GetFileProvider(HostingEnvironment),
                     Cache,
                     ViewContext.HttpContext.Request.PathBase);
             }

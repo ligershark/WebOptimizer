@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 
 namespace WebOptimizer.Taghelpers
@@ -80,21 +81,21 @@ namespace WebOptimizer.Taghelpers
             {
                 byte[] contents = await asset.ExecuteAsync(ViewContext.HttpContext, Options);
 
-                AddToCache(cacheKey, contents, asset.SourceFiles.ToArray());
+                AddToCache(cacheKey, contents, asset.GetFileProvider(HostingEnvironment), asset.SourceFiles.ToArray());
                 string s = contents.AsString();
 
                 return s ?? $"/* File '{route}' not found */";
             }
             else
             {
-                string file = Options.FileProvider.GetFileInfo(route.TrimStart('~')).PhysicalPath;
+                string file = HostingEnvironment.WebRootFileProvider.GetFileInfo(route.TrimStart('~')).PhysicalPath;
 
                 if (File.Exists(file))
                 {
                     using (FileStream fs = File.OpenRead(file))
                     {
                         byte[] content = await fs.AsBytesAsync();
-                        AddToCache(cacheKey, content, file);
+                        AddToCache(cacheKey, content, HostingEnvironment.WebRootFileProvider, file);
 
                         return content.AsString();
                     }
@@ -104,13 +105,13 @@ namespace WebOptimizer.Taghelpers
             throw new FileNotFoundException("File or bundle doesn't exist", route);
         }
 
-        private void AddToCache(string cacheKey, byte[] value, params string[] files)
+        private void AddToCache(string cacheKey, byte[] value, IFileProvider fileProvider, params string[] files)
         {
             var cacheOptions = new MemoryCacheEntryOptions();
 
             foreach (string file in files)
             {
-                cacheOptions.AddExpirationToken(Options.FileProvider.Watch(file));
+                cacheOptions.AddExpirationToken(fileProvider.Watch(file));
             }
 
             var response = new MemoryCachedResponse(200, value);

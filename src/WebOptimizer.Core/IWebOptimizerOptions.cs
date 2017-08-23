@@ -19,11 +19,6 @@ namespace WebOptimizer
         bool? EnableTagHelperBundling { get; set; }
 
         /// <summary>
-        /// Gets the file provider.
-        /// </summary>
-        IFileProvider FileProvider { get; }
-
-        /// <summary>
         /// Gets the CDN url used for TagHelpers.
         /// </summary>
         string CdnUrl { get; }

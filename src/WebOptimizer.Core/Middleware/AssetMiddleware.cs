@@ -67,23 +67,23 @@ namespace WebOptimizer
                     return;
                 }
 
-                AddToCache(cacheKey, response, asset.SourceFiles, options);
+                AddToCache(cacheKey, response, asset, options);
 
                 await WriteOutputAsync(context, asset, response, cacheKey, options).ConfigureAwait(false);
                 _logger.LogGeneratedOutput(context.Request.Path);
             }
         }
 
-        private void AddToCache(string cacheKey, MemoryCachedResponse value, IEnumerable<string> files, WebOptimizerOptions options)
+        private void AddToCache(string cacheKey, MemoryCachedResponse value, IAsset asset, WebOptimizerOptions options)
         {
             if (options.EnableCaching == true)
             {
                 var cacheOptions = new MemoryCacheEntryOptions();
                 cacheOptions.SetSlidingExpiration(TimeSpan.FromHours(24));
 
-                foreach (string file in files)
+                foreach (string file in asset.SourceFiles)
                 {
-                    cacheOptions.AddExpirationToken(options.FileProvider.Watch(file));
+                    cacheOptions.AddExpirationToken(asset.GetFileProvider(_env).Watch(file));
                 }
 
                 _cache.Set(cacheKey, value, cacheOptions);
@@ -117,9 +117,13 @@ namespace WebOptimizer
                 context.Response.Headers[name] = cachedResponse.Headers[name];
             }
 
-            if (options.EnableCaching == true && !string.IsNullOrEmpty(cacheKey))
+            if (!string.IsNullOrEmpty(cacheKey))
             {
-                context.Response.Headers[HeaderNames.CacheControl] = $"max-age=31536000"; // 1 year
+                if (options.EnableCaching == true)
+                {
+                    context.Response.Headers[HeaderNames.CacheControl] = $"max-age=31536000"; // 1 year
+                }
+
                 context.Response.Headers[HeaderNames.ETag] = $"\"{cacheKey}\"";
 
                 if (IsConditionalGet(context, cacheKey))

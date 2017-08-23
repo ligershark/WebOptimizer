@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.FileProviders;
@@ -22,6 +23,7 @@ namespace WebOptimizer
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             SourceFiles = sourceFiles ?? throw new ArgumentNullException(nameof(sourceFiles));
             Processors = new List<IProcessor>();
+            Items = new Dictionary<string, object>();
         }
 
         public string Route { get; private set; }
@@ -32,9 +34,12 @@ namespace WebOptimizer
 
         public IList<IProcessor> Processors { get; }
 
+        public IDictionary<string, object> Items { get; }
+
         public async Task<byte[]> ExecuteAsync(HttpContext context, IWebOptimizerOptions options)
         {
-            string root = options.FileProvider.GetFileInfo("/").PhysicalPath;
+            var env = (IHostingEnvironment)context.RequestServices.GetService(typeof(IHostingEnvironment));
+            string root = this.GetFileProvider(env).GetFileInfo("/").PhysicalPath;
             var config = new AssetContext(context, this, options);
 
             // Handle globbing
@@ -63,7 +68,7 @@ namespace WebOptimizer
             {
                 if (!config.Content.ContainsKey(file))
                 {
-                    DateTime dateChanged = await LoadFileContentAsync(options.FileProvider, config, file);
+                    DateTime dateChanged = await LoadFileContentAsync(this.GetFileProvider(env), config, file);
 
                     if (dateChanged > lastModified)
                     {
@@ -130,7 +135,7 @@ namespace WebOptimizer
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
-    internal static class AssetExtensions
+    public static class AssetExtensions
     {
         internal static IEnumerable<IAsset> AddProcessor(this IEnumerable<IAsset> assets, Func<IAsset, IAsset> processor)
         {
@@ -142,6 +147,14 @@ namespace WebOptimizer
             }
 
             return list;
+        }
+
+        /// <summary>
+        /// Gets the file provider.
+        /// </summary>
+        public static IFileProvider GetFileProvider(this IAsset asset, IHostingEnvironment env)
+        {
+            return asset.IsUsingContentRoot() ? env.ContentRootFileProvider : env.WebRootFileProvider;
         }
     }
 }

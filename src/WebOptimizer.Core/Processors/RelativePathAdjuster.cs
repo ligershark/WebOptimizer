@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
 
 namespace WebOptimizer
@@ -15,12 +16,14 @@ namespace WebOptimizer
         public override Task ExecuteAsync(IAssetContext config)
         {
             var content = new Dictionary<string, byte[]>();
+            var env = (IHostingEnvironment)config.HttpContext.RequestServices.GetService(typeof(IHostingEnvironment));
             var pipeline = (IAssetPipeline)config.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
+            IFileProvider fileProvider = config.Asset.GetFileProvider(env);
 
             foreach (string key in config.Content.Keys)
             {
-                IFileInfo input = config.Options.FileProvider.GetFileInfo(key);
-                IFileInfo output = config.Options.FileProvider.GetFileInfo(config.Asset.Route);
+                IFileInfo input = fileProvider.GetFileInfo(key);
+                IFileInfo output = fileProvider.GetFileInfo(config.Asset.Route);
 
                 content[key] = Adjust(config.Content[key].AsString(), input.PhysicalPath, output.PhysicalPath);
             }

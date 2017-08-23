@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
 using WebOptimizer;
@@ -14,8 +15,9 @@ namespace BundlerSample
         public async Task ExecuteAsync(IAssetContext context)
         {
             var pipeline = (IAssetPipeline)context.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
+            var env = (IHostingEnvironment)context.HttpContext.RequestServices.GetService(typeof(IHostingEnvironment));
             var content = new Dictionary<string, byte[]>();
-            IFileInfo file = context.Options.FileProvider.GetFileInfo("/images/logo.png");
+            IFileInfo file = context.Asset.GetFileProvider(env).GetFileInfo("/images/logo.png");
 
             using (Stream fs = file.CreateReadStream())
             {

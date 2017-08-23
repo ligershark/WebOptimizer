@@ -2,7 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Moq;
 using Xunit;
@@ -25,18 +27,26 @@ namespace WebOptimizer.Test.Processors
             var pipeline = new Mock<IAssetPipeline>().SetupAllProperties();
             var inputFile = new PhysicalFileInfo(new FileInfo(@"c:\source\css\site.css"));
             var outputFile = new PhysicalFileInfo(new FileInfo(@"c:\source\dist\all.css"));
-            var options = new Mock<WebOptimizerOptions>().SetupAllProperties();
+            var asset = new Mock<IAsset>().SetupAllProperties();
+            var env = new Mock<IHostingEnvironment>();
+            var fileProvider = new Mock<IFileProvider>();
 
             context.SetupGet(s => s.Asset.Route)
                    .Returns("/my/route.css");
 
-            context.SetupGet(s => s.Options)
-                   .Returns(options.Object);
-
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IAssetPipeline)))
                    .Returns(pipeline.Object);
 
-            options.SetupSequence(s => s.FileProvider.GetFileInfo(It.IsAny<string>()))
+            context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IHostingEnvironment)))
+                   .Returns(env.Object);
+
+            context.SetupGet(s => s.Asset)
+                   .Returns(asset.Object);
+
+            env.SetupGet(e => e.WebRootFileProvider)
+                 .Returns(fileProvider.Object);
+
+            fileProvider.SetupSequence(f => f.GetFileInfo(It.IsAny<string>()))
                    .Returns(inputFile)
                    .Returns(outputFile);
 

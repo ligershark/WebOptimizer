@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.FileProviders;
 
 namespace WebOptimizer
 {
@@ -21,16 +20,6 @@ namespace WebOptimizer
         public bool? EnableTagHelperBundling { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to use the content root instead of the webroot.
-        /// </summary>
-        public bool? UseContentRoot { get; set; }
-
-        /// <summary>
-        /// Gets the file provider.
-        /// </summary>
-        public virtual IFileProvider FileProvider { get; private set; }
-
-        /// <summary>
         /// Gets the CDN url used for TagHelpers.
         /// </summary>
         public string CdnUrl { get; set; }
@@ -47,9 +36,6 @@ namespace WebOptimizer
 
             EnableCaching = EnableCaching ?? true;
             EnableTagHelperBundling = EnableTagHelperBundling ?? true;
-            UseContentRoot = UseContentRoot ?? false;
-
-            FileProvider = UseContentRoot == true ? env.ContentRootFileProvider : env.WebRootFileProvider;
         }
     }
 }

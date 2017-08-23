@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.FileProviders;
 
 namespace WebOptimizer
 {
@@ -18,6 +19,11 @@ namespace WebOptimizer
         /// Gets a list of processors
         /// </summary>
         IList<IProcessor> Processors { get; }
+
+        /// <summary>
+        /// Gets the items collection for the asset.
+        /// </summary>
+        IDictionary<string, object> Items { get; }
 
         /// <summary>
         /// Gets the route to the bundle output.

@@ -204,10 +204,6 @@ Default: **true**
 
 Default: **true**
 
-**UseContentRoot** allows you to use files from behind the `wwwroot` folder as source files to bundles.
-
-Default: **false**
-
 **CdnUrl** is an absolute URL that, if present, is automatically addeda as a prefix to any script, stylesheet or media file on the page. A Tag Helper is adding the prefix automatically when the Tag Helpers have been registered. See how to [register the Tag Helpers here](#tag-helpers).
 
 ### Custom pipeline

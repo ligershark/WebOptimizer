@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Moq;
 using Xunit;
@@ -22,6 +24,9 @@ namespace WebOptimizer.Test.Processors
             var processor = new CssImageInliner(5120);
             var context = new Mock<IAssetContext>().SetupAllProperties();
             var pipeline = new Mock<IAssetPipeline>().SetupAllProperties();
+            var asset = new Mock<IAsset>().SetupAllProperties();
+            var env = new Mock<IHostingEnvironment>();
+            var fileProvider = new Mock<IFileProvider>();
 
             string temp = Path.GetTempPath();
             string path = Path.Combine(temp, "css", "img");
@@ -39,12 +44,18 @@ namespace WebOptimizer.Test.Processors
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IAssetPipeline)))
                    .Returns(pipeline.Object);
 
-            var options = new Mock<WebOptimizerOptions>();
-            options.Setup(s => s.FileProvider.GetFileInfo(It.IsAny<string>()))
-                   .Returns(inputFile);
+            context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IHostingEnvironment)))
+                  .Returns(env.Object);
 
-            context.SetupGet(s => s.Options)
-                   .Returns(options.Object);
+            context.SetupGet(s => s.Asset)
+                        .Returns(asset.Object);
+
+            env.SetupGet(e => e.WebRootFileProvider)
+                 .Returns(fileProvider.Object);
+
+            fileProvider.SetupSequence(f => f.GetFileInfo(It.IsAny<string>()))
+                   .Returns(inputFile)
+                   .Returns(outputFile);
 
             context.Object.Content = new Dictionary<string, byte[]> { { "css/site.css", url.AsByteArray() } };
 

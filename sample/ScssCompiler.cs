@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
 using SharpScss;
@@ -15,11 +16,13 @@ namespace BundlerSample
         {
             context.HttpContext.Response.Headers["Vary"] = "ost";
             var pipeline = (IAssetPipeline)context.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
+            var env = (IHostingEnvironment)context.HttpContext.RequestServices.GetService(typeof(IHostingEnvironment));
             var content = new Dictionary<string, byte[]>();
+            IFileProvider fileProvider = context.Asset.GetFileProvider(env);
 
             foreach (string route in context.Content.Keys)
             {
-                IFileInfo file = context.Options.FileProvider.GetFileInfo(route);
+                IFileInfo file = fileProvider.GetFileInfo(route);
                 var settings = new ScssOptions { InputFile = file.PhysicalPath };
 
                 ScssResult result = Scss.ConvertToCss(context.Content[route].AsString(), settings);
