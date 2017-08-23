@@ -67,7 +67,7 @@ namespace WebOptimizer.Test.Processors
             Assert.Equal("/foo.js", asset.Route);
             Assert.Equal("application/javascript; charset=UTF-8", asset.ContentType);
             Assert.Equal(2, asset.SourceFiles.Count());
-            Assert.Equal(2, asset.Processors.Count);
+            Assert.Equal(3, asset.Processors.Count);
         }
 
         [Fact2]
@@ -80,7 +80,7 @@ namespace WebOptimizer.Test.Processors
             Assert.Equal("/foo.js", asset.Route);
             Assert.Equal("application/javascript; charset=UTF-8", asset.ContentType);
             Assert.Equal(2, asset.SourceFiles.Count());
-            Assert.Equal(2, asset.Processors.Count);
+            Assert.Equal(3, asset.Processors.Count);
         }
 
         [Fact2]
