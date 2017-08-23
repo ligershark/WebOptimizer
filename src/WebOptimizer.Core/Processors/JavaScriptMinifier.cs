@@ -22,6 +22,7 @@ namespace WebOptimizer
             {
                 if (key.EndsWith(".min.js"))
                     continue;
+
                 string input = config.Content[key].AsString();
                 UglifyResult result = Uglify.Js(input, Settings);
                 string minified = result.Code;
@@ -58,8 +59,7 @@ namespace WebOptimizer
         /// </summary>
         public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings)
         {
-            return pipeline.AddFiles("application/javascript; charset=UTF-8", "**/*.js")
-                           .MinifyJavaScript(settings);
+            return pipeline.MinifyJsFiles(settings, "**/*.js");
         }
 
         /// <summary>
@@ -93,6 +93,7 @@ namespace WebOptimizer
         public static IAsset AddJavaScriptBundle(this IAssetPipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
         {
             return pipeline.AddBundle(route, "application/javascript; charset=UTF-8", sourceFiles)
+                           .EnforceFileExtensions(".js", ".jsx", ".es5", ".es6")
                            .Concatenate()
                            .MinifyJavaScript(settings);
         }

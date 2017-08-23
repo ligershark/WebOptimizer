@@ -95,6 +95,7 @@ namespace WebOptimizer
         public static IAsset AddHtmlBundle(this IAssetPipeline pipeline, string route, HtmlSettings settings, params string[] sourceFiles)
         {
             return pipeline.AddBundle(route, "text/html; charset=UTF-8", sourceFiles)
+                           .EnforceFileExtensions(".htm", ".html", ".xhtml", ".xhtm", ".shtml", ".shtm", ".js", ".nj", ".njk", ".njs", ".nunj", ".nunjs", ".nunjucks", ".smarty", ".svg", ".tpl", ".vue", ".vash", ".ejs", ".erb", ".liquid", ".lava", "..spark", ".cfm", ".kit", ".brail", ".twig", ".tag")
                            .Concatenate()
                            .MinifyHtml(settings);
         }

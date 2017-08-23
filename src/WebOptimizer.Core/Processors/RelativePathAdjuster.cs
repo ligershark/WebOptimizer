@@ -104,7 +104,6 @@ namespace WebOptimizer
     /// </summary>
     public static partial class PipelineExtensions
     {
-
         /// <summary>
         /// Adjusts the relative paths in CSS documents.
         /// </summary>

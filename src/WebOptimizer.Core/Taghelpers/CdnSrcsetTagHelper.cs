@@ -4,7 +4,8 @@ using Microsoft.Extensions.Configuration;
 namespace WebOptimizer.Taghelpers
 {
     /// <summary>Handles src attributes</summary>
-    [HtmlTargetElement("*", Attributes = "srcset")]
+    [HtmlTargetElement("img", Attributes = "srcset")]
+    [HtmlTargetElement("source", Attributes = "srcset")]
     public class CdnSrcsetTagHelper : CdnBaseTagHelper
     {
         /// <summary>Initializes a new instance of the <see cref="CdnSrcTagHelper"/> class.</summary>

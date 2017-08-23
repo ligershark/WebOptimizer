@@ -98,6 +98,7 @@ namespace WebOptimizer
         public static IAsset AddCssBundle(this IAssetPipeline pipeline, string route, CssSettings settings, params string[] sourceFiles)
         {
             return pipeline.AddBundle(route, "text/css; charset=UTF-8", sourceFiles)
+                           .EnforceFileExtensions(".css")
                            .AdjustRelativePaths()
                            .Concatenate()
                            .FingerprintUrls()
