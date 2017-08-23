@@ -19,27 +19,18 @@ namespace WebOptimizer
         /// <param name="minifyCss">If <code>true</code>; calls <code>AddCss()</code> on the pipeline.</param>
         public static IAssetPipeline AddWebOptimizer(this IServiceCollection services, bool minifyJavaScript = true, bool minifyCss = true)
         {
-            if (services == null)
+            return services.AddWebOptimizer(pipeline =>
             {
-                throw new ArgumentNullException(nameof(services));
-            }
+                if (minifyCss)
+                {
+                    pipeline.MinifyCssFiles();
+                }
 
-            var pipeline = new AssetPipeline();
-
-            if (minifyCss)
-            {
-                pipeline.MinifyCssFiles();
-            }
-
-            if (minifyJavaScript)
-            {
-                pipeline.MinifyJsFiles();
-            }
-
-            services.TryAddSingleton<IMemoryCache, MemoryCache>();
-            services.AddSingleton<IAssetPipeline, AssetPipeline>(factory => pipeline);
-
-            return pipeline;
+                if (minifyJavaScript)
+                {
+                    pipeline.MinifyJsFiles();
+                }
+            });
         }
 
         /// <summary>

@@ -5,6 +5,7 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace WebOptimizer
 {
@@ -39,9 +40,9 @@ namespace WebOptimizer
         /// <summary>
         /// Initializes a new instance of the <see cref="CdnTagHelper"/> class.
         /// </summary>
-        public CdnTagHelper(IConfiguration config)
+        public CdnTagHelper(IOptionsSnapshot<WebOptimizerOptions> options)
         {
-            _cdnUrl = config["WebOptimizer:CdnUrl"];
+            _cdnUrl = options.Value.CdnUrl;
         }
 
         /// <summary>
