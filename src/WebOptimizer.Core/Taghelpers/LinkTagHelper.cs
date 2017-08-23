@@ -30,11 +30,10 @@ namespace WebOptimizer.Taghelpers
         {
             if (string.IsNullOrEmpty(output.TagName))
             {
-                // output.SuppressOutput() was called by another TagHelper before this one
                 return;
             }
 
-            string href = context.AllAttributes["href"].Value.ToString();
+            string href = CdnTagHelper.GetValue("href", output);
 
             if (Pipeline.TryGetAssetFromRoute(href, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {

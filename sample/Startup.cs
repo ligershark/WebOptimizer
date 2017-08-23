@@ -29,7 +29,7 @@ namespace BundlerSample
                 pipeline.AddCssBundle("/all.css", "lib/bootstrap/dist/css/bootstrap.css", "css/site.css")
                         .InlineImages();
 
-                pipeline.AddJavaScriptBundle("/all.js", "js/site.js", "js/b.js2");
+                pipeline.AddJavaScriptBundle("/all.js", "js/site.js", "js/b.js");
 
                 pipeline.AddBundle("/demo.txt", "text/plain", "js/site.js", "js/b.js")
                         .Concatenate();

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Bundler</title>
     <link rel="stylesheet" href="~/all.css" />
-    <link rel="stylesheet" href="~/css/b.css" inline />
+    <link rel="stylesheet" href="~/css/b.css" inline scoped />
 </head>
 <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -38,7 +38,7 @@
     </div>
 
     <environment include="Development">
-        <script src="~/lib/jquery/dist/jquery.js" asp-append-version="true"></script>
+        <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js" asp-append-version="true"></script>
     </environment>
     <environment exclude="Development">

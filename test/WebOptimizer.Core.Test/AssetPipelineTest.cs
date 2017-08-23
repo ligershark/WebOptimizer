@@ -135,6 +135,15 @@ namespace WebOptimizer.Test
         }
 
         [Fact2]
+        public void FromRoute_Null_Success()
+        {
+            var pipeline = new AssetPipeline();
+
+            Assert.False(pipeline.TryGetAssetFromRoute(null, out var a1));
+            Assert.Null(a1);
+        }
+
+        [Fact2]
         public void AddFilesNoContentType_Throws()
         {
             var pipeline = new AssetPipeline();

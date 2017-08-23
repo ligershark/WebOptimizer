@@ -16,7 +16,7 @@ namespace WebOptimizer
             asset = null;
 
             // Bail if this is an absolute path
-            if (route.StartsWith("//") || route.Contains("://"))
+            if (string.IsNullOrEmpty(route) || route.StartsWith("//") || route.Contains("://"))
             {
                 return false;
             }

@@ -11,7 +11,7 @@ namespace WebOptimizer.Taghelpers
     /// <summary>
     /// A TagHelper for hooking JavaScript bundles up to the HTML page.
     /// </summary>
-    [HtmlTargetElement("script", Attributes = "src")]
+    [HtmlTargetElement("script")]
     public class ScriptTagHelper : BaseTagHelper
     {
         /// <summary>
@@ -28,11 +28,10 @@ namespace WebOptimizer.Taghelpers
         {
             if (string.IsNullOrEmpty(output.TagName))
             {
-                // output.SuppressOutput() was called by another TagHelper before this one
                 return;
             }
 
-            string src = context.AllAttributes["src"].Value.ToString();
+            string src = CdnTagHelper.GetValue("src", output);
 
             if (Pipeline.TryGetAssetFromRoute(src, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
@@ -41,13 +40,14 @@ namespace WebOptimizer.Taghelpers
                 if (Options.EnableTagHelperBundling == true)
                 {
                     src = GenerateHash(asset);
-                    output.Attributes.SetAttribute("src", src);
                 }
                 else
                 {
                     WriteIndividualTags(output, asset);
                 }
             }
+
+            output.Attributes.SetAttribute("src", src);
         }
 
         private void WriteIndividualTags(TagHelperOutput output, IAsset asset)

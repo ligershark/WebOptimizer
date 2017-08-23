@@ -30,6 +30,16 @@ namespace WebOptimizer
         public ViewContext ViewContext { get; set; }
 
         /// <summary>
+        /// Initializes the <see cref="T:Microsoft.AspNetCore.Razor.TagHelpers.ITagHelper" /> with the given <paramref name="context" />. Additions to
+        /// <see cref="P:Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext.Items" /> should be done within this method to ensure they're added prior to
+        /// executing the children.
+        /// </summary>
+        public override void Init(TagHelperContext context)
+        {
+            ViewContext.HttpContext.GetOrCreateNonce();
+        }
+
+        /// <summary>
         /// Synchronously executes the <see cref="T:Microsoft.AspNetCore.Razor.TagHelpers.TagHelper" /> with the given <paramref name="context" /> and
         /// <paramref name="output" />.
         /// </summary>

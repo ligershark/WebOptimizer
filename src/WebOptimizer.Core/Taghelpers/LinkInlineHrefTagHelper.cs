@@ -40,14 +40,20 @@ namespace WebOptimizer.Taghelpers
         {
             if (string.IsNullOrEmpty(output.TagName))
             {
-                // output.SuppressOutput() was called by another TagHelper before this one
                 return;
             }
 
             if (!string.IsNullOrEmpty(Href))
             {
+                TagHelperAttribute scoped = GetScoped(output);
                 output.TagName = "style";
                 output.Attributes.Clear();
+
+                // Make sure to use add the scope attribute if the user specified it
+                if (scoped != null)
+                {
+                    output.Attributes.Add(scoped);
+                }
 
                 Options.EnsureDefaults(HostingEnvironment);
                 string route = AssetPipeline.NormalizeRoute(Href);
@@ -56,6 +62,16 @@ namespace WebOptimizer.Taghelpers
                 output.Content.SetHtmlContent(content);
                 output.TagMode = TagMode.StartTagAndEndTag;
             }
+        }
+
+        private TagHelperAttribute GetScoped(TagHelperOutput output)
+        {
+            if (output.Attributes.TryGetAttribute("scoped", out var attr))
+            {
+                return attr;
+            }
+
+            return null;
         }
 
         private async Task<string> GetFileContentAsync(string route)
