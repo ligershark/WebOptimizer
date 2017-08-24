@@ -117,7 +117,7 @@ namespace WebOptimizer
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
-    public static partial class PipelineExtensions
+    public static partial class AssetPipelineExtensions
     {
         /// <summary>
         /// Inlines url() references as base64 encoded strings if the image size is below <paramref name="maxFileSize"/>.

@@ -30,7 +30,7 @@ namespace WebOptimizer
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
-    public static partial class PipelineExtensions
+    public static partial class AssetPipelineExtensions
     {
         /// <summary>
         /// Adds the string content of all source files to the pipeline.

@@ -95,9 +95,15 @@ namespace WebOptimizer
         {
             IFileInfo file = fileProvider.GetFileInfo(sourceFile);
 
-            using (Stream fs = file.CreateReadStream())
+            using (Stream fs = File.OpenRead(file.PhysicalPath))
             {
                 byte[] bytes = await fs.AsBytesAsync();
+
+                if (bytes.Length > 2 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
+                {
+                    bytes = bytes.Skip(3).ToArray();
+                }
+
                 config.Content.Add(sourceFile, bytes);
             }
 

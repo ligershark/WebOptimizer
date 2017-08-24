@@ -42,6 +42,12 @@ namespace BundlerSample
                 pipeline.MinifyCssFiles("css/site.css").InlineImages();
                 pipeline.CompileScssFiles();
                 pipeline.ReplaceImages();
+
+                pipeline.AddBundle("/text.txt", "text/plain", "random/*.txt")
+                        .AdjustRelativePaths()
+                        .Concatenate()
+                        .FingerprintUrls()
+                        .MinifyCss();
             });
         }
 

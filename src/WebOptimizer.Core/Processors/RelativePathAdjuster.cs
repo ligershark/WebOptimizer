@@ -105,7 +105,7 @@ namespace WebOptimizer
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
-    public static partial class PipelineExtensions
+    public static partial class AssetPipelineExtensions
     {
         /// <summary>
         /// Adjusts the relative paths in CSS documents.

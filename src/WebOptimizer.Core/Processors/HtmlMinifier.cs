@@ -44,7 +44,7 @@ namespace WebOptimizer
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
-    public static partial class PipelineExtensions
+    public static partial class AssetPipelineExtensions
     {
         /// <summary>
         /// Minifies any .html file requested.

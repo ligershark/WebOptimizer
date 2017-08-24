@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUglify;
 using NUglify.Css;
@@ -45,7 +44,7 @@ namespace WebOptimizer
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
-    public static partial class PipelineExtensions
+    public static partial class AssetPipelineExtensions
     {
         /// <summary>
         /// Minifies any .css file requested.
