@@ -1,7 +1,7 @@
 ﻿using System;
-using Microsoft.AspNetCore.Builder;
+using WebOptimizer;
 
-namespace WebOptimizer
+namespace Microsoft.AspNetCore.Builder
 {
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.

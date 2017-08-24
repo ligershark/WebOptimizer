@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using WebOptimizer;
 
 namespace WebOptimizer
 {
@@ -30,11 +31,14 @@ namespace WebOptimizer
             return Task.CompletedTask;
         }
     }
+}
 
+namespace Microsoft.Extensions.DependencyInjection
+{ 
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
-    public static partial class AssetPipelineExtensions
+public static partial class AssetPipelineExtensions
     {
         /// <summary>
         /// Throws an exception if any file doesn't match one of the specified file extensions.

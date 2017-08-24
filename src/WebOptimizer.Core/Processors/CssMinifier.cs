@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using NUglify;
 using NUglify.Css;
+using WebOptimizer;
 
 namespace WebOptimizer
 {
@@ -40,7 +41,10 @@ namespace WebOptimizer
             return Task.CompletedTask;
         }
     }
+}
 
+namespace Microsoft.Extensions.DependencyInjection
+{
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>

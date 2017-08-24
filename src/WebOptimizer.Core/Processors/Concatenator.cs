@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using WebOptimizer;
 
 namespace WebOptimizer
 {
@@ -25,6 +26,9 @@ namespace WebOptimizer
         }
     }
 
+}
+namespace Microsoft.Extensions.DependencyInjection
+{
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>

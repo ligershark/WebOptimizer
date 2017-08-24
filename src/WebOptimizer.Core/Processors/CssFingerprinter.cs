@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.FileProviders;
+using WebOptimizer;
 
 namespace WebOptimizer
 {
@@ -88,7 +89,10 @@ namespace WebOptimizer
             }
         }
     }
+}
 
+namespace Microsoft.Extensions.DependencyInjection
+{
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>

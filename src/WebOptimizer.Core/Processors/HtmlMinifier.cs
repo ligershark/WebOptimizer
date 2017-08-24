@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using NUglify;
 using NUglify.Html;
+using WebOptimizer;
 
 namespace WebOptimizer
 {
@@ -40,7 +41,10 @@ namespace WebOptimizer
             return Task.CompletedTask;
         }
     }
+}
 
+namespace Microsoft.Extensions.DependencyInjection
+{
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
@@ -113,7 +117,7 @@ namespace WebOptimizer
         /// </summary>
         public static IAsset MinifyHtml(this IAsset bundle, HtmlSettings settings)
         {
-            var minifier = new HtmlMinifier(settings);
+            var minifier = new WebOptimizer.HtmlMinifier(settings);
             bundle.Processors.Add(minifier);
 
             return bundle;

@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
+using WebOptimizer;
 
 namespace WebOptimizer
 {
@@ -113,7 +114,10 @@ namespace WebOptimizer
             return null;
         }
     }
+}
 
+namespace Microsoft.Extensions.DependencyInjection
+{
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>

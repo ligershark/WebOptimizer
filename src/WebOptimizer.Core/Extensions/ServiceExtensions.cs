@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using WebOptimizer;
 
-namespace WebOptimizer
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.

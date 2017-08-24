@@ -30,13 +30,7 @@ The pipeline is set up when the ASP.NET web application starts, but no output is
 ## Install and setup
 Add the NuGet package [LigerShark.WebOptimizer.Core](https://nuget.org/packages/LigerShark.WebOptimizer.Core/) to any ASP.NET Core 2.0 project.
 
-Then in **Startup.cs**, add the following using statements:
-
-```csharp
-using WebOptimizer;
-```
-
-...then add `app.UseWebOptimizer()` to the `Configure` method anywhere before `app.UseStaticFiles` (if present), like so:
+Then in **Startup.cs**, add `app.UseWebOptimizer()` to the `Configure` method anywhere before `app.UseStaticFiles` (if present), like so:
 
 ```csharp
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)

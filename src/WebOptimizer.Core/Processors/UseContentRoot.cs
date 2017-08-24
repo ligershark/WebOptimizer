@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
+using WebOptimizer;
 
 namespace WebOptimizer
 {
@@ -26,7 +27,10 @@ namespace WebOptimizer
             return Task.CompletedTask;
         }
     }
+}
 
+namespace Microsoft.Extensions.DependencyInjection
+{
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>

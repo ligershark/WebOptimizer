@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using BundlerSample;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
@@ -35,7 +36,10 @@ namespace BundlerSample
             return Task.CompletedTask;
         }
     }
+}
 
+namespace Microsoft.Extensions.DependencyInjection
+{
     public static class ScssCompilerExtensions
     {
         public static IAsset CompileScss(this IAsset asset)
