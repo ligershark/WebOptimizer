@@ -10,7 +10,9 @@ namespace WebOptimizer
     /// <summary>
     /// A Tag Helper for adding "nonce" attributes to script and style elements.
     /// </summary>
-    [HtmlTargetElement("link", Attributes = "href")]
+    [HtmlTargetElement("link", Attributes = "href, [rel=stylesheet]")]
+    [HtmlTargetElement("link", Attributes = "href, [rel=preload]")]
+    [HtmlTargetElement("link", Attributes = "href, [rel=prefetch]")]
     [HtmlTargetElement("script")]
     [HtmlTargetElement("style")]
     public class NonceTagHelper : TagHelper
