@@ -34,7 +34,7 @@ namespace WebOptimizer
                 throw new ArgumentNullException(nameof(env));
             }
 
-            EnableCaching = EnableCaching ?? true;
+            EnableCaching = EnableCaching ?? !env.IsDevelopment();
             EnableTagHelperBundling = EnableTagHelperBundling ?? true;
         }
     }
