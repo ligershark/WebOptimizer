@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Options;
 
 namespace WebOptimizer
 {
@@ -17,6 +18,16 @@ namespace WebOptimizer
     [HtmlTargetElement("style")]
     public class NonceTagHelper : TagHelper
     {
+        private bool _enabled;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NonceTagHelper"/> class.
+        /// </summary>
+        public NonceTagHelper(IOptionsSnapshot<WebOptimizerOptions> options)
+        {
+            _enabled = options.Value.GenerateNonce == true;
+        }
+
         /// <summary>
         /// When a set of <see cref="T:Microsoft.AspNetCore.Razor.TagHelpers.ITagHelper" />s are executed, their <see cref="M:Microsoft.AspNetCore.Razor.TagHelpers.TagHelper.Init(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext)" />'s
         /// are first invoked in the specified <see cref="P:Microsoft.AspNetCore.Razor.TagHelpers.TagHelper.Order" />; then their
@@ -38,7 +49,10 @@ namespace WebOptimizer
         /// </summary>
         public override void Init(TagHelperContext context)
         {
-            ViewContext.HttpContext.GetOrCreateNonce();
+            if (_enabled)
+            {
+                ViewContext.HttpContext.GetOrCreateNonce();
+            }
         }
 
         /// <summary>
@@ -49,7 +63,7 @@ namespace WebOptimizer
         /// <param name="output">A stateful HTML element used to generate an HTML tag.</param>
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (output.Attributes.ContainsName("nonce"))
+            if (!_enabled || output.Attributes.ContainsName("nonce"))
             {
                 return;
             }
