@@ -49,7 +49,7 @@ namespace WebOptimizer
 
             foreach (string sourceFile in SourceFiles)
             {
-                var matcher = new Matcher();
+                var matcher = new Matcher(StringComparison.Ordinal);
                 matcher.AddInclude(sourceFile);
                 PatternMatchingResult globbingResult = matcher.Execute(dir);
                 IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
