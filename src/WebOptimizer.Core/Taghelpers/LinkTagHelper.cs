@@ -70,7 +70,9 @@ namespace WebOptimizer.Taghelpers
                 attrs.Add(attr);
             }
 
-            foreach (string file in asset.SourceFiles)
+            IEnumerable<string> sourceFiles = Asset.ExpandGlobs(asset, HostingEnvironment);
+
+            foreach (string file in sourceFiles)
             {
                 string href = AddFileVersionToPath(file, asset);
                 output.PostElement.AppendHtml($"<link href=\"{href}\" {string.Join(" ", attrs)} />" + Environment.NewLine);

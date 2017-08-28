@@ -19,11 +19,6 @@ namespace WebOptimizer
         bool? EnableTagHelperBundling { get; }
 
         /// <summary>
-        /// Controls if a "nonce" attribute on scripts and style elements should be generated.
-        /// </summary>
-        bool? GenerateNonce { get; }
-
-        /// <summary>
         /// Gets the CDN url used for TagHelpers.
         /// </summary>
         string CdnUrl { get; }

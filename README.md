@@ -205,7 +205,6 @@ You can control the options from the appsettings.json file.
   "webOptimizer": {
     "enableCaching": true,
     "enableTagHelperBundling": true,
-    "generateNonce": false,
     "cdnUrl": "https://my-cdn.com/"
   }
 }
@@ -218,8 +217,6 @@ Default: **true**
 **enableTagHelperBundling** determines if `<script>` and `<link>` elements should point to the bundled path or a reference per source file should be created. This is helpful to disable when in development mode.
 
 Default: **true**
-
-**generateNonce** determines whether or not a `nonce` attribute should be added to all `<script>`, `<link>` and `<style>` elements. It's used for [Content Security Policy](https://developers.google.com/web/fundamentals/security/csp/) and should only be set to true if your web application uses that.
 
 **cdnUrl** is an absolute URL that, if present, is automatically adds a prefix to any script, stylesheet or media file on the page. A Tag Helper adds the prefix automatically when the Tag Helpers have been registered. See how to [register the Tag Helpers here](#tag-helpers).
 

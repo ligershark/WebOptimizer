@@ -25,11 +25,6 @@ namespace WebOptimizer
         public string CdnUrl { get; set; }
 
         /// <summary>
-        /// Controls if a "nonce" attribute on scripts and style elements should be generated.
-        /// </summary>
-        public bool? GenerateNonce { get; set; }
-
-        /// <summary>
         /// Ensures that defaults are set
         /// </summary>
         public void EnsureDefaults(IHostingEnvironment env)
@@ -41,7 +36,6 @@ namespace WebOptimizer
 
             EnableCaching = EnableCaching ?? !env.IsDevelopment();
             EnableTagHelperBundling = EnableTagHelperBundling ?? true;
-            GenerateNonce = GenerateNonce ?? false;
         }
     }
 }

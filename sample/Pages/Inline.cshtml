@@ -7,9 +7,11 @@
     <link rel="stylesheet" href="~/css/a.css" inline />
 }
 
-<p>
-    This page references the stylesheet <a href="~/css/a.css" type="text/css">/css/a.css</a> and
-    instrct it to be inlined as a <code>&lt;style&gt;</code> element:
+<div>
+    <p>
+        This page references the stylesheet <a href="~/css/a.css" type="text/css">/css/a.css</a> and
+        instrct it to be inlined as a <code>&lt;style&gt;</code> element:
+    </p>
 
     <ul>
         <li><code>&lt;link&gt;</code> is converted into a <code>&lt;style&gt;</code></li>
@@ -17,7 +19,7 @@
         <li>Image urls inside the CSS is being fingerprinted</li>
         <li>Cached server-side</li>
     </ul>
-</p>
+</div>
 
 <p>
     The script bundle <a href="~/js/bbundle.js">/js/bundle.js</a> is also being inlined.

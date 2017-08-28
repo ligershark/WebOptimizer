@@ -69,7 +69,9 @@ namespace WebOptimizer.Taghelpers
                 attrs.Add(attr);
             }
 
-            foreach (string file in asset.SourceFiles)
+            IEnumerable<string> sourceFiles = Asset.ExpandGlobs(asset, HostingEnvironment);
+
+            foreach (string file in sourceFiles)
             {
                 string src = AddFileVersionToPath(file, asset);
                 output.PostElement.AppendHtml($"<script src=\"{src}\" {string.Join(" ", attrs)}></script>" + Environment.NewLine);

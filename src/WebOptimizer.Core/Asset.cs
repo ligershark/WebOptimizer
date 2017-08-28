@@ -40,27 +40,9 @@ namespace WebOptimizer
         public async Task<byte[]> ExecuteAsync(HttpContext context, IWebOptimizerOptions options)
         {
             var env = (IHostingEnvironment)context.RequestServices.GetService(typeof(IHostingEnvironment));
-            string root = this.GetFileProvider(env).GetFileInfo("/").PhysicalPath;
             var config = new AssetContext(context, this, options);
 
-            // Handle globbing
-            var dir = new DirectoryInfoWrapper(new DirectoryInfo(root));
-            var files = new List<string>();
-
-            foreach (string sourceFile in SourceFiles)
-            {
-                var matcher = new Matcher();
-                matcher.AddInclude(sourceFile);
-                PatternMatchingResult globbingResult = matcher.Execute(dir);
-                IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
-
-                if (!fileMatches.Any())
-                {
-                    throw new FileNotFoundException($"No files found matching \"{sourceFile}\" exist in \"{dir.FullName}\"");
-                }
-
-                files.AddRange(fileMatches.Where(f => !files.Contains(f)));
-            }
+            IEnumerable<string> files = ExpandGlobs(this, env);
 
             DateTime lastModified = DateTime.MinValue;
 
@@ -90,6 +72,30 @@ namespace WebOptimizer
             }
 
             return config.Content.FirstOrDefault().Value;
+        }
+
+        public static IEnumerable<string> ExpandGlobs(IAsset asset, IHostingEnvironment env)
+        {
+            string root = asset.GetFileProvider(env).GetFileInfo("/").PhysicalPath;
+            var dir = new DirectoryInfoWrapper(new DirectoryInfo(root));
+            var files = new List<string>();
+
+            foreach (string sourceFile in asset.SourceFiles)
+            {
+                var matcher = new Matcher();
+                matcher.AddInclude(sourceFile);
+                PatternMatchingResult globbingResult = matcher.Execute(dir);
+                IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
+
+                if (!fileMatches.Any())
+                {
+                    throw new FileNotFoundException($"No files found matching \"{sourceFile}\" exist in \"{dir.FullName}\"");
+                }
+
+                files.AddRange(fileMatches.Where(f => !files.Contains(f)));
+            }
+
+            return files;
         }
 
         private static async Task<DateTime> LoadFileContentAsync(IFileProvider fileProvider, AssetContext config, string sourceFile)
