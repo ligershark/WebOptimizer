@@ -202,24 +202,38 @@ You can control the options from the appsettings.json file.
 
 ```json
 {
-  "WebOptimizer": {
-    "EnableCaching": true,
-    "EnableTagHelperBundling": true,
-    "UseContentRoot":  false,
-    "CdnUrl": "https://my-cdn.com/"
+  "webOptimizer": {
+    "enableCaching": true,
+    "enableTagHelperBundling": true,
+    "generateNonce": false,
+    "cdnUrl": "https://my-cdn.com/"
   }
 }
 ```
 
-**EnableCaching** determines if the `cache-control` HTTP headers should be set and if conditional GET (304) requests should be supported. This could be helpful to disable while in development mode.
+**enableCaching** determines if the `cache-control` HTTP headers should be set and if conditional GET (304) requests should be supported. This could be helpful to disable while in development mode.
 
 Default: **true**
 
-**EnableTagHelperBundling** determines if `<script>` and `<link>` elements should point to the bundled path or a reference per source file should be created. This is helpful to disable when in development mode.
+**enableTagHelperBundling** determines if `<script>` and `<link>` elements should point to the bundled path or a reference per source file should be created. This is helpful to disable when in development mode.
 
 Default: **true**
 
-**CdnUrl** is an absolute URL that, if present, is automatically addeda as a prefix to any script, stylesheet or media file on the page. A Tag Helper is adding the prefix automatically when the Tag Helpers have been registered. See how to [register the Tag Helpers here](#tag-helpers).
+**generateNonce** determines whether or not a `nonce` attribute should be added to all `<script>`, `<link>` and `<style>` elements. It's used for [Content Security Policy](https://developers.google.com/web/fundamentals/security/csp/) and should only be set to true if your web application uses that.
+
+**cdnUrl** is an absolute URL that, if present, is automatically adds a prefix to any script, stylesheet or media file on the page. A Tag Helper adds the prefix automatically when the Tag Helpers have been registered. See how to [register the Tag Helpers here](#tag-helpers).
+
+For example. if the cdnUrl is set to `"http://my-cdn.com"` then script and link tags will prepend the *cdnUrl* to the references. For instance, this script tag:
+
+```html
+<script src="/js/file.js"></script>
+```
+
+...will become this:
+
+```html
+<script src="http://my-cdn.com/js/file.js"></script>
+```
 
 ### Custom pipeline
 Read more in the [custom pipeline documentation](https://ligershark.github.io/WebOptimizer/custom-pipeline.html).
