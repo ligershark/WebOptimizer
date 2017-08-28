@@ -1,48 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-//using WebOptimizer;
 
-namespace BundlerSample
+namespace WebOptimizerDemo
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddResponseCaching();
             services.AddMvc();
 
             services.AddWebOptimizer(pipeline =>
             {
-                pipeline.AddCssBundle("/all.css", "lib/bootstrap/dist/css/bootstrap.css", "css/site.css")
-                        .InlineImages();
+                // Creates a CSS and a JS bundle. Globbing patterns supported.
+                pipeline.AddCssBundle("/css/bundle.css", "css/*.css");
+                pipeline.AddJavaScriptBundle("/js/bundle.js", "js/plus.js", "js/minus.js");
 
-                pipeline.AddJavaScriptBundle("/all.js", "js/site.js", "js/b.js");
+                // This bundle uses source files from the Content Root and uses a custom PrependHeader extension
+                pipeline.AddJavaScriptBundle("/js/scripts.js", "scripts/a.js", "wwwroot/js/plus.js")
+                        .UseContentRoot()
+                        .PrependHeader("My custom header");
 
-                pipeline.AddBundle("/demo.txt", "text/plain", "js/site.js", "js/b.js")
-                        .Concatenate();
+                // This will minify any JS and CSS file that isn't part of any bundle
+                pipeline.MinifyCssFiles();
+                pipeline.MinifyJsFiles();
 
-                pipeline.MinifyJsFiles("**/*.jsx");
-                pipeline.AddBundle("test.res", "text/xml", "Resources/Strings.resx").UseContentRoot();
-
-                pipeline.AddScssBundle("/scss.css", "css/test2.scss", "css/test.scss");
-
-                pipeline.MinifyCssFiles("css/site.css").InlineImages();
+                // This will automatically compile any referenced .scss files
                 pipeline.CompileScssFiles();
-                pipeline.ReplaceImages();
 
+                // AddFiles/AddBundle allow for custom pipelines
                 pipeline.AddBundle("/text.txt", "text/plain", "random/*.txt")
                         .AdjustRelativePaths()
                         .Concatenate()
@@ -57,33 +49,13 @@ namespace BundlerSample
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
+                app.UseBrowserLink();
             }
 
             app.UseWebOptimizer();
-            app.UseResponseCaching();
 
-            app.UseStaticFiles(new StaticFileOptions()
-            {
-                OnPrepareResponse = context =>
-                {
-                    var expires = TimeSpan.FromDays(365);
-                    context.Context.Response.Headers["Cache-Control"] = $"public, max-age={expires.TotalSeconds}";
-                    context.Context.Response.Headers["Expires"] = DateTime.Now.Add(expires).ToString("R");
-                }
-            });
-
-            app.UseETagger();
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseStaticFiles();
+            app.UseMvc();
         }
     }
 }

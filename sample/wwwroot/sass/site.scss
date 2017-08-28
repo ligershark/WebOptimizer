@@ -1,0 +1,5 @@
+﻿$background: lightblue;
+
+body {
+    background: linear-gradient(to right, white, $background);
+}

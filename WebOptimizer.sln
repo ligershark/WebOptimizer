@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26719.2
+VisualStudioVersion = 15.0.26815.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebOptimizer.Core.Sample", "sample\WebOptimizer.Core.Sample.csproj", "{E48DE00D-27F3-417A-9EDF-277483474F49}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebOptimizer.Core", "src\WebOptimizer.Core\WebOptimizer.Core.csproj", "{FCB6608A-3219-44ED-A400-A735EEB33C40}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9BE34752-7E0B-40DB-A192-7B6CB09217D4}"
@@ -15,16 +13,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebOptimizer.Core.Test", "test\WebOptimizer.Core.Test\WebOptimizer.Core.Test.csproj", "{68BA50A0-966B-41AC-9A6D-B73ADFC65D2F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebOptimizer.Core.Sample", "sample\WebOptimizer.Core.Sample.csproj", "{478357DE-07B8-443D-B430-E2390F74B060}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E48DE00D-27F3-417A-9EDF-277483474F49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E48DE00D-27F3-417A-9EDF-277483474F49}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E48DE00D-27F3-417A-9EDF-277483474F49}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E48DE00D-27F3-417A-9EDF-277483474F49}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FCB6608A-3219-44ED-A400-A735EEB33C40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FCB6608A-3219-44ED-A400-A735EEB33C40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCB6608A-3219-44ED-A400-A735EEB33C40}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,6 +29,10 @@ Global
 		{68BA50A0-966B-41AC-9A6D-B73ADFC65D2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68BA50A0-966B-41AC-9A6D-B73ADFC65D2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68BA50A0-966B-41AC-9A6D-B73ADFC65D2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{478357DE-07B8-443D-B430-E2390F74B060}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{478357DE-07B8-443D-B430-E2390F74B060}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{478357DE-07B8-443D-B430-E2390F74B060}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{478357DE-07B8-443D-B430-E2390F74B060}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

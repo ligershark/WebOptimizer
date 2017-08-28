@@ -1,0 +1,20 @@
+﻿@page
+@{
+    ViewData["Title"] = "Sass compiler";
+}
+
+@section head {
+    <link rel="stylesheet" href="~/css/a.css" />
+    <link rel="stylesheet" href="~/sass/site.scss" />
+}
+
+<p>
+    This page references the Sass file <a href="~/sass/site.scss">/sass/site.scss</a> which result in:
+
+    <ul>
+        <li>Sass document being compiled to CSS</li>
+        <li>Response is minified</li>
+        <li>Image url is being fingerprinted</li>
+        <li>Cached on both server- and client-side</li>
+    </ul>
+</p>

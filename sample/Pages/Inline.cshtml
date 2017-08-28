@@ -1,0 +1,26 @@
+﻿@page
+@{
+    ViewData["Title"] = "Inlining";
+}
+
+@section head {
+    <link rel="stylesheet" href="~/css/a.css" inline />
+}
+
+<p>
+    This page references the stylesheet <a href="~/css/a.css" type="text/css">/css/a.css</a> and
+    instrct it to be inlined as a <code>&lt;style&gt;</code> element:
+
+    <ul>
+        <li><code>&lt;link&gt;</code> is converted into a <code>&lt;style&gt;</code></li>
+        <li>Response is minified</li>
+        <li>Image urls inside the CSS is being fingerprinted</li>
+        <li>Cached server-side</li>
+    </ul>
+</p>
+
+<p>
+    The script bundle <a href="~/js/bbundle.js">/js/bundle.js</a> is also being inlined.
+</p>
+
+<script src="~/js/bundle.js" inline></script>
