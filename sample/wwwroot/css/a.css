@@ -12,7 +12,11 @@ body {
 }
 
 main {
-    padding-bottom: 75px;
+    padding: 0 15px 75px;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
 }
 
 h1 {
