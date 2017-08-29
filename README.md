@@ -5,7 +5,7 @@
 
 ASP.NET Core middleware for bundling and minification of CSS and JavaScript files at runtime. With full server-side and client-side caching to ensure high performance. No complicated build process and no hazzle.
 
-Check out the **[demo website](https://weboptimizer.azurewebsites.net/)**.
+Check out the **[demo website](https://weboptimizer.azurewebsites.net/)** or its **[source code](https://github.com/ligershark/WebOptimizer/tree/master/sample)**.
 
 ## Content
 
