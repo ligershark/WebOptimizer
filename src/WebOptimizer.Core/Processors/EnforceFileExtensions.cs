@@ -34,11 +34,11 @@ namespace WebOptimizer
 }
 
 namespace Microsoft.Extensions.DependencyInjection
-{ 
+{
     /// <summary>
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
-public static partial class AssetPipelineExtensions
+    public static partial class AssetPipelineExtensions
     {
         /// <summary>
         /// Throws an exception if any file doesn't match one of the specified file extensions.
