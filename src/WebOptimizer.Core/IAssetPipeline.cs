@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace WebOptimizer
 {
@@ -11,6 +12,11 @@ namespace WebOptimizer
         /// Gets the assets registered on the pipeline.
         /// </summary>
         IReadOnlyList<IAsset> Assets { get; }
+
+        /// <summary>
+        /// Gets the service collection.
+        /// </summary>s
+        IServiceCollection ServiceCollection { get; }
 
         /// <summary>
         /// Adds an <see cref="IAsset"/> to the optimization pipeline.
