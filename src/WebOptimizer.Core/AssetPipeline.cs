@@ -9,10 +9,9 @@ namespace WebOptimizer
     internal class AssetPipeline : IAssetPipeline
     {
         public AssetPipeline()
-        {
+            : this(null)
+        { }
 
-        }
-        
         public AssetPipeline(IServiceCollection serviceCollection)
         {
             ServiceCollection = serviceCollection;
@@ -56,7 +55,7 @@ namespace WebOptimizer
 
                     if (matcher.Match(cleanRoute.TrimStart('/')).HasMatches)
                     {
-                        asset = new Asset(cleanRoute, existing.ContentType, new[] { cleanRoute });
+                        asset = new Asset(cleanRoute, existing.ContentType, this, new[] { cleanRoute });
 
                         foreach (IProcessor processor in existing.Processors)
                         {
@@ -109,7 +108,7 @@ namespace WebOptimizer
                 throw new ArgumentException($"The route \"{route}\" was already specified", nameof(route));
             }
 
-            IAsset asset = new Asset(route, contentType, sourceFiles);
+            IAsset asset = new Asset(route, contentType, this, sourceFiles);
             _assets.Add(asset);
 
             return asset;
@@ -131,7 +130,7 @@ namespace WebOptimizer
 
             foreach (string file in sourceFiles)
             {
-                IAsset asset = new Asset(NormalizeRoute(file), contentType, new[] { file });
+                IAsset asset = new Asset(NormalizeRoute(file), contentType, this, new[] { file });
                 list.Add(asset);
             }
 

@@ -3,7 +3,7 @@ using Xunit;
 
 namespace WebOptimizer.Test.Processors
 {
-    public class UseContentRoot
+    public class UseContentRootTest
     {
         [Fact2]
         public void UseContentRoot_Success()

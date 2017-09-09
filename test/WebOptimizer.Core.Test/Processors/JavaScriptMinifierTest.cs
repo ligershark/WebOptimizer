@@ -92,8 +92,8 @@ namespace WebOptimizer.Test.Processors
 
             Assert.Equal("/**/*.js", asset.Route);
             Assert.Equal("application/javascript; charset=UTF-8", asset.ContentType);
-            Assert.Equal(1, asset.SourceFiles.Count());
-            Assert.Equal(1, asset.Processors.Count);
+            Assert.True(1 == asset.SourceFiles.Count());
+            Assert.True(1 == asset.Processors.Count);
         }
     }
 }

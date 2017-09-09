@@ -18,6 +18,12 @@ namespace WebOptimizer
 {
     internal class Asset : IAsset
     {
+        public Asset(string route, string contentType, IAssetPipeline pipeline, IEnumerable<string> sourceFiles)
+            : this(route, contentType, sourceFiles)
+        {
+            Pipeline = pipeline;
+        }
+
         public Asset(string route, string contentType, IEnumerable<string> sourceFiles)
         {
             Route = route ?? throw new ArgumentNullException(nameof(route));
@@ -36,6 +42,8 @@ namespace WebOptimizer
         public IList<IProcessor> Processors { get; }
 
         public IDictionary<string, object> Items { get; }
+
+        public IAssetPipeline Pipeline { get; private set; }
 
         public async Task<byte[]> ExecuteAsync(HttpContext context, IWebOptimizerOptions options)
         {
