@@ -246,6 +246,8 @@ A good extension to look at is the [WebOptimizer.Sass](https://github.com/ligers
 
 ### Plugins
 
+- [WebOptimizer.TypeScript](https://github.com/ligershark/WebOptimizer.TypeScript) - compiles TypeScript/ES6+/JSX files to JavaScript (ES5)
 - [WebOptimizer.Sass](https://github.com/ligershark/WebOptimizer.Sass) - compiles Scss files to CSS
+- [WebOptimizer.LESS](https://github.com/ligershark/WebOptimizer.Less) - compiles LESS files to CSS
 - [WebOptimizer.Markdown](https://github.com/ligershark/WebOptimizer.Markdown) - compiles markdown files to HTML
 - [WebOptimizer.i18n](https://github.com/ligershark/WebOptimizer.i18n) - localization of .js files
