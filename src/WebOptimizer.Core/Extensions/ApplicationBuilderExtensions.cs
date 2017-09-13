@@ -26,19 +26,5 @@ namespace Microsoft.AspNetCore.Builder
 
             app.UseMiddleware<AssetMiddleware>();
         }
-
-        /// <summary>
-        /// Adds automatic ETag/If-None-Match HTTP header handling to the request execution pipeline.
-        /// </summary>
-        /// <param name="app">The application.</param>
-        public static void UseETagger(this IApplicationBuilder app)
-        {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
-            app.UseMiddleware<ETagMiddleware>();
-        }
     }
 }

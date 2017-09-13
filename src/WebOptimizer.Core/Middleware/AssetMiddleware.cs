@@ -80,8 +80,8 @@ namespace WebOptimizer
                 }
 
                 AddToCache(cacheKey, response, asset, options);
-                response.CacheToDisk(context.Request.Path, cacheKey, _cacheDir);
 
+                await response.CacheToDiskAsync(context.Request.Path, cacheKey, _cacheDir).ConfigureAwait(false);
                 await WriteOutputAsync(context, asset, response, cacheKey, options).ConfigureAwait(false);
                 _logger.LogGeneratedOutput(context.Request.Path);
             }

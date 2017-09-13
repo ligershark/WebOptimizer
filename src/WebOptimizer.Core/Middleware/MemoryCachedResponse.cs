@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace WebOptimizer
 {
@@ -11,9 +12,10 @@ namespace WebOptimizer
         public MemoryCachedResponse(byte[] body)
         {
             Body = body;
+            Headers = new Dictionary<string, string>();
         }
 
-        public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Headers { get; }
 
         public byte[] Body { get; set; }
 
@@ -25,28 +27,23 @@ namespace WebOptimizer
 
             if (File.Exists(filePath))
             {
-                var formatter = new BinaryFormatter();
-
-                using (var fs = new FileStream(filePath, FileMode.Open))
+                try
                 {
-                    try
-                    {
-                        response = formatter.Deserialize(fs) as MemoryCachedResponse;
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.Write(ex);
-                        File.Delete(filePath);
-                    }
+                    string json = File.ReadAllText(filePath);
+                    response = JsonConvert.DeserializeObject<MemoryCachedResponse>(json);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.Write(ex);
+                    File.Delete(filePath);
                 }
             }
 
             return response != null;
         }
 
-        public void CacheToDisk(string route, string cacheKey, string cacheDir)
+        public async Task CacheToDiskAsync(string route, string cacheKey, string cacheDir)
         {
-            var formatter = new BinaryFormatter();
             string name = CleanRouteName(route);
             Directory.CreateDirectory(cacheDir);
 
@@ -61,16 +58,10 @@ namespace WebOptimizer
             // Then serialize to disk
             string filePath = GetPath(name, cacheKey, cacheDir);
 
-            using (var fs = new FileStream(filePath, FileMode.Create))
+            string json = JsonConvert.SerializeObject(this);
+            using (var writer = new StreamWriter(filePath))
             {
-                try
-                {
-                    formatter.Serialize(fs, this);
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.Write(ex);
-                }
+                await writer.WriteAsync(json).ConfigureAwait(false);
             }
         }
 

@@ -29,4 +29,11 @@
         <PackageReference Include="NUglify" Version="1.5.8" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="Build/$(PackageId).targets">
+            <Pack>true</Pack>
+            <PackagePath>build</PackagePath>
+        </Content>
+    </ItemGroup>
+
 </Project>
