@@ -98,6 +98,7 @@ namespace WebOptimizer.Test
             var logger = new Mock<ILogger<AssetMiddleware>>();
 
             var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, logger.Object);
+            Directory.Delete(middleware._cacheDir, true);
             var stream = new MemoryStream();
 
             await middleware.InvokeAsync(context.Object, amo.Object);
@@ -131,7 +132,7 @@ namespace WebOptimizer.Test
             var next = new Mock<RequestDelegate>();
             var env = new HostingEnvironment();
             var cache = new Mock<IMemoryCache>();
-            var mcr = new MemoryCachedResponse(200, cssContent);
+            var mcr = new MemoryCachedResponse(cssContent);
 
             object bytes = mcr;
             cache.Setup(c => c.TryGetValue(It.IsAny<string>(), out bytes))
@@ -186,7 +187,7 @@ namespace WebOptimizer.Test
             var next = new Mock<RequestDelegate>();
             var env = new HostingEnvironment();
             var cache = new Mock<IMemoryCache>();
-            var mcr = new MemoryCachedResponse(200, cssContent);
+            var mcr = new MemoryCachedResponse(cssContent);
 
             object bytes = mcr;
             cache.Setup(c => c.TryGetValue(It.IsAny<string>(), out bytes))

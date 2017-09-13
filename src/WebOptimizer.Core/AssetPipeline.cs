@@ -8,20 +8,9 @@ namespace WebOptimizer
 {
     internal class AssetPipeline : IAssetPipeline
     {
-        public AssetPipeline()
-            : this(null)
-        { }
-
-        public AssetPipeline(IServiceCollection serviceCollection)
-        {
-            ServiceCollection = serviceCollection;
-        }
-
         private List<IAsset> _assets = new List<IAsset>();
 
         public IReadOnlyList<IAsset> Assets => _assets;
-
-        public IServiceCollection ServiceCollection { get; }
 
         public bool TryGetAssetFromRoute(string route, out IAsset asset)
         {

@@ -35,11 +35,6 @@ namespace WebOptimizer
         IEnumerable<string> SourceFiles { get; }
 
         /// <summary>
-        /// Gets the pipeline containing the asset.
-        /// </summary>
-        IAssetPipeline Pipeline { get; }
-
-        /// <summary>
         /// Executes the processors and returns the modified content.
         /// </summary>
         Task<byte[]> ExecuteAsync(HttpContext context, IWebOptimizerOptions options);

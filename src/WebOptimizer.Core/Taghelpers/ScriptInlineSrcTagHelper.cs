@@ -114,7 +114,7 @@ namespace WebOptimizer.Taghelpers
                 cacheOptions.AddExpirationToken(fileProvider.Watch(file));
             }
 
-            var response = new MemoryCachedResponse(200, value);
+            var response = new MemoryCachedResponse(value);
 
             Cache.Set(cacheKey, response, cacheOptions);
         }

@@ -7,7 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.TagHelpers.Internal;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileSystemGlobbing;
@@ -18,11 +20,12 @@ namespace WebOptimizer
 {
     internal class Asset : IAsset
     {
+        private static FileVersionProvider _fileVersionProvider;
+        private const string _physicalFilesKey = "PhysicalFiles";
+
         public Asset(string route, string contentType, IAssetPipeline pipeline, IEnumerable<string> sourceFiles)
             : this(route, contentType, sourceFiles)
-        {
-            Pipeline = pipeline;
-        }
+        { }
 
         public Asset(string route, string contentType, IEnumerable<string> sourceFiles)
         {
@@ -43,7 +46,6 @@ namespace WebOptimizer
 
         public IDictionary<string, object> Items { get; }
 
-        public IAssetPipeline Pipeline { get; private set; }
 
         public async Task<byte[]> ExecuteAsync(HttpContext context, IWebOptimizerOptions options)
         {
@@ -103,6 +105,8 @@ namespace WebOptimizer
                 files.AddRange(fileMatches.Where(f => !files.Contains(f)));
             }
 
+            asset.Items[_physicalFilesKey] = files;
+
             return files;
         }
 
@@ -127,21 +131,51 @@ namespace WebOptimizer
 
         public string GenerateCacheKey(HttpContext context)
         {
-            string cacheKey = Route;
+            var cacheKey = new StringBuilder(Route);
 
             if (context.Request.Headers.TryGetValue("Accept-Encoding", out var enc))
             {
-                cacheKey += enc.ToString();
+                cacheKey.Append(enc.ToString());
+            }
+
+            IEnumerable<string> physicalFiles;
+            var env = (IHostingEnvironment)context.RequestServices.GetService(typeof(IHostingEnvironment));
+
+            if (_fileVersionProvider == null)
+            {
+                var cache = (IMemoryCache)context.RequestServices.GetService(typeof(IMemoryCache));
+
+                _fileVersionProvider = new FileVersionProvider(
+                    this.GetFileProvider(env),
+                    cache,
+                    context.Request.PathBase);
+            }
+
+            if (!Items.ContainsKey(_physicalFilesKey))
+            {
+                physicalFiles = ExpandGlobs(this, env);
+            }
+            else
+            {
+                physicalFiles = Items[_physicalFilesKey] as IEnumerable<string>;
+            }
+
+            if (physicalFiles != null)
+            {
+                foreach (string file in physicalFiles)
+                {
+                    cacheKey.Append(_fileVersionProvider.AddFileVersionToPath(file));
+                }
             }
 
             foreach (IProcessor processors in Processors)
             {
-                cacheKey += processors.CacheKey(context) ?? string.Empty;
+                cacheKey.Append(processors.CacheKey(context) ?? string.Empty);
             }
 
             using (var algo = SHA1.Create())
             {
-                byte[] buffer = Encoding.UTF8.GetBytes(cacheKey);
+                byte[] buffer = Encoding.UTF8.GetBytes(cacheKey.ToString());
                 byte[] hash = algo.ComputeHash(buffer);
                 return WebEncoders.Base64UrlEncode(hash);
             }

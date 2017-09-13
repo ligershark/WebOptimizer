@@ -14,11 +14,6 @@ namespace WebOptimizer
         IReadOnlyList<IAsset> Assets { get; }
 
         /// <summary>
-        /// Gets the service collection.
-        /// </summary>s
-        IServiceCollection ServiceCollection { get; }
-
-        /// <summary>
         /// Adds an <see cref="IAsset"/> to the optimization pipeline.
         /// </summary>
         IAsset AddBundle(IAsset asset);

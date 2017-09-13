@@ -1,5 +1,11 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Primitives;
+using Moq;
 using Xunit;
 
 namespace WebOptimizer.Test
@@ -27,18 +33,34 @@ namespace WebOptimizer.Test
             string route = "route";
             string contentType = "text/css";
             var sourcefiles = new[] { "file1.css" };
-            var context = new DefaultHttpContext();
+            var context = new Mock<HttpContext>().SetupAllProperties();
+            var env = new Mock<IHostingEnvironment>();
+            var cache = new Mock<IMemoryCache>();
+            var fileProvider = new PhysicalFileProvider(Path.GetTempPath());
 
             var asset = new Asset(route, contentType, sourcefiles);
+            asset.Items.Add("PhysicalFiles", new string[0] );
 
+            StringValues ae = "gzip, deflate";
+            context.SetupSequence(c => c.Request.Headers.TryGetValue("Accept-Encoding", out ae))
+                   .Returns(false)
+                   .Returns(true);
+
+            context.Setup(c => c.RequestServices.GetService(typeof(IHostingEnvironment)))
+                   .Returns(env.Object);
+
+            context.Setup(c => c.RequestServices.GetService(typeof(IMemoryCache)))
+                   .Returns(cache.Object);
+
+            env.Setup(e => e.WebRootFileProvider)
+                .Returns(fileProvider);
 
             // Check non-gzip value
-            string key = asset.GenerateCacheKey(context);
+            string key = asset.GenerateCacheKey(context.Object);
             Assert.Equal("_BZuuBNh_zEXnNPIPaO_4Ii4UdM", key);
 
             // Check gzip value
-            context.Request.Headers["Accept-Encoding"] = "gzip, deflate";
-            string gzipKey = asset.GenerateCacheKey(context);
+            string gzipKey = asset.GenerateCacheKey(context.Object);
             Assert.Equal("SvH6WGVAapgMXiPenaOGnKS_oMI", gzipKey);
         }
 

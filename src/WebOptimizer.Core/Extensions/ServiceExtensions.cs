@@ -50,7 +50,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(assetPipeline));
             }
 
-            var pipeline = new AssetPipeline(services);
+            var pipeline = new AssetPipeline();
             assetPipeline(pipeline);
 
             services.TryAddSingleton<IMemoryCache, MemoryCache>();

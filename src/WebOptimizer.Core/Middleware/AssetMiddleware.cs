@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -16,6 +17,7 @@ namespace WebOptimizer
         private readonly IMemoryCache _cache;
         private readonly IAssetPipeline _pipeline;
         private readonly ILogger _logger;
+        internal readonly string _cacheDir;
 
         public AssetMiddleware(RequestDelegate next, IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, ILogger<AssetMiddleware> logger)
         {
@@ -24,6 +26,11 @@ namespace WebOptimizer
             _cache = cache;
             _pipeline = pipeline;
             _logger = logger;
+
+            // Use temp path for unit testing purposes
+            string root = string.IsNullOrEmpty(env.ContentRootPath) ? Path.GetTempPath() : env.ContentRootPath;
+
+            _cacheDir = Path.Combine(root, "obj", "WebOptimizerCache");
         }
 
         public Task InvokeAsync(HttpContext context, IOptionsSnapshot<WebOptimizerOptions> options)
@@ -46,13 +53,19 @@ namespace WebOptimizer
             if (_cache.TryGetValue(cacheKey, out MemoryCachedResponse value))
             {
                 await WriteOutputAsync(context, asset, value, cacheKey, options).ConfigureAwait(false);
-                _logger.LogServedFromCache(context.Request.Path);
+                _logger.LogServedFromMemoryCache(context.Request.Path);
+            }
+            else if (MemoryCachedResponse.TryGetFromDiskCache(context.Request.Path, cacheKey, _cacheDir, out value))
+            {
+                await WriteOutputAsync(context, asset, value, cacheKey, options).ConfigureAwait(false);
+                AddToCache(cacheKey, value, asset, options);
+                _logger.LogServedFromDiskCache(context.Request.Path);
             }
             else
             {
                 byte[] bytes = await asset.ExecuteAsync(context, options).ConfigureAwait(false);
 
-                var response = new MemoryCachedResponse(context.Response.StatusCode, bytes);
+                var response = new MemoryCachedResponse(bytes);
 
                 foreach (string name in context.Response.Headers.Keys)
                 {
@@ -67,6 +80,7 @@ namespace WebOptimizer
                 }
 
                 AddToCache(cacheKey, response, asset, options);
+                response.CacheToDisk(context.Request.Path, cacheKey, _cacheDir);
 
                 await WriteOutputAsync(context, asset, response, cacheKey, options).ConfigureAwait(false);
                 _logger.LogGeneratedOutput(context.Request.Path);
@@ -137,20 +151,5 @@ namespace WebOptimizer
                 await context.Response.Body.WriteAsync(cachedResponse.Body, 0, cachedResponse.Body.Length);
             }
         }
-    }
-
-    internal class MemoryCachedResponse
-    {
-        public MemoryCachedResponse(int statusCode, byte[] body)
-        {
-            StatusCode = statusCode;
-            Body = body;
-        }
-
-        public int StatusCode { get; set; }
-
-        public IHeaderDictionary Headers { get; set; } = new HeaderDictionary();
-
-        public byte[] Body { get; set; }
     }
 }
