@@ -55,7 +55,7 @@ namespace WebOptimizer.Taghelpers
                 output.Attributes.RemoveAll("src");
                 output.Attributes.RemoveAll("async");
                 output.Attributes.RemoveAll("defer");
-                
+
                 string route = AssetPipeline.NormalizeRoute(Src);
                 string content = await GetFileContentAsync(route);
 
@@ -64,7 +64,11 @@ namespace WebOptimizer.Taghelpers
             }
         }
 
-        private async Task<string> GetFileContentAsync(string route)
+        /// <summary>
+        /// Gets the file content asynchronous.
+        /// </summary>
+        /// <exception cref="FileNotFoundException">File or bundle doesn't exist</exception>
+        protected async Task<string> GetFileContentAsync(string route)
         {
             if (Pipeline.TryGetAssetFromRoute(route, out IAsset asset))
             {

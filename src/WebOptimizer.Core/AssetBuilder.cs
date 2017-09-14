@@ -12,7 +12,7 @@ namespace WebOptimizer
     /// A class for building assets.
     /// </summary>
     /// <seealso cref="WebOptimizer.IAssetBuilder" />
-    public class AssetBuilder : IAssetBuilder
+    internal class AssetBuilder : IAssetBuilder
     {
         private IMemoryCache _cache;
         private ILogger<AssetBuilder> _logger;

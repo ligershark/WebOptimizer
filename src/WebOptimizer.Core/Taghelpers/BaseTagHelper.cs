@@ -46,7 +46,7 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Gets the options.
         /// </summary>
-        protected WebOptimizerOptions Options { get; }
+        protected IWebOptimizerOptions Options { get; }
 
         /// <summary>
         /// Makes sure this taghelper runs before the built in ones.
