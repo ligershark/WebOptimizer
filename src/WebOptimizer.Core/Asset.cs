@@ -170,7 +170,14 @@ namespace WebOptimizer
 
             foreach (IProcessor processors in Processors)
             {
-                cacheKey.Append(processors.CacheKey(context) ?? string.Empty);
+                try
+                {
+                    cacheKey.Append(processors.CacheKey(context) ?? string.Empty);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"CacheKey generation exception in {processors.GetType().FullName} processor", ex);
+                }
             }
 
             using (var algo = SHA1.Create())

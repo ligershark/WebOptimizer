@@ -2,11 +2,21 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <_WebOptimizerCacheDirectory>$(MSBuildProjectDirectory)\obj\WebOptimizerCache</_WebOptimizerCacheDirectory>
+    <_WebOptimizerCacheDirectory>obj\WebOptimizerCache</_WebOptimizerCacheDirectory>
   </PropertyGroup>
 
+  <Target Name="PublishWebOptimizer" BeforeTargets="BeforePublish" Condition=" '$(PublishWebOptimizerCache)' == 'True' ">
+    <Message Text="Adding WebOptimizer cache files to publish output" Importance="high" />
+    <ItemGroup>
+      <DistFiles Include="$(MSBuildProjectDirectory)\$(_WebOptimizerCacheDirectory)/*.cache" />
+      <DotNetPublishFiles Include="%(DistFiles.Identity)">
+        <DestinationRelativePath>$(_WebOptimizerCacheDirectory)\%(Filename)%(Extension)</DestinationRelativePath>
+      </DotNetPublishFiles>
+    </ItemGroup>
+  </Target>
+
   <Target Name="CleanWebOptimizerCache" AfterTargets="Clean">
-    <RemoveDir Directories="$(_WebOptimizerCacheDirectory)" />
+    <RemoveDir Directories="$(MSBuildProjectDirectory)\$(_WebOptimizerCacheDirectory)" />
   </Target>
 
 </Project>

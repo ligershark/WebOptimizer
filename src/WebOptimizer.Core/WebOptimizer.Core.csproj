@@ -34,6 +34,9 @@
             <Pack>true</Pack>
             <PackagePath>build</PackagePath>
         </Content>
+        <Content Include="Build/$(PackageId).props">
+          <PackagePath>build</PackagePath>
+          <Pack>true</Pack>
+        </Content>
     </ItemGroup>
-
 </Project>
