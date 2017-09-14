@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.FileProviders;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.FileProviders;
 
 namespace WebOptimizer
 {
@@ -22,5 +23,10 @@ namespace WebOptimizer
         /// Gets the CDN url used for TagHelpers.
         /// </summary>
         string CdnUrl { get; }
+
+        /// <summary>
+        /// Ensures that defaults are set
+        /// </summary>
+        void EnsureDefaults(IHostingEnvironment env);
     }
 }

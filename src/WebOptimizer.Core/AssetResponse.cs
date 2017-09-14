@@ -7,11 +7,12 @@ using Newtonsoft.Json;
 namespace WebOptimizer
 {
     [Serializable]
-    internal class MemoryCachedResponse
+    internal class AssetResponse : IAssetResponse
     {
-        public MemoryCachedResponse(byte[] body)
+        public AssetResponse(byte[] body, string cacheKey)
         {
             Body = body;
+            CacheKey = cacheKey;
             Headers = new Dictionary<string, string>();
         }
 
@@ -19,7 +20,9 @@ namespace WebOptimizer
 
         public byte[] Body { get; set; }
 
-        public static bool TryGetFromDiskCache(string route, string cacheKey, string cacheDir, out MemoryCachedResponse response)
+        public string CacheKey { get; }
+
+        public static bool TryGetFromDiskCache(string route, string cacheKey, string cacheDir, out AssetResponse response)
         {
             response = null;
             string name = CleanRouteName(route);
@@ -30,7 +33,7 @@ namespace WebOptimizer
                 try
                 {
                     string json = File.ReadAllText(filePath);
-                    response = JsonConvert.DeserializeObject<MemoryCachedResponse>(json);
+                    response = JsonConvert.DeserializeObject<AssetResponse>(json);
                 }
                 catch (Exception ex)
                 {

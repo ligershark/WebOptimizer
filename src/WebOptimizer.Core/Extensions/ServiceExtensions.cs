@@ -55,6 +55,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.TryAddSingleton<IMemoryCache, MemoryCache>();
             services.TryAddSingleton<IAssetPipeline>(factory => pipeline);
+            services.TryAddSingleton<IAssetBuilder, AssetBuilder>();
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<WebOptimizerOptions>, WebOptimizerConfig>());
 
             return services;

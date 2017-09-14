@@ -51,9 +51,11 @@ namespace WebOptimizer.Test
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
 
-            var logger =  new Mock<ILogger<AssetMiddleware>>();
-
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, logger.Object);
+            var mcr = new AssetResponse(cssContent.AsByteArray(), null);
+            var logger = new Mock<ILogger<AssetMiddleware>>();
+            var builder = new Mock<IAssetBuilder>();
+            builder.Setup(b => b.BuildAsync(It.IsAny<IAsset>(), context.Object, options)).Returns(Task.FromResult<IAssetResponse>(mcr));
+            var middleware = new AssetMiddleware(next.Object, pipeline, logger.Object, builder.Object);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
@@ -96,9 +98,9 @@ namespace WebOptimizer.Test
             amo.SetupGet(a => a.Value).Returns(options);
 
             var logger = new Mock<ILogger<AssetMiddleware>>();
+            var builder = new Mock<IAssetBuilder>();
+            var middleware = new AssetMiddleware(next.Object, pipeline, logger.Object, builder.Object);
 
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, logger.Object);
-            Directory.Delete(middleware._cacheDir, true);
             var stream = new MemoryStream();
 
             await middleware.InvokeAsync(context.Object, amo.Object);
@@ -132,7 +134,7 @@ namespace WebOptimizer.Test
             var next = new Mock<RequestDelegate>();
             var env = new HostingEnvironment();
             var cache = new Mock<IMemoryCache>();
-            var mcr = new MemoryCachedResponse(cssContent);
+            var mcr = new AssetResponse(cssContent, null);
 
             object bytes = mcr;
             cache.Setup(c => c.TryGetValue(It.IsAny<string>(), out bytes))
@@ -145,8 +147,9 @@ namespace WebOptimizer.Test
             amo.SetupGet(a => a.Value).Returns(options);
 
             var logger = new Mock<ILogger<AssetMiddleware>>();
-
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, logger.Object);
+            var builder = new Mock<IAssetBuilder>();
+            builder.Setup(b => b.BuildAsync(It.IsAny<IAsset>(), context.Object, options)).Returns(Task.FromResult<IAssetResponse>(mcr));
+            var middleware = new AssetMiddleware(next.Object, pipeline, logger.Object, builder.Object);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
@@ -187,7 +190,7 @@ namespace WebOptimizer.Test
             var next = new Mock<RequestDelegate>();
             var env = new HostingEnvironment();
             var cache = new Mock<IMemoryCache>();
-            var mcr = new MemoryCachedResponse(cssContent);
+            var mcr = new AssetResponse(cssContent, values);
 
             object bytes = mcr;
             cache.Setup(c => c.TryGetValue(It.IsAny<string>(), out bytes))
@@ -200,8 +203,9 @@ namespace WebOptimizer.Test
             amo.SetupGet(a => a.Value).Returns(options);
 
             var logger = new Mock<ILogger<AssetMiddleware>>();
-
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline, logger.Object);
+            var builder = new Mock<IAssetBuilder>();
+            builder.Setup(b => b.BuildAsync(It.IsAny<IAsset>(), context.Object, options)).Returns(Task.FromResult<IAssetResponse>(mcr));
+            var middleware = new AssetMiddleware(next.Object, pipeline, logger.Object, builder.Object);
             var stream = new MemoryStream();
 
             response.Setup(r => r.Body).Returns(stream);
@@ -232,10 +236,10 @@ namespace WebOptimizer.Test
             amo.SetupGet(a => a.Value).Returns(options);
 
             var logger = new Mock<ILogger<AssetMiddleware>>();
+            var builder = new Mock<IAssetBuilder>();
+            var middleware = new AssetMiddleware(next.Object, pipeline.Object, logger.Object, builder.Object);
 
-            var middleware = new AssetMiddleware(next.Object, env, cache.Object, pipeline.Object, logger.Object);
-
-            await middleware.InvokeAsync(context.Object,amo.Object);
+            await middleware.InvokeAsync(context.Object, amo.Object);
 
             next.Verify(n => n(context.Object), Times.Once);
 

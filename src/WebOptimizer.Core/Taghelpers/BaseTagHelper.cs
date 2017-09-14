@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.TagHelpers.Internal;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 
 namespace WebOptimizer.Taghelpers
@@ -59,7 +60,6 @@ namespace WebOptimizer.Taghelpers
         [HtmlAttributeNotBound]
         public ViewContext ViewContext { get; set; }
 
-
         /// <summary>
         /// Gets the quote character.
         /// </summary>
@@ -100,6 +100,21 @@ namespace WebOptimizer.Taghelpers
             string hash = asset.GenerateCacheKey(ViewContext.HttpContext);
 
             return $"{asset.Route}?v={hash}";
+        }
+
+        /// <summary>
+        /// Adds string value to memory cache.
+        /// </summary>
+        protected void AddToCache(string cacheKey, string value, IFileProvider fileProvider, params string[] files)
+        {
+            var cacheOptions = new MemoryCacheEntryOptions();
+
+            foreach (string file in files)
+            {
+                cacheOptions.AddExpirationToken(fileProvider.Watch(file));
+            }
+
+            Cache.Set(cacheKey, value, cacheOptions);
         }
     }
 }

@@ -1,11 +1,9 @@
 ﻿using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 
 namespace WebOptimizer.Taghelpers
@@ -17,12 +15,16 @@ namespace WebOptimizer.Taghelpers
     [HtmlTargetElement("script", Attributes = "inline")]
     public class ScriptInlineSrcTagHelper : BaseTagHelper
     {
+        private IAssetBuilder _builder;
+
         /// <summary>
         /// Tag helper for inlining content
         /// </summary>
-        public ScriptInlineSrcTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsSnapshot<WebOptimizerOptions> options)
+        public ScriptInlineSrcTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsSnapshot<WebOptimizerOptions> options, IAssetBuilder builder)
             : base(env, cache, pipeline, options)
-        { }
+        {
+            _builder = builder;
+        }
 
         /// <summary>
         /// Makes sure this taghelper runs before the built in ones.
@@ -53,8 +55,7 @@ namespace WebOptimizer.Taghelpers
                 output.Attributes.RemoveAll("src");
                 output.Attributes.RemoveAll("async");
                 output.Attributes.RemoveAll("defer");
-
-                Options.EnsureDefaults(HostingEnvironment);
+                
                 string route = AssetPipeline.NormalizeRoute(Src);
                 string content = await GetFileContentAsync(route);
 
@@ -65,58 +66,34 @@ namespace WebOptimizer.Taghelpers
 
         private async Task<string> GetFileContentAsync(string route)
         {
-            string cacheKey = route;
-
             if (Pipeline.TryGetAssetFromRoute(route, out IAsset asset))
             {
-                cacheKey = asset.GenerateCacheKey(ViewContext.HttpContext);
-            }
-
-            if (Cache.TryGetValue(cacheKey, out MemoryCachedResponse response))
-            {
+                IAssetResponse response = await _builder.BuildAsync(asset, ViewContext.HttpContext, Options);
                 return response.Body.AsString();
             }
 
-            if (asset != null)
+            string cacheKey = "_WO_" + route;
+
+            if (Cache.TryGetValue(cacheKey, out string content))
             {
-                byte[] contents = await asset.ExecuteAsync(ViewContext.HttpContext, Options);
-
-                AddToCache(cacheKey, contents, asset.GetFileProvider(HostingEnvironment), asset.SourceFiles.ToArray());
-                string s = contents.AsString();
-
-                return s ?? $"/* File '{route}' not found */";
+                return content;
             }
-            else
+
+            string cleanRoute = route.TrimStart('~');
+            string file = HostingEnvironment.WebRootFileProvider.GetFileInfo(cleanRoute).PhysicalPath;
+
+            if (File.Exists(file))
             {
-                string file = HostingEnvironment.WebRootFileProvider.GetFileInfo(route.TrimStart('~')).PhysicalPath;
-
-                if (File.Exists(file))
+                using (StreamReader reader = File.OpenText(file))
                 {
-                    using (FileStream fs = File.OpenRead(file))
-                    {
-                        byte[] content = await fs.AsBytesAsync();
-                        AddToCache(cacheKey, content, HostingEnvironment.WebRootFileProvider, file);
+                    content = await reader.ReadToEndAsync();
+                    AddToCache(cacheKey, content, HostingEnvironment.WebRootFileProvider, cleanRoute);
 
-                        return content.AsString();
-                    }
+                    return content;
                 }
             }
 
             throw new FileNotFoundException("File or bundle doesn't exist", route);
-        }
-
-        private void AddToCache(string cacheKey, byte[] value, IFileProvider fileProvider, params string[] files)
-        {
-            var cacheOptions = new MemoryCacheEntryOptions();
-
-            foreach (string file in files)
-            {
-                cacheOptions.AddExpirationToken(fileProvider.Watch(file));
-            }
-
-            var response = new MemoryCachedResponse(value);
-
-            Cache.Set(cacheKey, response, cacheOptions);
         }
     }
 }
