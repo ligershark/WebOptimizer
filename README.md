@@ -14,7 +14,7 @@ Check out the **[demo website](https://weboptimizer.azurewebsites.net/)** or its
 - [Minification](#minification)
 - [Bundling](#bundling)
 - [Tag Helpers](#tag-helpers)
-  - [Cache busing](#cache-busting)
+  - [Cache busting](#cache-busting)
   - [Inlining content](#inlining-content)
 - [Compiling Scss](#compiling-scss)
 - [Options](#options)
