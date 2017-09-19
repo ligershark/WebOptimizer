@@ -31,7 +31,7 @@ namespace WebOptimizer.Taghelpers
                 return;
             }
 
-            string src = CdnTagHelper.GetValue("src", output);
+            string src = LinkTagHelper.GetValue("src", output);
 
             if (Pipeline.TryGetAssetFromRoute(src, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {

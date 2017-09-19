@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -33,7 +36,7 @@ namespace WebOptimizer.Taghelpers
                 return;
             }
 
-            string href = CdnTagHelper.GetValue("href", output);
+            string href = GetValue("href", output);
 
             if (Pipeline.TryGetAssetFromRoute(href, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
@@ -77,6 +80,34 @@ namespace WebOptimizer.Taghelpers
                 string href = AddFileVersionToPath(file, asset);
                 output.PostElement.AppendHtml($"<link href=\"{href}\" {string.Join(" ", attrs)} />" + Environment.NewLine);
             }
+        }
+
+        internal static string GetValue(string attrName, TagHelperOutput output)
+        {
+            if (string.IsNullOrEmpty(attrName) || !output.Attributes.TryGetAttribute(attrName, out var attr))
+            {
+                return null;
+            }
+
+            if (attr.Value is string stringValue)
+            {
+                return stringValue;
+            }
+            else if (attr.Value is IHtmlContent content)
+            {
+                if (content is HtmlString htmlString)
+                {
+                    return htmlString.ToString();
+                }
+
+                using (var writer = new StringWriter())
+                {
+                    content.WriteTo(writer, HtmlEncoder.Default);
+                    return writer.ToString();
+                }
+            }
+
+            return null;
         }
     }
 }
