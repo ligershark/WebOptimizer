@@ -33,6 +33,9 @@ namespace WebOptimizer.Taghelpers
 
             string src = LinkTagHelper.GetValue("src", output);
 
+            if (string.IsNullOrEmpty(src))
+                return;
+
             if (Pipeline.TryGetAssetFromRoute(src, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
                 Options.EnsureDefaults(HostingEnvironment);
