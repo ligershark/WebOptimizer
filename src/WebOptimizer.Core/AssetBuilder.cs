@@ -43,7 +43,7 @@ namespace WebOptimizer
                 _logger.LogServedFromMemoryCache(context.Request.Path);
                 return value;
             }
-            else if (AssetResponse.TryGetFromDiskCache(context.Request.Path, cacheKey, _cacheDir, out value))
+            else if (AssetResponse.TryGetFromDiskCache(asset.Route, cacheKey, _cacheDir, out value))
             {
                 AddToCache(cacheKey, value, asset, options);
                 return value;
@@ -66,7 +66,7 @@ namespace WebOptimizer
 
                 AddToCache(cacheKey, response, asset, options);
 
-                await response.CacheToDiskAsync(context.Request.Path, cacheKey, _cacheDir).ConfigureAwait(false);
+                await response.CacheToDiskAsync(asset.Route, cacheKey, _cacheDir).ConfigureAwait(false);
 
                 _logger.LogGeneratedOutput(context.Request.Path);
 
