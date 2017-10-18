@@ -30,13 +30,13 @@ namespace WebOptimizer
             {
                 IFileInfo input = fileProvider.GetFileInfo(key);
 
-                content[key] = await InlineAsync(config.Content[key].AsString(), input);
+                content[key] = await InlineAsync(config.Content[key].AsString(), input, env);
             }
 
             config.Content = content;
         }
 
-        private static async Task<byte[]> InlineAsync(string content, IFileInfo input)
+        private static async Task<byte[]> InlineAsync(string content, IFileInfo input, IHostingEnvironment env)
         {
             MatchCollection matches = _rxUrl.Matches(content);
             string inputDir = Path.GetDirectoryName(input.PhysicalPath);
@@ -44,6 +44,7 @@ namespace WebOptimizer
             foreach (Match match in matches)
             {
                 string urlValue = match.Groups[2].Value;
+                string dir = inputDir;
 
                 if (urlValue.Contains("://") || urlValue.StartsWith("//"))
                 {
@@ -54,7 +55,12 @@ namespace WebOptimizer
                 string pathOnly = pathAndQuery[0];
                 string queryOnly = pathAndQuery.Length == 2 ? pathAndQuery[1] : string.Empty;
 
-                var info = new FileInfo(Path.Combine(inputDir, pathOnly.TrimStart('/')));
+                if (pathOnly.StartsWith("/", StringComparison.Ordinal))
+                {
+                    dir = env.WebRootPath;
+                }
+
+                var info = new FileInfo(Path.Combine(dir, pathOnly.TrimStart('/')));
 
                 if (!info.Exists)
                 {

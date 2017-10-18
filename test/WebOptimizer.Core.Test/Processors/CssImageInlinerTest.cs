@@ -14,9 +14,9 @@ namespace WebOptimizer.Test.Processors
     public class CssImageInlinerTest
     {
         [Theory2]
-        [InlineData("url(/img/test.png)", "url('data:image/png;base64,ZW1wdHk=')")]
-        [InlineData("url(/img/test.png?1=1)", "url('data:image/png;base64,ZW1wdHk=')")]
-        [InlineData("url('/img/test.png')", "url('data:image/png;base64,ZW1wdHk=')")]
+        [InlineData("url(/css/img/test.png)", "url('data:image/png;base64,ZW1wdHk=')")]
+        [InlineData("url(/css/img/test.png?1=1)", "url('data:image/png;base64,ZW1wdHk=')")]
+        [InlineData("url('/css/img/test.png')", "url('data:image/png;base64,ZW1wdHk=')")]
         [InlineData("url('/img/doesntexist.png')", "url('/img/doesntexist.png')")]
         [InlineData("url(http://test.png)", "url(http://test.png)")]
         public async Task CssImageInliner_Success(string url, string newUrl)
@@ -52,6 +52,9 @@ namespace WebOptimizer.Test.Processors
 
             env.SetupGet(e => e.WebRootFileProvider)
                  .Returns(fileProvider.Object);
+
+            env.SetupGet(e => e.WebRootPath)
+                .Returns(temp);
 
             fileProvider.SetupSequence(f => f.GetFileInfo(It.IsAny<string>()))
                    .Returns(inputFile)

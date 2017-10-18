@@ -21,7 +21,7 @@ main {
 
 h1 {
     height: 64px;
-    background: url(../img/a.png) no-repeat left center;
+    background: url(/img/a.png) no-repeat left center;
     padding-left: 64px;
 }
 

@@ -27,7 +27,7 @@ namespace WebOptimizer
                 IFileInfo input = fileProvider.GetFileInfo(key);
                 IFileInfo output = fileProvider.GetFileInfo(config.Asset.Route);
 
-                content[key] = Adjust(config.Content[key].AsString(), input, output);
+                content[key] = Adjust(config.Content[key].AsString(), input, output, env);
             }
 
             config.Content = content;
@@ -35,7 +35,7 @@ namespace WebOptimizer
             return Task.CompletedTask;
         }
 
-        private static byte[] Adjust(string content, IFileInfo input, IFileInfo output)
+        private static byte[] Adjust(string content, IFileInfo input, IFileInfo output, IHostingEnvironment env)
         {
             MatchCollection matches = _rxUrl.Matches(content);
 
@@ -47,6 +47,7 @@ namespace WebOptimizer
                 foreach (Match match in matches)
                 {
                     string urlValue = match.Groups[2].Value;
+                    string dir = inputDir;
 
                     // Ignore references with protocols
                     if (urlValue.Contains("://") || urlValue.StartsWith("//") || urlValue.StartsWith("data:"))
@@ -57,7 +58,12 @@ namespace WebOptimizer
                     string pathOnly = pathAndQuery[0];
                     string queryOnly = pathAndQuery.Length == 2 ? pathAndQuery[1] : string.Empty;
 
-                    var info = new FileInfo(Path.Combine(inputDir, pathOnly.TrimStart('/')));
+                    if (pathOnly.StartsWith("/", StringComparison.Ordinal))
+                    {
+                        dir = env.WebRootPath;
+                    }
+
+                    var info = new FileInfo(Path.Combine(dir, pathOnly.TrimStart('/')));
 
                     if (!info.Exists)
                     {

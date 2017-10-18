@@ -15,9 +15,9 @@ namespace WebOptimizer.Test.Processors
     public class CssFinterprinterTest
     {
         [Theory2]
-        [InlineData("url(/img/foo.png)", "url(/img/foo.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI)")]
-        [InlineData("url(/img/foo.png?1=1)", "url(/img/foo.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI&1=1)")]
-        [InlineData("url('/img/foo.png')", "url('/img/foo.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI')")]
+        [InlineData("url(/css/img/foo.png)", "url(/css/img/foo.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI)")]
+        [InlineData("url(/css/img/foo.png?1=1)", "url(/css/img/foo.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI&1=1)")]
+        [InlineData("url('/css/img/foo.png')", "url('/css/img/foo.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI')")]
         [InlineData("url('/img/doesntexist.png')", "url('/img/doesntexist.png')")]
         [InlineData("url(http://foo.png)", "url(http://foo.png)")]
         public async Task CssFingerprint_Success(string url, string newUrl)
@@ -49,10 +49,13 @@ namespace WebOptimizer.Test.Processors
                    .Returns(env.Object);
 
             context.SetupGet(s => s.Asset)
-                        .Returns(asset.Object);
+                   .Returns(asset.Object);
 
             env.SetupGet(e => e.WebRootFileProvider)
                  .Returns(fileProvider.Object);
+
+            env.SetupGet(e => e.WebRootPath)
+                .Returns(temp);
 
             fileProvider.SetupSequence(f => f.GetFileInfo(It.IsAny<string>()))
                    .Returns(inputFile)
