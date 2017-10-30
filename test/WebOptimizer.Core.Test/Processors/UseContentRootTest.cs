@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Xunit;
 
 namespace WebOptimizer.Test.Processors
@@ -11,9 +13,20 @@ namespace WebOptimizer.Test.Processors
             var minifier = new UseContentRoot();
             var asset = new Asset("", "", new[] { "" });
 
-            Assert.False(asset.IsUsingContentRoot());
+            Assert.Equal(0, asset.Items.Count);
             asset.UseContentRoot();
-            Assert.True(asset.IsUsingContentRoot());
+            Assert.Equal(1, asset.Items.Count);
+        }
+
+        [Fact2]
+        public void UseFileProvider_Success()
+        {
+            var minifier = new UseContentRoot();
+            var asset = new Asset("", "", new[] { "" });
+
+            Assert.Equal(0, asset.Items.Count);
+            asset.UseFileProvider(null);
+            Assert.Equal(1, asset.Items.Count);
         }
     }
 }

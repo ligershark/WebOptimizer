@@ -37,7 +37,7 @@ namespace Microsoft.Extensions.DependencyInjection
     public static partial class AssetPipelineExtensions
     {
         /// <summary>
-        /// Adds the string content of all source files to the pipeline.
+        /// Uses the content root folder (usually the project root) instead of the wwwroot.
         /// </summary>
         public static IAsset UseContentRoot(this IAsset asset)
         {
@@ -46,19 +46,34 @@ namespace Microsoft.Extensions.DependencyInjection
             return asset;
         }
 
-        internal static bool IsUsingContentRoot(this IAsset asset)
+        /// <summary>
+        /// Uses the specified <see cref="IFileProvider"/> to locate the source files.
+        /// </summary>
+        public static IAsset UseFileProvider(this IAsset asset, IFileProvider fileProvider)
+        {
+            asset.Items["fileprovider"] = fileProvider;
+
+            return asset;
+        }
+
+        internal static IFileProvider GetCustomFileProvider(this IAsset asset, IHostingEnvironment env)
         {
             if (asset?.Items == null)
             {
-                return false;
+                return null;
             }
 
-            if (asset.Items.TryGetValue("usecontentroot", out var value) && value is bool useContentRoot)
+            if (asset.Items.TryGetValue("usecontentroot", out object value) && value is bool useContentRoot)
             {
-                return useContentRoot;
+                return env.ContentRootFileProvider;
             }
 
-            return false;
+            if (asset.Items.TryGetValue("fileprovider", out value) && value is IFileProvider provider)
+            {
+                return provider;
+            }
+
+            return null;
         }
     }
 }

@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
+using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 
 namespace WebOptimizer
@@ -133,7 +134,7 @@ namespace WebOptimizer
         {
             var cacheKey = new StringBuilder(Route);
 
-            if (context.Request.Headers.TryGetValue("Accept-Encoding", out var enc))
+            if (context.Request.Headers.TryGetValue("Accept-Encoding", out StringValues enc))
             {
                 cacheKey.Append(enc.ToString());
             }
@@ -216,7 +217,7 @@ namespace WebOptimizer
         /// </summary>
         public static IFileProvider GetFileProvider(this IAsset asset, IHostingEnvironment env)
         {
-            return asset.IsUsingContentRoot() ? env.ContentRootFileProvider : env.WebRootFileProvider;
+            return asset.GetCustomFileProvider(env) ?? env.WebRootFileProvider;
         }
     }
 }
