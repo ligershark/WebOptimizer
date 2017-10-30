@@ -158,7 +158,20 @@ services.AddWebOptimizer(pipeline =>
 });
 ```
 
+
 The `UseContentRoot()` method makes the bundle look for source files in the Content Root rather than in the Web Root.
+
+To use a completely custom `IFileProvider`, you can use the `UseFileProvider` pipeline method.
+
+```csharp
+services.AddWebOptimizer(pipeline =>
+{
+    var provider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(@"C:\path\to\my\root\folder");
+    pipeline.AddJavaScriptBundle("/js/scripts.js", "a.js", "b.js")
+        .UseFileProvider(provider);
+});
+
+```
 
 ## Tag Helpers
 WebOptimizer ships with a few [Tag Helpers](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/intro) that helps with a few important tasks.
