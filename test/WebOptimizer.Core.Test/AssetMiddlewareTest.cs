@@ -181,6 +181,8 @@ namespace WebOptimizer.Test
                    .Returns(true);
             context.Setup(c => c.Response)
                    .Returns(response.Object);
+            context.Setup(c => c.Request.Query.ContainsKey(It.IsAny<string>()))
+                   .Returns(true);
 
             context.Setup(c => c.Request.Path).Returns("/file.css");
 

@@ -27,6 +27,20 @@ namespace WebOptimizer.Test.Processors
             Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
         }
 
+        [Fact2]
+        public async Task MinifyHtml_Malformed_Fail()
+        {
+            var minifier = new HtmlMinifier(new HtmlSettings());
+            var context = new Mock<IAssetContext>().SetupAllProperties();
+            context.Object.Content = new Dictionary<string, byte[]> { { "", "<br".AsByteArray() } };
+            var options = new Mock<WebOptimizerOptions>();
+
+            await minifier.ExecuteAsync(context.Object);
+
+            Assert.StartsWith("<!--", context.Object.Content.First().Value.AsString());
+            Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
+        }
+
         [Theory2]
         [InlineData("")]
         [InlineData("   ")]
