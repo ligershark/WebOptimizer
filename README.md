@@ -206,7 +206,7 @@ To do this, simply add the attribute `inline` to any `<link>` or `<script>` elem
 
 ```html
 <link rel="stylesheet" href="/css/bundle.css" inline />
-<scrpt src="/any/file.js" inline></script>
+<script src="/any/file.js" inline></script>
 ```
 
 There is a Tag Helper that understands what the `inline` attribute means and handles the inlining automatically.
