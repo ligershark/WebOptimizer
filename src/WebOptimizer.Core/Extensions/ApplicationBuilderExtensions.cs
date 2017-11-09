@@ -11,7 +11,7 @@ namespace Microsoft.AspNetCore.Builder
         /// <summary>
         /// Adds WebOptimizer to the <see cref="IApplicationBuilder"/> request execution pipeline
         /// </summary>
-        public static void UseWebOptimizer(this IApplicationBuilder app)
+        public static IApplicationBuilder UseWebOptimizer(this IApplicationBuilder app)
         {
             if (app == null)
             {
@@ -25,6 +25,8 @@ namespace Microsoft.AspNetCore.Builder
             }
 
             app.UseMiddleware<AssetMiddleware>();
+
+            return app;
         }
     }
 }
