@@ -55,7 +55,15 @@ namespace WebOptimizer
 
             foreach (string oldFile in oldCachedFiles)
             {
-                File.Delete(oldFile);
+                try
+                {
+                    File.Delete(oldFile);
+                }
+                catch (Exception)
+                {
+                    // The file might be locked by a previous request. If so, just ignore
+                    // and it will be cleaned up next time.
+                }
             }
 
             // Then serialize to disk
