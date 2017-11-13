@@ -13,7 +13,7 @@ install:
 
 build_script:
   - dotnet restore -v quiet
-  - ps: dotnet build /p:configuration=Release /p:Version=$($env:appveyor_build_version)-beta
+  - ps: dotnet build /p:configuration=Release /p:Version=$($env:appveyor_build_version)
 
 test_script:
   - dotnet test test/WebOptimizer.Core.Test/WebOptimizer.Core.Test.csproj
