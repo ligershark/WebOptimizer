@@ -77,8 +77,15 @@ namespace WebOptimizer.Taghelpers
 
             foreach (string file in sourceFiles)
             {
-                string href = AddFileVersionToPath(file, asset);
-                output.PostElement.AppendHtml($"<link href=\"{href}\" {string.Join(" ", attrs)} />" + Environment.NewLine);
+                string fileToAdd = file;
+                if (Path.GetExtension(file) == ".scss")
+                {
+                    if (Path.GetFileName(file).StartsWith("_")) continue;
+
+                    fileToAdd = Path.ChangeExtension(file, "css");
+                }
+                string href = AddFileVersionToPath(fileToAdd, asset);
+                output.PostElement.AppendHtml($"<link href=\"/{href}\" {string.Join(" ", attrs)} />" + Environment.NewLine);
             }
         }
 
