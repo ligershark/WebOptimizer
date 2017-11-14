@@ -78,7 +78,7 @@ namespace WebOptimizer.Taghelpers
             foreach (string file in sourceFiles)
             {
                 string href = AddFileVersionToPath(file, asset);
-                output.PostElement.AppendHtml($"<link href=\"{href}\" {string.Join(" ", attrs)} />" + Environment.NewLine);
+                output.PostElement.AppendHtml($"<link href=\"/{href}\" {string.Join(" ", attrs)} />" + Environment.NewLine);
             }
         }
 
