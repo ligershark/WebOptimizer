@@ -38,20 +38,28 @@ namespace WebOptimizer
             {
                 foreach (IAsset existing in Assets)
                 {
-                    var matcher = new Matcher();
-                    matcher.AddInclude(existing.Route);
-
-                    if (matcher.Match(cleanRoute.TrimStart('/')).HasMatches)
+                    try
                     {
-                        asset = new Asset(cleanRoute, existing.ContentType, this, new[] { cleanRoute });
+                        var matcher = new Matcher();
+                        matcher.AddInclude(existing.Route);
 
-                        foreach (IProcessor processor in existing.Processors)
+                        if (matcher.Match(cleanRoute.TrimStart('/')).HasMatches)
                         {
-                            asset.Processors.Add(processor);
-                        }
+                            asset = new Asset(cleanRoute, existing.ContentType, this, new[] { cleanRoute });
 
-                        _assets.Add(asset);
-                        return true;
+                            foreach (IProcessor processor in existing.Processors)
+                            {
+                                asset.Processors.Add(processor);
+                            }
+
+                            _assets.Add(asset);
+                            return true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //Some paths may be invalid and the call to matcher.Match will fail
+                        System.Diagnostics.Debug.Write(ex);
                     }
                 }
             }

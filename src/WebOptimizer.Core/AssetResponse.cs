@@ -38,7 +38,7 @@ namespace WebOptimizer
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.Write(ex);
-                    File.Delete(filePath);
+                    DeleteFileAsync(filePath).GetAwaiter().GetResult();
                 }
             }
 
@@ -55,25 +55,14 @@ namespace WebOptimizer
 
             foreach (string oldFile in oldCachedFiles)
             {
-                try
-                {
-                    File.Delete(oldFile);
-                }
-                catch (Exception)
-                {
-                    // The file might be locked by a previous request. If so, just ignore
-                    // and it will be cleaned up next time.
-                }
+                await DeleteFileAsync(oldFile).ConfigureAwait(false);
             }
 
             // Then serialize to disk
             string filePath = GetPath(name, cacheKey, cacheDir);
-
             string json = JsonConvert.SerializeObject(this);
-            using (var writer = new StreamWriter(filePath))
-            {
-                await writer.WriteAsync(json).ConfigureAwait(false);
-            }
+
+            await WriteFileAsync(filePath, json);
         }
 
         private static string CleanRouteName(string route)
@@ -84,6 +73,44 @@ namespace WebOptimizer
         private static string GetPath(string name, string cacheKey, string cacheDir)
         {
             return Path.Combine(cacheDir, $"{name}__{cacheKey}.cache");
+        }
+
+        private static async Task DeleteFileAsync(string filePath, int attempts = 5)
+        {
+            await TryAsync(attempts, () =>
+            {
+                File.Delete(filePath);
+                return Task.CompletedTask;
+            }).ConfigureAwait(false);
+        }
+
+        private static async Task WriteFileAsync(string filePath, string content, int attempts = 5)
+        {
+            await TryAsync(attempts, async () =>
+            {
+                using (var writer = new StreamWriter(filePath))
+                {
+                    await writer.WriteAsync(content).ConfigureAwait(false);
+                }
+            }).ConfigureAwait(false);
+        }
+
+        private static async Task TryAsync(int attempts, Func<Task> callback)
+        {
+            try
+            {
+                await callback().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.Write(ex);
+                if (attempts > 0)
+                {
+                    await Task.Delay(10);
+                    attempts--;
+                    await TryAsync(attempts, callback).ConfigureAwait(false);
+                }
+            }
         }
     }
 }
