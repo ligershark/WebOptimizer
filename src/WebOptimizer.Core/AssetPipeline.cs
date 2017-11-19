@@ -52,6 +52,16 @@ namespace WebOptimizer
                                 asset.Processors.Add(processor);
                             }
 
+                            foreach (KeyValuePair<string, object> items in existing.Items)
+                            {
+                                if (items.Key == Asset.PhysicalFilesKey)
+                                {
+                                    continue;
+                                }
+
+                                asset.Items.Add(items);
+                            }
+
                             _assets.Add(asset);
                             return true;
                         }
