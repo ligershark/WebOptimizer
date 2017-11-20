@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using NUglify.Helpers;
 using Xunit;
 
 namespace WebOptimizer.Test
@@ -133,6 +135,37 @@ namespace WebOptimizer.Test
             Assert.True(pipeline.TryGetAssetFromRoute(path, out var a1));
             Assert.Equal($"/{path.TrimStart('/')}", a1.Route);
         }
+
+        [Theory2]
+        [InlineData("scripts/*.css", "/scripts/ost.css")]
+        [InlineData("scripts/**/*.css", "/scripts/a/b/c/ost.css")]
+        [InlineData("**/*.css", "/scripts/a/b/c/ost.css")]
+        [InlineData("*.css", "/foo.css")]
+        public void FromRoute_Globbing_WithItems_Success(string pattern, string path)
+        {
+            var pipeline = new AssetPipeline();
+            pipeline.AddFiles("text/css", pattern).ForEach(x => x.UseContentRoot());
+
+            Assert.True(pipeline.TryGetAssetFromRoute(path, out var a1));
+            Assert.Equal($"/{path.TrimStart('/')}", a1.Route);
+            Assert.Equal(1, a1.Items.Count);
+            Assert.Contains(a1.Items, p => p.Key == "usecontentroot");
+        }
+
+        [Theory2]
+        [InlineData("scripts/*.css", "/scripts/ost.css")]
+        [InlineData("scripts/**/*.css", "/scripts/a/b/c/ost.css")]
+        [InlineData("**/*.css", "/scripts/a/b/c/ost.css")]
+        [InlineData("*.css", "/foo.css")]
+        public void FromRoute_Globbing_WithProcessors_Success(string pattern, string path)
+        {
+            var pipeline = new AssetPipeline();
+            pipeline.AddFiles("text/css", pattern).MinifyCss();
+
+            Assert.True(pipeline.TryGetAssetFromRoute(path, out var a1));
+            Assert.Equal(1, a1.Processors.Count);
+        }
+
 
         [Fact2]
         public void FromRoute_Null_Success()
