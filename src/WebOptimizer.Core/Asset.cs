@@ -22,7 +22,7 @@ namespace WebOptimizer
     internal class Asset : IAsset
     {
         private static FileVersionProvider _fileVersionProvider;
-        private const string _physicalFilesKey = "PhysicalFiles";
+        internal const string PhysicalFilesKey = "PhysicalFiles";
 
         public Asset(string route, string contentType, IAssetPipeline pipeline, IEnumerable<string> sourceFiles)
             : this(route, contentType, sourceFiles)
@@ -106,7 +106,7 @@ namespace WebOptimizer
                 files.AddRange(fileMatches.Where(f => !files.Contains(f)));
             }
 
-            asset.Items[_physicalFilesKey] = files;
+            asset.Items[PhysicalFilesKey] = files;
 
             return files;
         }
@@ -152,13 +152,13 @@ namespace WebOptimizer
                     context.Request.PathBase);
             }
 
-            if (!Items.ContainsKey(_physicalFilesKey))
+            if (!Items.ContainsKey(PhysicalFilesKey))
             {
                 physicalFiles = ExpandGlobs(this, env);
             }
             else
             {
-                physicalFiles = Items[_physicalFilesKey] as IEnumerable<string>;
+                physicalFiles = Items[PhysicalFilesKey] as IEnumerable<string>;
             }
 
             if (physicalFiles != null)
