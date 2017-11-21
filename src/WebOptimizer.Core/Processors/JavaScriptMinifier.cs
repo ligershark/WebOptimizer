@@ -79,7 +79,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings, params string[] sourceFiles)
         {
-            return pipeline.AddFiles("application/javascript; charset=UTF-8", sourceFiles)
+            return pipeline.AddFiles("text/javascript; charset=UTF-8", sourceFiles)
                            .MinifyJavaScript(settings);
         }
 
@@ -96,7 +96,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IAsset AddJavaScriptBundle(this IAssetPipeline pipeline, string route, CodeSettings settings, params string[] sourceFiles)
         {
-            return pipeline.AddBundle(route, "application/javascript; charset=UTF-8", sourceFiles)
+            return pipeline.AddBundle(route, "text/javascript; charset=UTF-8", sourceFiles)
                            .EnforceFileExtensions(".js", ".jsx", ".es5", ".es6")
                            .Concatenate()
                            .MinifyJavaScript(settings);

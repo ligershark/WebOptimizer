@@ -66,7 +66,7 @@ namespace WebOptimizer.Test.Processors
             var asset = pipeline.AddJavaScriptBundle("/foo.js", "file1.js", "file2.js");
 
             Assert.Equal("/foo.js", asset.Route);
-            Assert.Equal("application/javascript; charset=UTF-8", asset.ContentType);
+            Assert.Equal("text/javascript; charset=UTF-8", asset.ContentType);
             Assert.Equal(2, asset.SourceFiles.Count());
             Assert.Equal(3, asset.Processors.Count);
         }
@@ -79,7 +79,7 @@ namespace WebOptimizer.Test.Processors
             var asset = pipeline.AddJavaScriptBundle("/foo.js", settings, "file1.js", "file2.js");
 
             Assert.Equal("/foo.js", asset.Route);
-            Assert.Equal("application/javascript; charset=UTF-8", asset.ContentType);
+            Assert.Equal("text/javascript; charset=UTF-8", asset.ContentType);
             Assert.Equal(2, asset.SourceFiles.Count());
             Assert.Equal(3, asset.Processors.Count);
         }
@@ -91,7 +91,7 @@ namespace WebOptimizer.Test.Processors
             var asset = pipeline.MinifyJsFiles().First();
 
             Assert.Equal("/**/*.js", asset.Route);
-            Assert.Equal("application/javascript; charset=UTF-8", asset.ContentType);
+            Assert.Equal("text/javascript; charset=UTF-8", asset.ContentType);
             Assert.True(1 == asset.SourceFiles.Count());
             Assert.True(1 == asset.Processors.Count);
         }

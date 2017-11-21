@@ -34,7 +34,7 @@ namespace WebOptimizer
         /// <summary>
         /// Adds an array of files to the optimization pipeline.
         /// </summary>
-        /// <param name="contentType">The content type of the response. Example: text/css or application/javascript.</param>
+        /// <param name="contentType">The content type of the response. Example: text/css or text/javascript.</param>
         /// <param name="sourceFiles">A list of relative file names or globbing patterns of the sources to add.</param>
         IEnumerable<IAsset> AddFiles(string contentType, params string[] sourceFiles);
 
