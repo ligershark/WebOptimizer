@@ -64,6 +64,7 @@ namespace WebOptimizer
 
                 if (!info.Exists)
                 {
+                    match = _rxUrl.Match(content, match.Index + match.Length);
                     continue;
                 }
 
