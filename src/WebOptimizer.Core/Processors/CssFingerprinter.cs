@@ -13,7 +13,7 @@ namespace WebOptimizer
 {
     internal class CssFingerprinter : Processor
     {
-        private static readonly Regex _rxUrl = new Regex(@"url\s*\(\s*([""']?)([^:)]+)\1\s*\)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex _rxUrl = new Regex(@"(url\s*\(\s*)([""']?)([^:)]+)(\2\s*\))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         public override Task ExecuteAsync(IAssetContext config)
         {
@@ -37,49 +37,58 @@ namespace WebOptimizer
 
         private static byte[] Adjust(string content, IFileInfo input, IFileInfo output, IHostingEnvironment env)
         {
-            MatchCollection matches = _rxUrl.Matches(content);
+            string inputDir = Path.GetDirectoryName(input.PhysicalPath);
 
-            // Ignore the file if no match
-            if (matches.Count > 0)
+            Match match = _rxUrl.Match(content);
+
+            while (match.Success)
             {
-                string inputDir = Path.GetDirectoryName(input.PhysicalPath);
+                string urlValue = match.Groups[3].Value;
+                string dir = inputDir;
 
-                foreach (Match match in matches)
+                // Ignore references with protocols
+                if (urlValue.Contains("://") || urlValue.StartsWith("//") || urlValue.StartsWith("data:"))
+                    continue;
+
+                //prevent query string from causing error
+                string[] pathAndQuery = urlValue.Split(new[] { '?' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                string pathOnly = pathAndQuery[0];
+                string queryOnly = pathAndQuery.Length == 2 ? pathAndQuery[1] : string.Empty;
+
+                if (pathOnly.StartsWith("/", StringComparison.Ordinal))
                 {
-                    string urlValue = match.Groups[2].Value;
-                    string dir = inputDir;
-
-                    // Ignore references with protocols
-                    if (urlValue.Contains("://") || urlValue.StartsWith("//") || urlValue.StartsWith("data:"))
-                        continue;
-
-                    //prevent query string from causing error
-                    string[] pathAndQuery = urlValue.Split(new[] { '?' }, 2, StringSplitOptions.RemoveEmptyEntries);
-                    string pathOnly = pathAndQuery[0];
-                    string queryOnly = pathAndQuery.Length == 2 ? pathAndQuery[1] : string.Empty;
-
-                    if (pathOnly.StartsWith("/", StringComparison.Ordinal))
-                    {
-                        dir = env.WebRootPath;
-                    }
-
-                    var info = new FileInfo(Path.Combine(dir, pathOnly.TrimStart('/')));
-
-                    if (!info.Exists)
-                    {
-                        continue;
-                    }
-
-                    string hash = GenerateHash(info.LastWriteTime.Ticks.ToString());
-                    string withHash = pathOnly + $"?v={hash}";
-
-                    if (!string.IsNullOrEmpty(queryOnly))
-                    {
-                        withHash += $"&{queryOnly}";
-                    }
-
-                    content = content.Replace(match.Groups[2].Value, withHash);
+                    dir = env.WebRootPath;
                 }
+
+                var info = new FileInfo(Path.Combine(dir, pathOnly.TrimStart('/')));
+
+                if (!info.Exists)
+                {
+                    continue;
+                }
+
+                string hash = GenerateHash(info.LastWriteTime.Ticks.ToString());
+                string withHash = pathOnly + $"?v={hash}";
+
+                if (!string.IsNullOrEmpty(queryOnly))
+                {
+                    withHash += $"&{queryOnly}";
+                }
+
+                string replaced =
+                    match.Groups[1].Value +
+                    match.Groups[2].Value +
+                    withHash +
+                    match.Groups[4].Value;
+
+                string preMatchContent = content.Substring(0, match.Index);
+                string postMatchContent = content.Substring(match.Index + match.Length);
+
+                content = preMatchContent + replaced + postMatchContent;
+
+                //search next match from end of one just found (and replaced)
+                int startIndex = (preMatchContent + replaced).Length;
+                match = _rxUrl.Match(content, startIndex);
             }
 
             return content.AsByteArray();
