@@ -82,7 +82,7 @@ namespace WebOptimizer.Test.Processors
             Assert.Equal("/foo.css", asset.Route);
             Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
             Assert.Equal(2, asset.SourceFiles.Count());
-            Assert.Equal(5, asset.Processors.Count);
+            Assert.Equal(6, asset.Processors.Count);
         }
 
         [Fact2]
@@ -95,7 +95,7 @@ namespace WebOptimizer.Test.Processors
             Assert.Equal("/foo.css", asset.Route);
             Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
             Assert.Equal(2, asset.SourceFiles.Count());
-            Assert.Equal(5, asset.Processors.Count);
+            Assert.Equal(6, asset.Processors.Count);
         }
 
         [Fact2]
@@ -107,7 +107,7 @@ namespace WebOptimizer.Test.Processors
             Assert.Equal("/**/*.css", asset.Route);
             Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
             Assert.True(1 == asset.SourceFiles.Count());
-            Assert.True(2 == asset.Processors.Count);
+            Assert.True(3 == asset.Processors.Count);
         }
     }
 }

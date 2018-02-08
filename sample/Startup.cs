@@ -25,7 +25,8 @@ namespace WebOptimizerDemo
                 // This bundle uses source files from the Content Root and uses a custom PrependHeader extension
                 pipeline.AddJavaScriptBundle("/js/scripts.js", "scripts/a.js", "wwwroot/js/plus.js")
                         .UseContentRoot()
-                        .PrependHeader("My custom header");
+                        .PrependHeader("My custom header")
+                        .AddResponseHeader("x-test", "value");
 
                 // This will minify any JS and CSS file that isn't part of any bundle
                 pipeline.MinifyCssFiles();

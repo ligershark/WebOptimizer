@@ -80,6 +80,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IEnumerable<IAsset> MinifyJsFiles(this IAssetPipeline pipeline, CodeSettings settings, params string[] sourceFiles)
         {
             return pipeline.AddFiles("text/javascript; charset=UTF-8", sourceFiles)
+                           .AddResponseHeader("X-Content-Type-Options", "nosniff")
                            .MinifyJavaScript(settings);
         }
 
@@ -99,6 +100,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return pipeline.AddBundle(route, "text/javascript; charset=UTF-8", sourceFiles)
                            .EnforceFileExtensions(".js", ".jsx", ".es5", ".es6")
                            .Concatenate()
+                           .AddResponseHeader("X-Content-Type-Options", "nosniff")
                            .MinifyJavaScript(settings);
         }
 
