@@ -187,7 +187,9 @@ To do that, go to `_ViewImports.cshtml` and register the Tag Helpers by adding `
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 ```
 ### Cache busting
-As soon as the Tag Helpers are registered in your project, you'll notice how the `<script>` and `<link>` tags starts to render a little differently when they are referencing a bundle.
+As soon as the Tag Helpers are registered in your project, you'll notice how the `<script>` and `<link>` tags starts to render a little differently when they are referencing a file or bundle.
+
+**NOTE:** Unlike other ASP.NET Core Tag Helpers, `<script>` and `<link>` tags don't need an `asp-` attribute to be rendered as a Tag Helper. 
 
 They will get a version string added as a URL parameter:
 
