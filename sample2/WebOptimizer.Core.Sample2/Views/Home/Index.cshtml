@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div id="content">
+
+</div>
+
+@*<script type="text/javascript">
+
+        (function(innerhtml) {
+            var content = document.getElementById("content"),
+                div = document.createElement("div");
+
+            div.innerHTML = innerhtml;
+            content.appendChild(div);
+        })();
+
+
+    </script>*@
+
+
+
+<script type="text/javascript" src="~/Scripts1/Script1.js" asp-append-version="true" asp-bundle-key="bundle1"></script>
+
+<script type="text/javascript" src="~/Scripts2/Script2.js" asp-append-version="true" asp-bundle-key="bundle1"></script>
+
+<script type="text/javascript" src="~/js/Script3.js" asp-append-version="true" asp-bundle-key="bundle1"></script>
+
+<script type="text/javascript" src="~/EmbeddedResourcesScripts/EmbeddedScript1.js" asp-append-version="true" asp-bundle-key="bundle1"></script>
+
+<script type="text/javascript" src="~/EmbeddedResourcesScripts/Scripts/EmbeddedScript2.js" asp-append-version="true" asp-bundle-key="bundle1"></script>
+
+
+<script type="text/javascript" asp-bundle-dest-key="bundle1"></script>

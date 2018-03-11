@@ -87,23 +87,36 @@ namespace WebOptimizer
 
         public static IEnumerable<string> ExpandGlobs(IAsset asset, IHostingEnvironment env)
         {
-            string root = asset.GetFileProvider(env).GetFileInfo("/").PhysicalPath;
-            var dir = new DirectoryInfoWrapper(new DirectoryInfo(root));
             var files = new List<string>();
 
             foreach (string sourceFile in asset.SourceFiles)
             {
-                var matcher = new Matcher();
-                matcher.AddInclude(sourceFile);
-                PatternMatchingResult globbingResult = matcher.Execute(dir);
-                IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
+                string outSourceFile;
+                var provider = asset.GetFileProvider(env, sourceFile, out outSourceFile);
 
-                if (!fileMatches.Any())
+                var fileInfo = provider.GetFileInfo("/");
+                string root = fileInfo.PhysicalPath;
+                if (root != null)
                 {
-                    throw new FileNotFoundException($"No files found matching \"{sourceFile}\" exist in \"{dir.FullName}\"");
+                    var dir = new DirectoryInfoWrapper(new DirectoryInfo(root));
+                    var matcher = new Matcher();
+                    matcher.AddInclude(outSourceFile);
+                    PatternMatchingResult globbingResult = matcher.Execute(dir);
+                    IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
+
+                    if (!fileMatches.Any())
+                    {
+                        throw new FileNotFoundException($"No files found matching \"{sourceFile}\" exist in \"{dir.FullName}\"");
+                    }
+                    //files.AddRange(fileMatches.Where(f => !files.Contains(f)));
+                    files.Add(sourceFile);
+                }
+                else
+                {
+                    files.Add(sourceFile);
                 }
 
-                files.AddRange(fileMatches.Where(f => !files.Contains(f)));
+
             }
 
             asset.Items[PhysicalFilesKey] = files;
@@ -115,7 +128,7 @@ namespace WebOptimizer
         {
             IFileInfo file = fileProvider.GetFileInfo(sourceFile);
 
-            using (Stream fs = File.OpenRead(file.PhysicalPath))
+            using (Stream fs = file.CreateReadStream())
             {
                 byte[] bytes = await fs.AsBytesAsync();
 
@@ -218,6 +231,22 @@ namespace WebOptimizer
         public static IFileProvider GetFileProvider(this IAsset asset, IHostingEnvironment env)
         {
             return asset.GetCustomFileProvider(env) ?? env.WebRootFileProvider;
+        }
+
+        /// <summary>
+        /// Gets the file provider.
+        /// </summary>
+        internal static IFileProvider GetFileProvider(this IAsset asset, IHostingEnvironment env, string path, out string outpath)
+        {
+            var provider = asset.GetCustomFileProvider(env) ?? env.WebRootFileProvider;
+
+            if (provider is CompositeFileProviderExtended)
+            {
+                return ((CompositeFileProviderExtended)provider).GetFileProvider(path, out outpath);
+            }
+
+            outpath = path;
+            return provider;
         }
     }
 }

@@ -16,6 +16,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebOptimizer.Core.Test", "t
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebOptimizer.Core.Sample", "sample\WebOptimizer.Core.Sample.csproj", "{478357DE-07B8-443D-B430-E2390F74B060}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebOptimizer.Core.Sample2", "sample2\WebOptimizer.Core.Sample2\WebOptimizer.Core.Sample2.csproj", "{885AD8B7-1843-4579-8C28-E127B4A7CF68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebOptimizer.Core.Sample2.Lib", "sample2\WebOptimizer.Core.Sample2.Lib\WebOptimizer.Core.Sample2.Lib.csproj", "{F93B1ADA-6BF1-4BA3-9E88-2C5D84D81AD8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +38,14 @@ Global
 		{478357DE-07B8-443D-B430-E2390F74B060}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{478357DE-07B8-443D-B430-E2390F74B060}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{478357DE-07B8-443D-B430-E2390F74B060}.Release|Any CPU.Build.0 = Release|Any CPU
+		{885AD8B7-1843-4579-8C28-E127B4A7CF68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{885AD8B7-1843-4579-8C28-E127B4A7CF68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{885AD8B7-1843-4579-8C28-E127B4A7CF68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{885AD8B7-1843-4579-8C28-E127B4A7CF68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F93B1ADA-6BF1-4BA3-9E88-2C5D84D81AD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F93B1ADA-6BF1-4BA3-9E88-2C5D84D81AD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F93B1ADA-6BF1-4BA3-9E88-2C5D84D81AD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F93B1ADA-6BF1-4BA3-9E88-2C5D84D81AD8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
