@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Internal;
-using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -55,27 +49,27 @@ namespace WebOptimizer.Core.Sample2
 
             const string scriptsPath1 = "Scripts1";
             const string scriptsPath2 = "Scripts2";
-
+            
             var currentDirectory = Directory.GetCurrentDirectory();
             app.UseWebOptimizer(HostingEnvironment, new[]
             {
-                new StaticFileOptions
+                new FileProviderOptions
                 {
                     RequestPath = "/" + scriptsPath1,
                     FileProvider = new PhysicalFileProvider(Path.Combine(currentDirectory, scriptsPath1))
                 },
-                new StaticFileOptions
+                new FileProviderOptions
                 {
                     RequestPath = "/" + scriptsPath2,
                     FileProvider = new PhysicalFileProvider(Path.Combine(currentDirectory, scriptsPath2))
                 },
-                new StaticFileOptions
+                new FileProviderOptions
                 {
                     RequestPath = "/EmbeddedResourcesScripts",
                     FileProvider = new EmbeddedFileProvider(Lib.AssemblyTools.GetCurrentAssembly()),
                 }
             });
-
+            
             app.UseStaticFiles();
 
             app.UseMvc(routes =>

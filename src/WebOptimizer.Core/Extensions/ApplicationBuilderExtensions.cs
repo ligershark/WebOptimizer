@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using WebOptimizer;
 
 namespace Microsoft.AspNetCore.Builder
@@ -13,11 +12,11 @@ namespace Microsoft.AspNetCore.Builder
         /// <summary>
         /// Adds WebOptimizer to the <see cref="IApplicationBuilder"/> request execution pipeline
         /// </summary>
-        public static IApplicationBuilder UseWebOptimizer(this IApplicationBuilder app, IHostingEnvironment env, StaticFileOptions[] staticFileOptions = null)
+        public static IApplicationBuilder UseWebOptimizer(this IApplicationBuilder app, IHostingEnvironment env, FileProviderOptions[] fileProviderOptions = null)
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
             
-            env.WebRootFileProvider = new CompositeFileProviderExtended(env.WebRootFileProvider, staticFileOptions);
+            env.WebRootFileProvider = new CompositeFileProviderExtended(env.WebRootFileProvider, fileProviderOptions);
 
             app.UseWebOptimizer();
 

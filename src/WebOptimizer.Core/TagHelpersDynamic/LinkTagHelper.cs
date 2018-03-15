@@ -25,7 +25,6 @@ namespace WebOptimizer.TagHelpersDynamic
     [HtmlTargetElement(TagName, Attributes = BundleKeyName)]
     [HtmlTargetElement(TagName, Attributes = BundleDestinationKeyName)]
     public class LinkTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.LinkTagHelper
-    //public class LinkTagHelper : Common.AspNetCore.TagHelpersOverrided.LinkTagHelper
     {
         private const string TagName = "link";
 

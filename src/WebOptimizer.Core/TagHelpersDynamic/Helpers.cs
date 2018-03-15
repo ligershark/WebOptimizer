@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using WebOptimizer;
     
 namespace WebOptimizer.TagHelpersDynamic
 {
@@ -29,34 +28,31 @@ namespace WebOptimizer.TagHelpersDynamic
         #endregion
 
 
+
+        private static WebOptimizerOptions _webOptimizerOptions;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static WebOptimizerOptions GetWebOptimizerOptions(this IServiceProvider serviceProvider,
             IHostingEnvironment env)
         {
-            var options = ((IOptionsSnapshot<WebOptimizerOptions>)
-                    serviceProvider.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>)))
-                .Value;
+            if (_webOptimizerOptions == null)
+            {
+                var options = ((IOptionsSnapshot<WebOptimizerOptions>)
+                        serviceProvider.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>)))
+                    .Value;
 
-            EnsureDefaults(options, env);
+                //Ensures that defaults are set
+                options.EnableCaching = options.EnableCaching ?? !env.IsDevelopment();
+                options.EnableTagHelperBundling = options.EnableTagHelperBundling ?? true;
+                _webOptimizerOptions = options;
+            }
 
-            return options;
+            return _webOptimizerOptions;
         }
 
-        /// <summary>
-        /// Ensures that defaults are set
-        /// </summary>
-        internal static void EnsureDefaults(IWebOptimizerOptions options, IHostingEnvironment env)
+        private static string GetKey(IServiceProvider serviceProvider, string key)
         {
-            if (env == null) throw new ArgumentNullException(nameof(env));
-
-            options.EnableCaching = options.EnableCaching ?? !env.IsDevelopment();
-            options.EnableTagHelperBundling = options.EnableTagHelperBundling ?? true;
-        }
-
-        internal static string GetKey(IServiceProvider serviceProvider, string key)
-        {
-            var actionContextAccessor =
-                (IActionContextAccessor) serviceProvider.GetService(typeof(IActionContextAccessor));
+            var actionContextAccessor = (IActionContextAccessor) serviceProvider.GetService(typeof(IActionContextAccessor));
             var actionDescriptor = (ControllerActionDescriptor) actionContextAccessor.ActionContext.ActionDescriptor;
 
             return string.Concat(actionDescriptor.ControllerName, actionDescriptor.ActionName, key);
@@ -161,9 +157,8 @@ namespace WebOptimizer.TagHelpersDynamic
             return assetItem;
         }
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static IAssetPipeline GetAssetPipeline(this IServiceProvider serviceProvider)
+        private static IAssetPipeline GetAssetPipeline(this IServiceProvider serviceProvider)
         {
             var pipeline = (IAssetPipeline) serviceProvider.GetService(typeof(IAssetPipeline));
             return pipeline;
@@ -173,7 +168,7 @@ namespace WebOptimizer.TagHelpersDynamic
         /// Generates a has of the files in the bundle.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static string GenerateHash(IAsset asset, HttpContext httpContext)
+        private static string GenerateHash(IAsset asset, HttpContext httpContext)
         {
             string hash = asset.GenerateCacheKey(httpContext);
 

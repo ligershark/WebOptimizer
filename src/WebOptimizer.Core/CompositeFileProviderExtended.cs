@@ -1,19 +1,25 @@
 ﻿using System;
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 
 namespace WebOptimizer
 {
+    public class FileProviderOptions
+    {
+        public PathString RequestPath { get; set; }
+        public IFileProvider FileProvider { get; set; }
+    }
+
     internal class CompositeFileProviderExtended : IFileProvider
     {
         private readonly IFileProvider _webRootFileProvider;
-        private readonly StaticFileOptions[] _staticFileOptions;
+        private readonly FileProviderOptions[] _fileProviderOptions;
 
-        public CompositeFileProviderExtended(IFileProvider webRootFileProvider, StaticFileOptions[] staticFileOptions)
+        public CompositeFileProviderExtended(IFileProvider webRootFileProvider, FileProviderOptions[] fileProviderOptions)
         {
             _webRootFileProvider = webRootFileProvider ?? throw new ArgumentNullException(nameof(webRootFileProvider));
-            _staticFileOptions = staticFileOptions;
+            _fileProviderOptions = fileProviderOptions;
         }
 
         public IDirectoryContents GetDirectoryContents(string subpath)
@@ -44,14 +50,14 @@ namespace WebOptimizer
         {
             outpath = path;
 
-            var fileProviders = _staticFileOptions;
+            var fileProviders = _fileProviderOptions;
             if (fileProviders != null)
             {
                 for (var index = 0; index < fileProviders.Length; index++)
                 {
                     var item = fileProviders[index];
 
-                    if (path.StartsWith(item.RequestPath, StringComparison.Ordinal))
+                    if (path.StartsWith(item.RequestPath, StringComparison.OrdinalIgnoreCase))
                     {
                         outpath = path.Substring(item.RequestPath.Value.Length, path.Length - item.RequestPath.Value.Length);
 

@@ -23,7 +23,6 @@ namespace WebOptimizer.TagHelpersDynamic
     [HtmlTargetElement(TagName, Attributes = BundleKeyName)]
     [HtmlTargetElement(TagName, Attributes = BundleDestinationKeyName)]
     public class ScriptTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.ScriptTagHelper
-    //public class ScriptTagHelper : Common.AspNetCore.TagHelpersOverrided.ScriptTagHelper
     {
         private const string TagName = "script";
         private const string SrcIncludeAttributeName = "asp-src-include";
