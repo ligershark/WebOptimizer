@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.AspNetCore.Hosting;
 using WebOptimizer;
 
 namespace Microsoft.AspNetCore.Builder
@@ -7,7 +8,22 @@ namespace Microsoft.AspNetCore.Builder
     /// Extension methods for <see cref="IAssetPipeline"/>.
     /// </summary>
     public static class ApplicationBuilderExtensions
-    {
+    { 
+        /// <summary>
+        /// Adds WebOptimizer to the <see cref="IApplicationBuilder"/> request execution pipeline
+        /// </summary>
+        public static IApplicationBuilder UseWebOptimizer(this IApplicationBuilder app, IHostingEnvironment env, FileProviderOptions[] fileProviderOptions = null)
+        {
+            if (app == null) throw new ArgumentNullException(nameof(app));
+            
+            env.WebRootFileProvider = new CompositeFileProviderExtended(env.WebRootFileProvider, fileProviderOptions);
+
+            app.UseWebOptimizer();
+
+            return app;
+        }
+
+
         /// <summary>
         /// Adds WebOptimizer to the <see cref="IApplicationBuilder"/> request execution pipeline
         /// </summary>
