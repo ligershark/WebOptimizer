@@ -223,6 +223,9 @@ You can control the options from the appsettings.json file.
 {
   "webOptimizer": {
     "enableCaching": true,
+    "enableMemoryCache": true,
+    "enableDiskCache": true,
+    "cacheDirectory": "/var/temp/weboptimizercache"
     "enableTagHelperBundling": true,
     "cdnUrl": "https://my-cdn.com/"
   }
@@ -245,7 +248,7 @@ Default: **true**
 
 Default: **true**
 
-**cacheDirectory** sets the directory where assets will be stored if `enableDiskCache` is **true**.
+**cacheDirectory** sets the directory where assets will be stored if `enableDiskCache` is **true**.  Must be read/write.
 
 Default: `<ContentRootPath>/obj/WebOptimizerCache`
 
