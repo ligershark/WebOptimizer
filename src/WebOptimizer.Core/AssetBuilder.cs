@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -18,16 +17,17 @@ namespace WebOptimizer
         private ILogger<AssetBuilder> _logger;
         private IHostingEnvironment _env;
         private string _cacheDir;
+        private readonly IAssetResponseStore _assetResponseCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AssetBuilder"/> class.
         /// </summary>
-        public AssetBuilder(IMemoryCache cache, ILogger<AssetBuilder> logger, IHostingEnvironment env)
+        public AssetBuilder(IMemoryCache cache, IAssetResponseStore assetResponseCache, ILogger<AssetBuilder> logger, IHostingEnvironment env)
         {
             _cache = cache;
             _logger = logger;
             _env = env;
-            _cacheDir = Path.Combine(env.ContentRootPath, "obj", "WebOptimizerCache");
+            _assetResponseCache = assetResponseCache;
         }
 
         /// <summary>
@@ -38,12 +38,12 @@ namespace WebOptimizer
             options.EnsureDefaults(_env);
             string cacheKey = asset.GenerateCacheKey(context);
 
-            if (_cache.TryGetValue(cacheKey, out AssetResponse value))
+            if (options.EnableMemoryCache == true && _cache.TryGetValue(cacheKey, out AssetResponse value))
             {
                 _logger.LogServedFromMemoryCache(context.Request.Path);
                 return value;
             }
-            else if (AssetResponse.TryGetFromDiskCache(asset.Route, cacheKey, _cacheDir, out value))
+            else if (options.EnableDiskCache == true && _assetResponseCache.TryGet(asset.Route, cacheKey, out value))
             {
                 AddToCache(cacheKey, value, asset, options);
                 return value;
@@ -66,16 +66,17 @@ namespace WebOptimizer
 
                 AddToCache(cacheKey, response, asset, options);
 
-                await response.CacheToDiskAsync(asset.Route, cacheKey, _cacheDir).ConfigureAwait(false);
+                await _assetResponseCache.AddAsync(asset.Route, cacheKey, response).ConfigureAwait(false);
 
                 _logger.LogGeneratedOutput(context.Request.Path);
 
                 return response;
             }
         }
+
         private void AddToCache(string cacheKey, AssetResponse value, IAsset asset, IWebOptimizerOptions options)
         {
-            if (options.EnableCaching == true)
+            if (options.EnableMemoryCache == true)
             {
                 var cacheOptions = new MemoryCacheEntryOptions();
                 cacheOptions.SetSlidingExpiration(TimeSpan.FromHours(24));

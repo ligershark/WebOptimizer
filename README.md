@@ -223,6 +223,9 @@ You can control the options from the appsettings.json file.
 {
   "webOptimizer": {
     "enableCaching": true,
+    "enableMemoryCache": true,
+    "enableDiskCache": true,
+    "cacheDirectory": "/var/temp/weboptimizercache"
     "enableTagHelperBundling": true,
     "cdnUrl": "https://my-cdn.com/"
   }
@@ -236,6 +239,18 @@ Default: **true**
 **enableTagHelperBundling** determines if `<script>` and `<link>` elements should point to the bundled path or a reference per source file should be created. This is helpful to disable when in development mode.
 
 Default: **true**
+
+**enableMemoryCache** determines if the `IMemoryCache` is used for caching.  Can be helpful to disable while in development mode.
+
+Default: **true**
+
+**enableDiskCache** determines if the pipeline assets are cached to disk.  This can speed up application restarts by loading pipline assets from the disk instead of re-executing the pipeline.  Can be helpful to disable while in development mode.
+
+Default: **true**
+
+**cacheDirectory** sets the directory where assets will be stored if `enableDiskCache` is **true**.  Must be read/write.
+
+Default: `<ContentRootPath>/obj/WebOptimizerCache`
 
 **cdnUrl** is an absolute URL that, if present, is automatically adds a prefix to any script, stylesheet or media file on the page. A Tag Helper adds the prefix automatically when the Tag Helpers have been registered. See how to [register the Tag Helpers here](#tag-helpers).
 

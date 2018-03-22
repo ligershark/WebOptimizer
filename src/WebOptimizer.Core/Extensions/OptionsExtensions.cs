@@ -8,7 +8,7 @@ namespace WebOptimizer
         /// <summary>
         /// Ensures that defaults are set
         /// </summary>
-        public static  void EnsureDefaults(this IWebOptimizerOptions options, IHostingEnvironment env)
+        public static void EnsureDefaults(this IWebOptimizerOptions options, IHostingEnvironment env)
         {
             if (env == null)
             {
@@ -16,6 +16,8 @@ namespace WebOptimizer
             }
 
             options.EnableCaching = options.EnableCaching ?? !env.IsDevelopment();
+            options.EnableDiskCache = options.EnableDiskCache ?? !env.IsDevelopment();
+            options.EnableMemoryCache = options.EnableMemoryCache ?? true;
             options.EnableTagHelperBundling = options.EnableTagHelperBundling ?? true;
         }
     }
