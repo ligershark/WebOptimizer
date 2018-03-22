@@ -225,7 +225,7 @@ You can control the options from the appsettings.json file.
     "enableCaching": true,
     "enableMemoryCache": true,
     "enableDiskCache": true,
-    "cacheDirectory": "/var/temp/weboptimizercache"
+    "cacheDirectory": "/var/temp/weboptimizercache",
     "enableTagHelperBundling": true,
     "cdnUrl": "https://my-cdn.com/"
   }
