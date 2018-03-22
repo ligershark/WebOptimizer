@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
@@ -89,6 +88,7 @@ namespace Microsoft.Extensions.DependencyInjection
             assetPipeline(pipeline);
 
             services.TryAddSingleton<IMemoryCache, MemoryCache>();
+            services.TryAddSingleton<IAssetResponseStore, AssetResponseStore>();
             services.TryAddSingleton<IAssetPipeline>(factory => pipeline);
             services.TryAddSingleton<IAssetBuilder, AssetBuilder>();
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<WebOptimizerOptions>, WebOptimizerConfig>());
