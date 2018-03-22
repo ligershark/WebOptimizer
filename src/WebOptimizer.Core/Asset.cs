@@ -108,8 +108,7 @@ namespace WebOptimizer
                     {
                         throw new FileNotFoundException($"No files found matching \"{sourceFile}\" exist in \"{dir.FullName}\"");
                     }
-                    //files.AddRange(fileMatches.Where(f => !files.Contains(f)));
-                    files.Add(sourceFile);
+                    files.AddRange(fileMatches.Where(f => !files.Contains(f)));
                 }
                 else
                 {
