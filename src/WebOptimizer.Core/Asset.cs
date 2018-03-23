@@ -108,17 +108,12 @@ namespace WebOptimizer
                     {
                         throw new FileNotFoundException($"No files found matching \"{sourceFile}\" exist in \"{dir.FullName}\"");
                     }
-
-                    if (!files.Contains(sourceFile))
-                    {
-                        files.Add(sourceFile);
-                    }
                 }
-                else
+
+                if (!files.Contains(sourceFile))
                 {
                     files.Add(sourceFile);
                 }
-
 
             }
 
