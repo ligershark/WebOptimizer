@@ -40,8 +40,6 @@ namespace WebOptimizer.Taghelpers
 
             if (Pipeline.TryGetAssetFromRoute(href, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
-                Options.EnsureDefaults(HostingEnvironment);
-
                 if (Options.EnableTagHelperBundling == true)
                 {
                     href = GenerateHash(asset);
