@@ -94,27 +94,42 @@ namespace WebOptimizer
                 string outSourceFile;
                 var provider = asset.GetFileProvider(env, sourceFile, out outSourceFile);
 
-                var fileInfo = provider.GetFileInfo("/");
-                string root = fileInfo.PhysicalPath;
-                if (root != null)
+                if (provider.GetFileInfo(outSourceFile).Exists)
                 {
-                    var dir = new DirectoryInfoWrapper(new DirectoryInfo(root));
-                    var matcher = new Matcher();
-                    matcher.AddInclude(outSourceFile);
-                    PatternMatchingResult globbingResult = matcher.Execute(dir);
-                    IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
-
-                    if (!fileMatches.Any())
+                    if (!files.Contains(sourceFile))
                     {
-                        throw new FileNotFoundException($"No files found matching \"{sourceFile}\" exist in \"{dir.FullName}\"");
+                        files.Add(sourceFile);
                     }
                 }
-
-                if (!files.Contains(sourceFile))
+                else
                 {
-                    files.Add(sourceFile);
-                }
+                    var fileInfo = provider.GetFileInfo("/");
+                    string root = fileInfo.PhysicalPath;
 
+                    if (root != null)
+                    {
+                        var dir = new DirectoryInfoWrapper(new DirectoryInfo(root));
+                        var matcher = new Matcher();
+                        matcher.AddInclude(outSourceFile);
+                        PatternMatchingResult globbingResult = matcher.Execute(dir);
+                        IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
+
+                        if (!fileMatches.Any())
+                        {
+                            throw new FileNotFoundException($"No files found matching \"{sourceFile}\" exist in \"{dir.FullName}\"");
+                        }
+
+                        files.AddRange(fileMatches.Where(f => !files.Contains(f)));
+
+                    }
+                    else
+                    {
+                        if (!files.Contains(sourceFile))
+                        {
+                            files.Add(sourceFile);
+                        }
+                    }
+                }
             }
 
             asset.Items[PhysicalFilesKey] = files;
