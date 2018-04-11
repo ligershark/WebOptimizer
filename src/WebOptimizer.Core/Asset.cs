@@ -93,9 +93,10 @@ namespace WebOptimizer
             {
                 string outSourceFile;
                 var provider = asset.GetFileProvider(env, sourceFile, out outSourceFile);
-
+               
                 var fileInfo = provider.GetFileInfo("/");
                 string root = fileInfo.PhysicalPath;
+
                 if (root != null)
                 {
                     var dir = new DirectoryInfoWrapper(new DirectoryInfo(root));
@@ -108,13 +109,26 @@ namespace WebOptimizer
                     {
                         throw new FileNotFoundException($"No files found matching \"{sourceFile}\" exist in \"{dir.FullName}\"");
                     }
-                }
 
-                if (!files.Contains(sourceFile))
+                    if (provider.GetFileInfo(outSourceFile).Exists)
+                    {
+                        if (!files.Contains(sourceFile))
+                        {
+                            files.Add(sourceFile);
+                        }
+                    }
+                    else
+                    {
+                        files.AddRange(fileMatches.Where(f => !files.Contains(f)));
+                    }
+                }
+                else
                 {
-                    files.Add(sourceFile);
+                    if (!files.Contains(sourceFile))
+                    {
+                        files.Add(sourceFile);
+                    }
                 }
-
             }
 
             asset.Items[PhysicalFilesKey] = files;
