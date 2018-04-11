@@ -15,11 +15,11 @@ namespace WebOptimizer
         private readonly IHostingEnvironment _env;
         private readonly WebOptimizerOptions _options = new WebOptimizerOptions();
 
-        public AssetResponseStore(ILogger<AssetResponseStore> logger, IHostingEnvironment env, IOptionsSnapshot<WebOptimizerOptions> options)
+        public AssetResponseStore(ILogger<AssetResponseStore> logger, IHostingEnvironment env, IConfigureOptions<WebOptimizerOptions> options)
         {
             _logger = logger;
             _env = env;
-            _options = options.Value;
+            options.Configure(_options);
         }
 
         public async Task AddAsync(string bucket, string cachekey, AssetResponse assetResponse)
