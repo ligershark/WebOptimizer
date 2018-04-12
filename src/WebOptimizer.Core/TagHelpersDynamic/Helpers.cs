@@ -41,9 +41,6 @@ namespace WebOptimizer.TagHelpersDynamic
                         serviceProvider.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>)))
                     .Value;
 
-                //Ensures that defaults are set
-                options.EnableCaching = options.EnableCaching ?? !env.IsDevelopment();
-                options.EnableTagHelperBundling = options.EnableTagHelperBundling ?? true;
                 _webOptimizerOptions = options;
             }
 

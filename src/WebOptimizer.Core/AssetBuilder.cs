@@ -35,7 +35,6 @@ namespace WebOptimizer
         /// </summary>
         public async Task<IAssetResponse> BuildAsync(IAsset asset, HttpContext context, IWebOptimizerOptions options)
         {
-            options.EnsureDefaults(_env);
             string cacheKey = asset.GenerateCacheKey(context);
 
             if (options.EnableMemoryCache == true && _cache.TryGetValue(cacheKey, out AssetResponse value))

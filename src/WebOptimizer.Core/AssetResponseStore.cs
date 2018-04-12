@@ -14,25 +14,21 @@ namespace WebOptimizer
         private readonly ILogger<AssetResponseStore> _logger;
         private readonly IHostingEnvironment _env;
         private readonly WebOptimizerOptions _options = new WebOptimizerOptions();
-        private string _cacheDir;
 
         public AssetResponseStore(ILogger<AssetResponseStore> logger, IHostingEnvironment env, IConfigureOptions<WebOptimizerOptions> options)
         {
             _logger = logger;
             _env = env;
             options.Configure(_options);
-            _cacheDir = string.IsNullOrWhiteSpace(_options.CacheDirectory)
-                ? Path.Combine(env.ContentRootPath, "obj", "WebOptimizerCache")
-                : _options.CacheDirectory;
         }
 
         public async Task AddAsync(string bucket, string cachekey, AssetResponse assetResponse)
         {
             string name = CleanName(bucket);
-            Directory.CreateDirectory(_cacheDir);
+            Directory.CreateDirectory(_options.CacheDirectory);
 
             // First delete old cached files
-            IEnumerable<string> oldCachedFiles = Directory.EnumerateFiles(_cacheDir, name + "__*.cache");
+            IEnumerable<string> oldCachedFiles = Directory.EnumerateFiles(_options.CacheDirectory, name + "__*.cache");
             foreach (string oldFile in oldCachedFiles)
             {
                 await DeleteFileAsync(oldFile).ConfigureAwait(false);
@@ -81,7 +77,7 @@ namespace WebOptimizer
         {
             // cachekey is Base64 encoded which uses / as one of the characters.  So for Linux 
             // we need to clean both the bucket and the cachekey.
-            return Path.Combine(_cacheDir, CleanName($"{bucket}__{cachekey}.cache"));
+            return Path.Combine(_options.CacheDirectory, CleanName($"{bucket}__{cachekey}.cache"));
         }
 
         private async Task DeleteFileAsync(string filePath, int attempts = 5)
