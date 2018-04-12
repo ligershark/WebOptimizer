@@ -20,8 +20,9 @@ namespace WebOptimizer.Core.Test
             string path = Path.Combine(Environment.CurrentDirectory, "WebOptimizerTest");
             string filePath = Path.Combine(path, "bucket__cachekey.cache");
 
-            var woo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
-            woo.Setup(o => o.Value).Returns(new WebOptimizerOptions() { CacheDirectory = path });
+            var woo = new Mock<IConfigureOptions<WebOptimizerOptions>>();
+            woo.Setup(o => o.Configure(It.IsAny<WebOptimizerOptions>()))
+                .Callback<WebOptimizerOptions>(o => o.CacheDirectory = path);
 
             byte[] body = "*{color:red}".AsByteArray();
             var before = new AssetResponse(body, "cachekey");
