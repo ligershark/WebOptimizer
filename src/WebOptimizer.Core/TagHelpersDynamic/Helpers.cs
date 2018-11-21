@@ -50,9 +50,16 @@ namespace WebOptimizer.TagHelpersDynamic
         private static string GetKey(IServiceProvider serviceProvider, string key)
         {
             var actionContextAccessor = (IActionContextAccessor) serviceProvider.GetService(typeof(IActionContextAccessor));
-            var actionDescriptor = (ControllerActionDescriptor) actionContextAccessor.ActionContext.ActionDescriptor;
-
-            return string.Concat(actionDescriptor.ControllerName, actionDescriptor.ActionName, key);
+            if (actionContextAccessor.ActionContext.ActionDescriptor.GetType() == typeof(ControllerActionDescriptor))
+            {
+                var actionDescriptor = (ControllerActionDescriptor)actionContextAccessor.ActionContext.ActionDescriptor;
+                return string.Concat(actionDescriptor.ControllerName, actionDescriptor.ActionName, key);
+            }
+            else
+            {
+                var actionDescriptor = actionContextAccessor.ActionContext.ActionDescriptor;
+                return string.Concat(actionDescriptor.DisplayName.Replace("/", ""), key);
+            }
         }
 
         private static readonly Concatenator Concatenator = new Concatenator();
