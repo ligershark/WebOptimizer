@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -54,6 +55,11 @@ namespace WebOptimizer.TagHelpersDynamic
             {
                 var actionDescriptor = (ControllerActionDescriptor)actionContextAccessor.ActionContext.ActionDescriptor;
                 return string.Concat(actionDescriptor.ControllerName, actionDescriptor.ActionName, key);
+            }
+            else if (actionContextAccessor.ActionContext.ActionDescriptor.GetType() == typeof(CompiledPageActionDescriptor))
+            {
+                var actionDescriptor = (CompiledPageActionDescriptor)actionContextAccessor.ActionContext.ActionDescriptor;
+                return string.Concat(actionDescriptor.AreaName, actionDescriptor.DisplayName.Replace("/", ""), key);
             }
             else
             {
