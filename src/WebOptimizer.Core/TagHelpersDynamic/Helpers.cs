@@ -51,15 +51,21 @@ namespace WebOptimizer.TagHelpersDynamic
         private static string GetKey(IServiceProvider serviceProvider, string key)
         {
             var actionContextAccessor = (IActionContextAccessor) serviceProvider.GetService(typeof(IActionContextAccessor));
-            if (actionContextAccessor.ActionContext.ActionDescriptor.GetType() == typeof(ControllerActionDescriptor))
+            var type = actionContextAccessor.ActionContext.ActionDescriptor.GetType();
+            if (type == typeof(ControllerActionDescriptor))
             {
                 var actionDescriptor = (ControllerActionDescriptor)actionContextAccessor.ActionContext.ActionDescriptor;
                 return string.Concat(actionDescriptor.ControllerName, actionDescriptor.ActionName, key);
             }
-            else if (actionContextAccessor.ActionContext.ActionDescriptor.GetType() == typeof(CompiledPageActionDescriptor))
+            else if (type == typeof(CompiledPageActionDescriptor))
             {
                 var actionDescriptor = (CompiledPageActionDescriptor)actionContextAccessor.ActionContext.ActionDescriptor;
-                return string.Concat(actionDescriptor.AreaName, actionDescriptor.DisplayName.Replace("/", ""), key);
+                return string.Concat(actionDescriptor.AreaName, actionDescriptor.ViewEnginePath.Replace("/", ""), key);
+            }
+            else if (type == typeof(PageActionDescriptor))
+            {
+                var actionDescriptor = (PageActionDescriptor)actionContextAccessor.ActionContext.ActionDescriptor;
+                return string.Concat(actionDescriptor.AreaName, actionDescriptor.ViewEnginePath.Replace("/", ""), key);
             }
             else
             {
