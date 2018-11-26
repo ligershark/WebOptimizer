@@ -83,7 +83,7 @@ namespace WebOptimizer.Taghelpers
                     fileToAdd = Path.ChangeExtension(file, "css");
                 }
                 string href = AddFileVersionToPath(fileToAdd, asset);
-                output.PostElement.AppendHtml($"<link href=\"/{href}\" {string.Join(" ", attrs)} />" + Environment.NewLine);
+                output.PostElement.AppendHtml($"<link href=\"{href}\" {string.Join(" ", attrs)} />" + Environment.NewLine);
             }
         }
 
