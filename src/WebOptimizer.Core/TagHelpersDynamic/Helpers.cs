@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -50,9 +51,27 @@ namespace WebOptimizer.TagHelpersDynamic
         private static string GetKey(IServiceProvider serviceProvider, string key)
         {
             var actionContextAccessor = (IActionContextAccessor) serviceProvider.GetService(typeof(IActionContextAccessor));
-            var actionDescriptor = (ControllerActionDescriptor) actionContextAccessor.ActionContext.ActionDescriptor;
-
-            return string.Concat(actionDescriptor.ControllerName, actionDescriptor.ActionName, key);
+            var type = actionContextAccessor.ActionContext.ActionDescriptor.GetType();
+            if (type == typeof(ControllerActionDescriptor))
+            {
+                var actionDescriptor = (ControllerActionDescriptor)actionContextAccessor.ActionContext.ActionDescriptor;
+                return string.Concat(actionDescriptor.ControllerName, actionDescriptor.ActionName, key);
+            }
+            else if (type == typeof(CompiledPageActionDescriptor))
+            {
+                var actionDescriptor = (CompiledPageActionDescriptor)actionContextAccessor.ActionContext.ActionDescriptor;
+                return string.Concat(actionDescriptor.AreaName, actionDescriptor.ViewEnginePath.Replace("/", ""), key);
+            }
+            else if (type == typeof(PageActionDescriptor))
+            {
+                var actionDescriptor = (PageActionDescriptor)actionContextAccessor.ActionContext.ActionDescriptor;
+                return string.Concat(actionDescriptor.AreaName, actionDescriptor.ViewEnginePath.Replace("/", ""), key);
+            }
+            else
+            {
+                var actionDescriptor = actionContextAccessor.ActionContext.ActionDescriptor;
+                return string.Concat(actionDescriptor.DisplayName.Replace("/", ""), key);
+            }
         }
 
         private static readonly Concatenator Concatenator = new Concatenator();
