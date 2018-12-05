@@ -7,7 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.TagHelpers.Internal;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +23,7 @@ namespace WebOptimizer
 {
     internal class Asset : IAsset
     {
-        private static FileVersionProvider _fileVersionProvider;
+        private static IFileVersionProvider _fileVersionProvider;
         internal const string PhysicalFilesKey = "PhysicalFiles";
 
         public Asset(string route, string contentType, IAssetPipeline pipeline, IEnumerable<string> sourceFiles)
@@ -171,11 +173,7 @@ namespace WebOptimizer
             if (_fileVersionProvider == null)
             {
                 var cache = (IMemoryCache)context.RequestServices.GetService(typeof(IMemoryCache));
-
-                _fileVersionProvider = new FileVersionProvider(
-                    this.GetFileProvider(env),
-                    cache,
-                    context.Request.PathBase);
+                _fileVersionProvider = context.RequestServices.GetRequiredService<IFileVersionProvider>();
             }
 
             if (!Items.ContainsKey(PhysicalFilesKey))
@@ -191,7 +189,7 @@ namespace WebOptimizer
             {
                 foreach (string file in physicalFiles)
                 {
-                    cacheKey.Append(_fileVersionProvider.AddFileVersionToPath(file));
+                    cacheKey.Append(_fileVersionProvider.AddFileVersionToPath(context.Request.PathBase, file));
                 }
             }
 

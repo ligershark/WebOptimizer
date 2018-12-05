@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
@@ -37,6 +38,7 @@ namespace WebOptimizer.Test
             var env = new Mock<IHostingEnvironment>();
             var cache = new Mock<IMemoryCache>();
             var fileProvider = new PhysicalFileProvider(Path.GetTempPath());
+            var fileVersionProvider = new Mock<IFileVersionProvider>();
 
             var asset = new Asset(route, contentType, sourcefiles);
             asset.Items.Add("PhysicalFiles", new string[0] );
@@ -51,6 +53,9 @@ namespace WebOptimizer.Test
 
             context.Setup(c => c.RequestServices.GetService(typeof(IMemoryCache)))
                    .Returns(cache.Object);
+
+            context.Setup(c => c.RequestServices.GetService(typeof(IFileVersionProvider)))
+                .Returns(fileVersionProvider.Object);
 
             env.Setup(e => e.WebRootFileProvider)
                 .Returns(fileProvider);
