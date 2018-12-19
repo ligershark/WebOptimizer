@@ -20,7 +20,7 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Tag helper for inlining content
         /// </summary>
-        public ScriptInlineSrcTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsSnapshot<WebOptimizerOptions> options, IAssetBuilder builder)
+        public ScriptInlineSrcTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsMonitor<WebOptimizerOptions> options, IAssetBuilder builder)
             : base(env, cache, pipeline, options)
         {
             _builder = builder;
