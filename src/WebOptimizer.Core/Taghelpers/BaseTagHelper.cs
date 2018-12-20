@@ -20,12 +20,12 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseTagHelper"/> class.
         /// </summary>
-        public BaseTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsSnapshot<WebOptimizerOptions> options)
+        public BaseTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsMonitor<WebOptimizerOptions> options)
         {
             HostingEnvironment = env;
             Cache = cache;
             Pipeline = pipeline;
-            Options = options.Value;
+            Options = options.CurrentValue;
         }
 
         /// <summary>

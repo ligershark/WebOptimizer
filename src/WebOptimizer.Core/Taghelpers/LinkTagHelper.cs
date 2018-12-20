@@ -22,7 +22,7 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Initializes a new instance of the <see cref="LinkTagHelper"/> class.
         /// </summary>
-        public LinkTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsSnapshot<WebOptimizerOptions> options)
+        public LinkTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsMonitor<WebOptimizerOptions> options)
             : base(env, cache, pipeline, options)
         { }
 
