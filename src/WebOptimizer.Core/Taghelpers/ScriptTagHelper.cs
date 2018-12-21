@@ -17,7 +17,7 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Initializes a new instance of the <see cref="ScriptTagHelper"/> class.
         /// </summary>
-        public ScriptTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsSnapshot<WebOptimizerOptions> options)
+        public ScriptTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsMonitor<WebOptimizerOptions> options)
             : base(env, cache, pipeline, options)
         { }
 
@@ -38,8 +38,6 @@ namespace WebOptimizer.Taghelpers
 
             if (Pipeline.TryGetAssetFromRoute(src, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
-                Options.EnsureDefaults(HostingEnvironment);
-
                 if (Options.EnableTagHelperBundling == true)
                 {
                     src = GenerateHash(asset);
@@ -77,7 +75,7 @@ namespace WebOptimizer.Taghelpers
             foreach (string file in sourceFiles)
             {
                 string src = AddFileVersionToPath(file, asset);
-                output.PostElement.AppendHtml($"<script src=\"/{src}\" {string.Join(" ", attrs)}></script>" + Environment.NewLine);
+                output.PostElement.AppendHtml($"<script src=\"{src}\" {string.Join(" ", attrs)}></script>" + Environment.NewLine);
             }
         }
     }

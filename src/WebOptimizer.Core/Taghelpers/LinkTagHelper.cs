@@ -22,7 +22,7 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Initializes a new instance of the <see cref="LinkTagHelper"/> class.
         /// </summary>
-        public LinkTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsSnapshot<WebOptimizerOptions> options)
+        public LinkTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsMonitor<WebOptimizerOptions> options)
             : base(env, cache, pipeline, options)
         { }
 
@@ -40,8 +40,6 @@ namespace WebOptimizer.Taghelpers
 
             if (Pipeline.TryGetAssetFromRoute(href, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
-                Options.EnsureDefaults(HostingEnvironment);
-
                 if (Options.EnableTagHelperBundling == true)
                 {
                     href = GenerateHash(asset);
@@ -85,7 +83,7 @@ namespace WebOptimizer.Taghelpers
                     fileToAdd = Path.ChangeExtension(file, "css");
                 }
                 string href = AddFileVersionToPath(fileToAdd, asset);
-                output.PostElement.AppendHtml($"<link href=\"/{href}\" {string.Join(" ", attrs)} />" + Environment.NewLine);
+                output.PostElement.AppendHtml($"<link href=\"{href}\" {string.Join(" ", attrs)} />" + Environment.NewLine);
             }
         }
 

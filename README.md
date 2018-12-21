@@ -223,6 +223,9 @@ You can control the options from the appsettings.json file.
 {
   "webOptimizer": {
     "enableCaching": true,
+    "enableMemoryCache": true,
+    "enableDiskCache": true,
+    "cacheDirectory": "/var/temp/weboptimizercache",
     "enableTagHelperBundling": true,
     "cdnUrl": "https://my-cdn.com/"
   }
@@ -236,6 +239,18 @@ Default: **true**
 **enableTagHelperBundling** determines if `<script>` and `<link>` elements should point to the bundled path or a reference per source file should be created. This is helpful to disable when in development mode.
 
 Default: **true**
+
+**enableMemoryCache** determines if the `IMemoryCache` is used for caching.  Can be helpful to disable while in development mode.
+
+Default: **true**
+
+**enableDiskCache** determines if the pipeline assets are cached to disk.  This can speed up application restarts by loading pipline assets from the disk instead of re-executing the pipeline.  Can be helpful to disable while in development mode.
+
+Default: **true**
+
+**cacheDirectory** sets the directory where assets will be stored if `enableDiskCache` is **true**.  Must be read/write.
+
+Default: `<ContentRootPath>/obj/WebOptimizerCache`
 
 **cdnUrl** is an absolute URL that, if present, is automatically adds a prefix to any script, stylesheet or media file on the page. A Tag Helper adds the prefix automatically when the Tag Helpers have been registered. See how to [register the Tag Helpers here](#tag-helpers).
 
@@ -264,7 +279,7 @@ A good extension to look at is the [WebOptimizer.Sass](https://github.com/ligers
 - [WebOptimizer.TypeScript](https://github.com/ligershark/WebOptimizer.TypeScript) - compiles TypeScript/ES6+/JSX files to JavaScript (ES5)
 - [WebOptimizer.Sass](https://github.com/ligershark/WebOptimizer.Sass) - compiles Scss files to CSS
 - [WebOptimizer.Less](https://github.com/ligershark/WebOptimizer.Less) - compiles LESS files to CSS
-- [WebOptimizer.Dotless](https://github.com/twenzel/WebOptimizer.Dotless) - compiles LESS files to CSS (using [dotless](https://github.com/dotless/dotless) instead of node.js/less). Requires full framework (.NET Standard support is in work)
+- [WebOptimizer.Dotless](https://github.com/twenzel/WebOptimizer.Dotless) - compiles LESS files to CSS (using [dotless](https://github.com/dotless/dotless) instead of node.js/less).
 - [WebOptimizer.AutoPrefixer](https://github.com/ligershark/WebOptimizer.AutoPrefixer) - Adds vendor prefixes to CSS
 - [WebOptimizer.Markdown](https://github.com/ligershark/WebOptimizer.Markdown) - compiles markdown files to HTML
 - [WebOptimizer.i18n](https://github.com/ligershark/WebOptimizer.i18n) - localization of .js files

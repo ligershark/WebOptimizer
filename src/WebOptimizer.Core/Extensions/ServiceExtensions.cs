@@ -1,4 +1,6 @@
 ﻿using System;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -11,6 +13,38 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class ServiceExtensions
     {
+        internal static CssBundlingSettings CssBundlingSettings;
+
+        internal static CodeBundlingSettings CodeBundlingSettings;
+
+        /// <summary>
+        /// Adds WebOptimizer to the specified <see cref="IServiceCollection"/> and enables CSS and JavaScript minification.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="env"></param>
+        /// <param name="cssBundlingSettings"></param>
+        /// <param name="codeBundlingSettings"></param>
+        public static IServiceCollection AddWebOptimizer(this IServiceCollection services,
+            IHostingEnvironment env,
+            CssBundlingSettings cssBundlingSettings,
+            CodeBundlingSettings codeBundlingSettings, Action<IAssetPipeline> assetPipeline = null)
+        {
+            if (cssBundlingSettings == null) throw new ArgumentNullException(nameof(cssBundlingSettings));
+            if (codeBundlingSettings == null) throw new ArgumentNullException(nameof(codeBundlingSettings));
+
+            CssBundlingSettings = cssBundlingSettings;
+            CodeBundlingSettings = codeBundlingSettings;
+
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
+            services.AddWebOptimizer(pipeline =>
+            {
+                assetPipeline?.Invoke(pipeline);
+            });
+
+            return services;
+        }
+
         /// <summary>
         /// Adds WebOptimizer to the specified <see cref="IServiceCollection"/> and enables CSS and JavaScript minification.
         /// </summary>
@@ -54,6 +88,7 @@ namespace Microsoft.Extensions.DependencyInjection
             assetPipeline(pipeline);
 
             services.TryAddSingleton<IMemoryCache, MemoryCache>();
+            services.TryAddSingleton<IAssetResponseStore, AssetResponseStore>();
             services.TryAddSingleton<IAssetPipeline>(factory => pipeline);
             services.TryAddSingleton<IAssetBuilder, AssetBuilder>();
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<WebOptimizerOptions>, WebOptimizerConfig>());
