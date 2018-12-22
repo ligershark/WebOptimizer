@@ -142,7 +142,7 @@ To bundle all files from a particular folder, we can use globbing patterns like 
 ```csharp
 services.AddWebOptimizer(pipeline =>
 {
-    pipeline.AddCssBundle("/css/bundle.css", "css/*.css");
+    pipeline.AddCssBundle("/css/bundle.css", "css/**/*.css");
 });
 ```
 
