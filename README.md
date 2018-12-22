@@ -78,6 +78,15 @@ That's it. You have now enabled automatic CSS and JavaScript minification. No ot
 
 Try it by requesting one of your .css or .js files in the browser and see if it has been minified.
 
+**Disabling Minification:**  
+If you want to disable minification (e.g. in development), the following overload fo AddWebOptimizer() can be used:
+```
+if (_env.IsDevelopment())
+{
+    services.AddWebOptimizer(minifyJavaScript:false,minifyCss:false);
+}
+```
+
 ## Minification
 To control the minification in more detail, we must interact with the pipeline that manipulates the file content. 
 
