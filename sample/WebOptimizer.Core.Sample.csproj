@@ -5,6 +5,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="LigerShark.WebOptimizer.Analyzers" Version="3.0.0-alpha">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="SharpScss" Version="1.4.0" />
     </ItemGroup>
 
