@@ -28,7 +28,7 @@ namespace WebOptimizer.Test.Processors
             var inputFile = new PhysicalFileInfo(new FileInfo(@"c:\source\css\site.css"));
             var outputFile = new PhysicalFileInfo(new FileInfo(@"c:\source\dist\all.css"));
             var asset = new Mock<IAsset>().SetupAllProperties();
-            var env = new Mock<IHostingEnvironment>();
+            var env = new Mock<IWebHostEnvironment>();
             var fileProvider = new Mock<IFileProvider>();
 
             context.SetupGet(s => s.Asset.Route)
@@ -37,7 +37,7 @@ namespace WebOptimizer.Test.Processors
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IAssetPipeline)))
                    .Returns(pipeline.Object);
 
-            context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IHostingEnvironment)))
+            context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IWebHostEnvironment)))
                    .Returns(env.Object);
 
             context.SetupGet(s => s.Asset)

@@ -17,7 +17,7 @@ namespace WebOptimizer.Taghelpers
         /// <summary>
         /// Initializes a new instance of the <see cref="ScriptTagHelper"/> class.
         /// </summary>
-        public ScriptTagHelper(IHostingEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsMonitor<WebOptimizerOptions> options)
+        public ScriptTagHelper(IWebHostEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsMonitor<WebOptimizerOptions> options)
             : base(env, cache, pipeline, options)
         { }
 

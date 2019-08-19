@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace WebOptimizer
 {
     internal class AssetResponseStore : IAssetResponseStore
     {
         private readonly ILogger<AssetResponseStore> _logger;
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
         private readonly WebOptimizerOptions _options = new WebOptimizerOptions();
 
-        public AssetResponseStore(ILogger<AssetResponseStore> logger, IHostingEnvironment env, IConfigureOptions<WebOptimizerOptions> options)
+        public AssetResponseStore(ILogger<AssetResponseStore> logger, IWebHostEnvironment env, IConfigureOptions<WebOptimizerOptions> options)
         {
             _logger = logger;
             _env = env;
@@ -35,7 +35,7 @@ namespace WebOptimizer
             }
 
             // Then serialize to disk
-            string json = JsonConvert.SerializeObject(assetResponse);
+            string json = JsonSerializer.Serialize(assetResponse);
             string filePath = GetPath(bucket, cachekey);
             await WriteFileAsync(filePath, json).ConfigureAwait(false);
         }
@@ -56,7 +56,9 @@ namespace WebOptimizer
                 try
                 {
                     string json = File.ReadAllText(filePath);
-                    assetResponse = JsonConvert.DeserializeObject<AssetResponse>(json);
+                    assetResponse = ParseJson(json);
+                    //TODO: Simplify this when System.Text.Json is fully baked
+                    //assetResponse = JsonSerializer.Deserialize<AssetResponse>(json);
                 }
                 catch (Exception ex)
                 {
@@ -66,6 +68,41 @@ namespace WebOptimizer
             }
 
             return assetResponse != null;
+        }
+
+        internal AssetResponse ParseJson(string json)
+        {
+            if (string.IsNullOrEmpty(json))
+            {
+                return null;
+            }
+
+            try
+            {
+                using (JsonDocument document = JsonDocument.Parse(json))
+                {
+                    var ck = document.RootElement.GetProperty("CacheKey").GetString();
+                    var b = document.RootElement.GetProperty("Body").GetString();
+                    var bytes = JsonSerializer.Deserialize<byte[]>("\"" + b + "\"");
+                    var ar = new AssetResponse(bytes,ck);
+                    var headersString = document.RootElement.GetProperty("Headers").GetRawText();
+                    if (!string.IsNullOrEmpty(headersString))
+                    {
+                        var headers = JsonSerializer.Deserialize<Dictionary<string, string>>(headersString);
+                        foreach (var d in headers)
+                        {
+                            ar.Headers.Add(d.Key, d.Value);
+                        }
+                    }
+
+                    return ar;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,"An error occurred parsing the AssetResponse");
+                return null;
+            }
         }
 
         private string CleanName(string route)

@@ -25,7 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="cssBundlingSettings"></param>
         /// <param name="codeBundlingSettings"></param>
         public static IServiceCollection AddWebOptimizer(this IServiceCollection services,
-            IHostingEnvironment env,
+            IWebHostEnvironment env,
             CssBundlingSettings cssBundlingSettings,
             CodeBundlingSettings codeBundlingSettings, Action<IAssetPipeline> assetPipeline = null)
         {

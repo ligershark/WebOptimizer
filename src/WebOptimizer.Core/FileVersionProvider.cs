@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
-using Microsoft.AspNetCore.Antiforgery.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Memory;
@@ -18,7 +18,7 @@ namespace WebOptimizer
         private readonly PathString _requestPathBase;
 
         /// <summary>
-        /// Creates a new instance of <see cref="Microsoft.AspNetCore.Mvc.TagHelpers.Internal.FileVersionProvider"/>.
+        /// Creates a new instance of <see cref="FileVersionProvider"/>.
         /// </summary>
         /// <param name="fileProvider">The file provider to get and watch files.</param>
         /// <param name="cache"><see cref="IMemoryCache"/> where versioned urls of files are cached.</param>
@@ -107,7 +107,7 @@ namespace WebOptimizer
 
         private static string GetHashForFile(IFileInfo fileInfo)
         {
-            using (var sha256 = CryptographyAlgorithms.CreateSHA256())
+            using (var sha256 = SHA256.Create())
             {
                 using (var readStream = fileInfo.CreateReadStream())
                 {

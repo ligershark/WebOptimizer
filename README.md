@@ -7,6 +7,9 @@ ASP.NET Core middleware for bundling and minification of CSS and JavaScript file
 
 Check out the **[demo website](https://weboptimizer.azurewebsites.net/)** or its **[source code](https://github.com/ligershark/WebOptimizer/tree/master/sample)**.
 
+## Versions
+Master is being updated for ```ASP.NET Core 3.0```
+For ```ASP.NET Core 2.x```, use the **[2.0 branch.](https://github.com/ligershark/WebOptimizer/tree/2.0)**
 ## Content
 
 - [How it works](#how-it-works)
@@ -41,7 +44,7 @@ dotnet add package LigerShark.WebOptimizer.Core
 Then in **Startup.cs**, add `app.UseWebOptimizer()` to the `Configure` method anywhere before `app.UseStaticFiles` (if present), like so:
 
 ```csharp
-public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 {
     if (env.IsDevelopment())
     {

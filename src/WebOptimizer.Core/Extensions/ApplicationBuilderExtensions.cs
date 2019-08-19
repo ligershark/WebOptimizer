@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.Builder
         /// <summary>
         /// Adds WebOptimizer to the <see cref="IApplicationBuilder"/> request execution pipeline
         /// </summary>
-        public static IApplicationBuilder UseWebOptimizer(this IApplicationBuilder app, IHostingEnvironment env, FileProviderOptions[] fileProviderOptions = null)
+        public static IApplicationBuilder UseWebOptimizer(this IApplicationBuilder app, IWebHostEnvironment env, FileProviderOptions[] fileProviderOptions = null)
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
             

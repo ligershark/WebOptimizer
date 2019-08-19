@@ -3,7 +3,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace WebOptimizer.Test
 {
-    public class HostingEnvironment : IHostingEnvironment
+    public class HostingEnvironment : IWebHostEnvironment
     {
         public string EnvironmentName { get; set; }
         public string ApplicationName { get; set; }

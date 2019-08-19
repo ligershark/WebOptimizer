@@ -6,6 +6,10 @@ namespace WebOptimizer
     [Serializable]
     internal class AssetResponse : IAssetResponse
     {
+        public AssetResponse()
+        {
+
+        }
         public AssetResponse(byte[] body, string cacheKey)
         {
             Body = body;

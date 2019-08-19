@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Razor.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -56,18 +58,19 @@ namespace WebOptimizer.TagHelpersDynamic
         /// <summary>
         /// Creates a new <see cref="LinkTagHelper"/>.
         /// </summary>
-        /// <param name="hostingEnvironment">The <see cref="IHostingEnvironment"/>.</param>
+        /// <param name="hostingEnvironment">The <see cref="IWebHostEnvironment"/>.</param>
         /// <param name="cache">The <see cref="IMemoryCache"/>.</param>
         /// <param name="htmlEncoder">The <see cref="HtmlEncoder"/>.</param>
         /// <param name="javaScriptEncoder">The <see cref="JavaScriptEncoder"/>.</param>
         /// <param name="urlHelperFactory">The <see cref="IUrlHelperFactory"/>.</param>
         public LinkTagHelper(
-            IHostingEnvironment hostingEnvironment,
-            IMemoryCache cache,
+            IWebHostEnvironment hostingEnvironment,
+            TagHelperMemoryCacheProvider cache,
+            IFileVersionProvider fileVersionProvider,
             HtmlEncoder htmlEncoder,
             JavaScriptEncoder javaScriptEncoder,
             IUrlHelperFactory urlHelperFactory, IServiceProvider serviceProvider)
-            : base(hostingEnvironment, cache, htmlEncoder, javaScriptEncoder, urlHelperFactory)
+            : base(hostingEnvironment, cache, fileVersionProvider, htmlEncoder, javaScriptEncoder, urlHelperFactory)
         {
             if (serviceProvider == null) throw new ArgumentNullException(nameof(serviceProvider));
             _serviceProvider = serviceProvider;

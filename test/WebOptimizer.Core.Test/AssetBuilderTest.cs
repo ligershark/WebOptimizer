@@ -38,7 +38,7 @@ namespace WebOptimizer.Core.Test
             context.Setup(c => c.Request.Path).Returns("/file.css");
 
             var next = new Mock<RequestDelegate>();
-            var env = new Mock<IHostingEnvironment>().SetupAllProperties();
+            var env = new Mock<IWebHostEnvironment>().SetupAllProperties();
             env.Setup(e => e.ContentRootPath).Returns(@"D:\Project\");
 
             object bytes;
@@ -84,7 +84,7 @@ namespace WebOptimizer.Core.Test
             context.Setup(c => c.Request.Path).Returns("/file.css");
 
             var next = new Mock<RequestDelegate>();
-            var env = new Mock<IHostingEnvironment>().SetupAllProperties();
+            var env = new Mock<IWebHostEnvironment>().SetupAllProperties();
             env.Setup(e => e.ContentRootPath).Returns(@"D:\Project\");
 
             var mco = new Mock<IOptions<MemoryCacheOptions>>();
@@ -129,7 +129,7 @@ namespace WebOptimizer.Core.Test
             context.Setup(c => c.Request.Path).Returns("/file.css");
 
             var next = new Mock<RequestDelegate>();
-            var env = new Mock<IHostingEnvironment>().SetupAllProperties();
+            var env = new Mock<IWebHostEnvironment>().SetupAllProperties();
             env.Setup(e => e.ContentRootPath).Returns(@"D:\Project\");
 
             object bytes;

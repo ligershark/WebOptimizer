@@ -34,7 +34,7 @@ namespace WebOptimizer.TagHelpersDynamic
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static WebOptimizerOptions GetWebOptimizerOptions(this IServiceProvider serviceProvider,
-            IHostingEnvironment env)
+            IWebHostEnvironment env)
         {
             if (_webOptimizerOptions == null)
             {
@@ -194,7 +194,7 @@ namespace WebOptimizer.TagHelpersDynamic
 
         internal static bool HandleBundle(Func<IAssetPipeline, string, IAsset> createAsset,
             IServiceProvider serviceProvider,
-            IHostingEnvironment env,
+            IWebHostEnvironment env,
             TagHelperOutput output,
             HttpContext httpContext,
             string attrName,

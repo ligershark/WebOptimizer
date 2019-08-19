@@ -49,7 +49,7 @@ namespace WebOptimizer
 
         public async Task<byte[]> ExecuteAsync(HttpContext context, IWebOptimizerOptions options)
         {
-            var env = (IHostingEnvironment)context.RequestServices.GetService(typeof(IHostingEnvironment));
+            var env = (IWebHostEnvironment)context.RequestServices.GetService(typeof(IWebHostEnvironment));
             var config = new AssetContext(context, this, options);
 
             IEnumerable<string> files = ExpandGlobs(this, env);
@@ -84,7 +84,7 @@ namespace WebOptimizer
             return config.Content.FirstOrDefault().Value;
         }
 
-        public static IEnumerable<string> ExpandGlobs(IAsset asset, IHostingEnvironment env)
+        public static IEnumerable<string> ExpandGlobs(IAsset asset, IWebHostEnvironment env)
         {
             var files = new List<string>();
 
@@ -165,7 +165,7 @@ namespace WebOptimizer
             }
 
             IEnumerable<string> physicalFiles;
-            var env = (IHostingEnvironment)context.RequestServices.GetService(typeof(IHostingEnvironment));
+            var env = (IWebHostEnvironment)context.RequestServices.GetService(typeof(IWebHostEnvironment));
 
             if (_fileVersionProvider == null)
             {
@@ -240,7 +240,7 @@ namespace WebOptimizer
         /// <summary>
         /// Gets the file provider.
         /// </summary>
-        public static IFileProvider GetFileProvider(this IAsset asset, IHostingEnvironment env)
+        public static IFileProvider GetFileProvider(this IAsset asset, IWebHostEnvironment env)
         {
             return asset.GetCustomFileProvider(env) ?? env.WebRootFileProvider;
         }
@@ -248,7 +248,7 @@ namespace WebOptimizer
         /// <summary>
         /// Gets the file provider.
         /// </summary>
-        internal static IFileProvider GetFileProvider(this IAsset asset, IHostingEnvironment env, string path, out string outpath)
+        internal static IFileProvider GetFileProvider(this IAsset asset, IWebHostEnvironment env, string path, out string outpath)
         {
             var provider = asset.GetCustomFileProvider(env) ?? env.WebRootFileProvider;
 

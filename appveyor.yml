@@ -1,5 +1,5 @@
 image: Visual Studio 2017
-version: 1.0.{build}
+version: 3.0.{build}
 
 build_script:
   - dotnet restore -v quiet

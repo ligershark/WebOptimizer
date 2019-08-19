@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace WebOptimizer
@@ -9,9 +10,9 @@ namespace WebOptimizer
     {
         private IConfiguration _config;
         private IOptionsMonitorCache<WebOptimizerOptions> _options;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public WebOptimizerConfig(IConfiguration config, IOptionsMonitorCache<WebOptimizerOptions> options, IHostingEnvironment hostingEnvironment)
+        public WebOptimizerConfig(IConfiguration config, IOptionsMonitorCache<WebOptimizerOptions> options, IWebHostEnvironment hostingEnvironment)
         {
             _config = config;
             _options = options;

@@ -15,14 +15,14 @@ namespace WebOptimizer
     {
         private IMemoryCache _cache;
         private ILogger<AssetBuilder> _logger;
-        private IHostingEnvironment _env;
+        private IWebHostEnvironment _env;
         private string _cacheDir;
         private readonly IAssetResponseStore _assetResponseCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AssetBuilder"/> class.
         /// </summary>
-        public AssetBuilder(IMemoryCache cache, IAssetResponseStore assetResponseCache, ILogger<AssetBuilder> logger, IHostingEnvironment env)
+        public AssetBuilder(IMemoryCache cache, IAssetResponseStore assetResponseCache, ILogger<AssetBuilder> logger, IWebHostEnvironment env)
         {
             _cache = cache;
             _logger = logger;

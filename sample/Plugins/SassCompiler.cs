@@ -26,7 +26,7 @@ namespace WebOptimizerDemo
         public Task ExecuteAsync(IAssetContext context)
         {
             var content = new Dictionary<string, byte[]>();
-            var env = (IHostingEnvironment)context.HttpContext.RequestServices.GetService(typeof(IHostingEnvironment));
+            var env = (IWebHostEnvironment)context.HttpContext.RequestServices.GetService(typeof(IWebHostEnvironment));
             IFileProvider fileProvider = context.Asset.GetFileProvider(env);
 
             foreach (string route in context.Content.Keys)

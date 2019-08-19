@@ -34,7 +34,7 @@ namespace WebOptimizer.Test
             string contentType = "text/css";
             var sourcefiles = new[] { "file1.css" };
             var context = new Mock<HttpContext>().SetupAllProperties();
-            var env = new Mock<IHostingEnvironment>();
+            var env = new Mock<IWebHostEnvironment>();
             var cache = new Mock<IMemoryCache>();
             var fileProvider = new PhysicalFileProvider(Path.GetTempPath());
 
@@ -46,7 +46,7 @@ namespace WebOptimizer.Test
                    .Returns(false)
                    .Returns(true);
 
-            context.Setup(c => c.RequestServices.GetService(typeof(IHostingEnvironment)))
+            context.Setup(c => c.RequestServices.GetService(typeof(IWebHostEnvironment)))
                    .Returns(env.Object);
 
             context.Setup(c => c.RequestServices.GetService(typeof(IMemoryCache)))

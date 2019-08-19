@@ -22,7 +22,7 @@ namespace WebOptimizer
         public override async Task ExecuteAsync(IAssetContext config)
         {
             var content = new Dictionary<string, byte[]>();
-            var env = (IHostingEnvironment)config.HttpContext.RequestServices.GetService(typeof(IHostingEnvironment));
+            var env = (IWebHostEnvironment)config.HttpContext.RequestServices.GetService(typeof(IWebHostEnvironment));
             var pipeline = (IAssetPipeline)config.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
             IFileProvider fileProvider = config.Asset.GetFileProvider(env);
 
@@ -36,7 +36,7 @@ namespace WebOptimizer
             config.Content = content;
         }
 
-        private static async Task<byte[]> InlineAsync(string content, IFileInfo input, IHostingEnvironment env)
+        private static async Task<byte[]> InlineAsync(string content, IFileInfo input, IWebHostEnvironment env)
         {
             MatchCollection matches = _rxUrl.Matches(content);
             string inputDir = Path.GetDirectoryName(input.PhysicalPath);

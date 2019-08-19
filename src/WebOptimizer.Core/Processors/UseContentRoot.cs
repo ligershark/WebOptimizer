@@ -56,7 +56,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return asset;
         }
 
-        internal static IFileProvider GetCustomFileProvider(this IAsset asset, IHostingEnvironment env)
+        internal static IFileProvider GetCustomFileProvider(this IAsset asset, IWebHostEnvironment env)
         {
             if (asset?.Items == null)
             {
