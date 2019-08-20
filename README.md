@@ -2,7 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/twj2lkgnm4th6qh9?svg=true)](https://ci.appveyor.com/project/madskristensen/weboptimizer)
 [![NuGet](https://img.shields.io/nuget/v/LigerShark.WebOptimizer.Core.svg)](https://nuget.org/packages/LigerShark.WebOptimizer.Core/)
-
+ 
 ASP.NET Core middleware for bundling and minification of CSS and JavaScript files at runtime. With full server-side and client-side caching to ensure high performance. No complicated build process and no hassle.
 
 Check out the **[demo website](https://weboptimizer.azurewebsites.net/)** or its **[source code](https://github.com/ligershark/WebOptimizer/tree/master/sample)**.
