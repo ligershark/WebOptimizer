@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27019.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29209.152
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebOptimizer.Core", "src\WebOptimizer.Core\WebOptimizer.Core.csproj", "{FCB6608A-3219-44ED-A400-A735EEB33C40}"
 EndProject
@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		appveyor.yml = appveyor.yml
+		global.json = global.json
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -16,9 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebOptimizer.Core.Test", "t
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebOptimizer.Core.Sample", "sample\WebOptimizer.Core.Sample.csproj", "{478357DE-07B8-443D-B430-E2390F74B060}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebOptimizer.Core.Sample2", "sample2\WebOptimizer.Core.Sample2\WebOptimizer.Core.Sample2.csproj", "{885AD8B7-1843-4579-8C28-E127B4A7CF68}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebOptimizer.Core.Sample2", "sample2\WebOptimizer.Core.Sample2\WebOptimizer.Core.Sample2.csproj", "{885AD8B7-1843-4579-8C28-E127B4A7CF68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebOptimizer.Core.Sample2.Lib", "sample2\WebOptimizer.Core.Sample2.Lib\WebOptimizer.Core.Sample2.Lib.csproj", "{F93B1ADA-6BF1-4BA3-9E88-2C5D84D81AD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebOptimizer.Core.Sample2.Lib", "sample2\WebOptimizer.Core.Sample2.Lib\WebOptimizer.Core.Sample2.Lib.csproj", "{F93B1ADA-6BF1-4BA3-9E88-2C5D84D81AD8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

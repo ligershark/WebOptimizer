@@ -3,7 +3,7 @@ version: 3.0.{build}
 
 install:
    # .NET Core SDK binaries
-  - ps: $urlCurrent = "https://dotnet.microsoft.com/download/thank-you/dotnet-sdk-3.0.100-preview8-windows-x64-binaries"
+  - ps: $urlCurrent = "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/release/3.0.1xx/dotnet-sdk-latest-win-x64.zip"
   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
   - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
   - ps: $tempFileCurrent = [System.IO.Path]::GetTempFileName()
