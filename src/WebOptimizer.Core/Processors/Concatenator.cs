@@ -11,23 +11,19 @@ namespace WebOptimizer
     {
         public override Task ExecuteAsync(IAssetContext context)
         {
-            // If there is no content, nothing to do
-            if (context.Content.Count > 0)
+            var sb = new StringBuilder();
+
+            foreach (byte[] bytes in context.Content.Values)
             {
-                var sb = new StringBuilder();
-
-                foreach (byte[] bytes in context.Content.Values)
-                {
-                    sb.AppendLine(bytes.AsString());
-                }
-
-                // Use existing first key as new key to have a valid input for subsequent calls to GetFileInfo
-                var newKey = context.Content.Keys.First();
-                context.Content = new Dictionary<string, byte[]>
-                {
-                    { newKey, sb.ToString().AsByteArray() }
-                };
+                sb.AppendLine(bytes.AsString());
             }
+
+            // Use existing first key as new key to have a valid input for subsequent calls to GetFileInfo or a Guid, if there is no content
+            var newKey = context.Content.Keys.FirstOrDefault() ?? Guid.NewGuid().ToString();
+            context.Content = new Dictionary<string, byte[]>
+            {
+                { newKey, sb.ToString().AsByteArray() }
+            };
             return Task.CompletedTask;
         }
     }
