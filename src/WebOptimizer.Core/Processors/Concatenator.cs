@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebOptimizer;
@@ -17,11 +18,12 @@ namespace WebOptimizer
                 sb.AppendLine(bytes.AsString());
             }
 
+            // Use existing first key as new key to have a valid input for subsequent calls to GetFileInfo or a Guid, if there is no content
+            var newKey = context.Content.Keys.FirstOrDefault() ?? Guid.NewGuid().ToString();
             context.Content = new Dictionary<string, byte[]>
             {
-                { Guid.NewGuid().ToString(), sb.ToString().AsByteArray() }
+                { newKey, sb.ToString().AsByteArray() }
             };
-
             return Task.CompletedTask;
         }
     }
