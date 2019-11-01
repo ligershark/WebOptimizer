@@ -41,14 +41,14 @@ namespace WebOptimizer
 
             Match match = _rxUrl.Match(content);
 
+            // Ignore references with protocols
+            if(match.Value.Contains("://") || match.Value.StartsWith("//") || match.Value.StartsWith("data:"))
+                content.AsByteArray();
+
             while (match.Success)
             {
                 string urlValue = match.Groups[3].Value;
                 string dir = inputDir;
-
-                // Ignore references with protocols
-                if (urlValue.Contains("://") || urlValue.StartsWith("//") || urlValue.StartsWith("data:"))
-                    continue;
 
                 //prevent query string from causing error
                 string[] pathAndQuery = urlValue.Split(new[] { '?' }, 2, StringSplitOptions.RemoveEmptyEntries);
