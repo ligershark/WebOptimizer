@@ -2,8 +2,10 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div id="content">
+<h1>WebOptimizer</h1>
 
+<div id="content">
+    
 </div>
 
 <script type="text/javascript" src="~/Scripts1/Script1.js" asp-append-version="true" asp-bundle-key="bundle1"></script>
@@ -17,3 +19,18 @@
 <script type="text/javascript" src="~/EmbeddedResourcesScripts/Scripts/EmbeddedScript2.js" asp-append-version="true" asp-bundle-key="bundle1"></script>
 
 <script type="text/javascript" asp-bundle-dest-key="bundle1"></script>
+
+<style type="text/css" minify>
+    /* change the color and font size of the h1 tag */
+    #h1 { color: #444; font-size: 18px; background-color: #aaa;  }
+</style>
+
+<script minify>
+    // create an object
+    var obj = {
+        prop1: "some value"
+    };
+
+    // log the object
+    console.log(obj);
+</script>
