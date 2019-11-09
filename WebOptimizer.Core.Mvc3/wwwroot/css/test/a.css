@@ -1,0 +1,59 @@
+﻿
+html {
+    min-height: 100%;
+    position: relative;
+}
+
+body {
+    margin: 0 auto;
+    max-width: 960px;
+    height: 100%;
+    font: 20px/1.5 georgia, sans-serif;
+}
+
+main {
+    padding: 0 15px 75px;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+}
+
+h1 {
+    height: 64px;
+    background: url(/img/a.png) no-repeat left center;
+    padding-left: 64px;
+}
+
+nav {
+    background: #e5e5e5;
+}
+
+    nav ul {
+        display: inline;
+        padding: 0;
+        list-style: none;
+    }
+
+        nav ul li {
+            display: inline-block;
+            padding: 5px 0 5px 15px;
+        }
+
+        nav ul a {
+            text-decoration: none;
+            color: black;
+            font-variant: small-caps;
+        }
+
+
+footer {
+    border-top: 1px solid lightgray;
+    background: #f1f1f1;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    height: 75px; /* This value is the height of your footer */
+}
