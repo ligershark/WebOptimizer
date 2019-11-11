@@ -65,7 +65,10 @@ namespace WebOptimizer
 
                 AddToCache(cacheKey, response, asset, options);
 
-                await _assetResponseCache.AddAsync(asset.Route, cacheKey, response).ConfigureAwait(false);
+                if (options.EnableDiskCache == true)
+                {
+                    await _assetResponseCache.AddAsync(asset.Route, cacheKey, response).ConfigureAwait(false);
+                }
 
                 _logger.LogGeneratedOutput(context.Request.Path);
 
