@@ -75,6 +75,7 @@ namespace WebOptimizer.Taghelpers
             foreach (string file in sourceFiles)
             {
                 string src = AddFileVersionToPath(file, asset);
+                if (!src.StartsWith("/")) src = "/" + src; //dealing with missing prefix "/"
                 output.PostElement.AppendHtml($"<script src=\"{src}\" {string.Join(" ", attrs)}></script>" + Environment.NewLine);
             }
         }

@@ -83,6 +83,7 @@ namespace WebOptimizer.Taghelpers
                     fileToAdd = Path.ChangeExtension(file, "css");
                 }
                 string href = AddFileVersionToPath(fileToAdd, asset);
+                if (!href.StartsWith("/")) href = "/" + href; //dealing with missing prefix "/"
                 output.PostElement.AppendHtml($"<link href=\"{href}\" {string.Join(" ", attrs)} />" + Environment.NewLine);
             }
         }
