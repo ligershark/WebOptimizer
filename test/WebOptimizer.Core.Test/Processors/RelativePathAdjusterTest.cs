@@ -25,16 +25,16 @@ namespace WebOptimizer.Test.Processors
             var adjuster = new RelativePathAdjuster();
             var context = new Mock<IAssetContext>().SetupAllProperties();
             var pipeline = new Mock<IAssetPipeline>().SetupAllProperties();
-            var inputFile = new PhysicalFileInfo(new FileInfo(@"c:\source\css\site.css"));
+            var inputFile = new PhysicalFileInfo(new FileInfo(@"//source/css/site.css"));
             var asset = new Mock<IAsset>().SetupAllProperties();
             var env = new Mock<IWebHostEnvironment>();
             var fileProvider = new Mock<IFileProvider>();
 
             env.SetupGet(s => s.WebRootPath)
-                .Returns(@"c:\source");
+                .Returns(@"//source");
 
             context.SetupGet(s => s.Asset.Route)
-                   .Returns("/my/route.css");
+                   .Returns(@"dist/all.css");
 
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IAssetPipeline)))
                    .Returns(pipeline.Object);
