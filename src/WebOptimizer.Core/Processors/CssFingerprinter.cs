@@ -25,9 +25,7 @@ namespace WebOptimizer
             foreach (string key in config.Content.Keys)
             {
                 IFileInfo input = fileProvider.GetFileInfo(key);
-                IFileInfo output = fileProvider.GetFileInfo(config.Asset.Route);
-
-                content[key] = Adjust(config.Content[key].AsString(), input, output, env);
+                content[key] = Adjust(config.Content[key].AsString(), input, env);
             }
 
             config.Content = content;
@@ -35,7 +33,7 @@ namespace WebOptimizer
             return Task.CompletedTask;
         }
 
-        private static byte[] Adjust(string content, IFileInfo input, IFileInfo output, IWebHostEnvironment env)
+        private static byte[] Adjust(string content, IFileInfo input, IWebHostEnvironment env)
         {
             string inputDir = Path.GetDirectoryName(input.PhysicalPath);
 

@@ -26,10 +26,12 @@ namespace WebOptimizer.Test.Processors
             var context = new Mock<IAssetContext>().SetupAllProperties();
             var pipeline = new Mock<IAssetPipeline>().SetupAllProperties();
             var inputFile = new PhysicalFileInfo(new FileInfo(@"c:\source\css\site.css"));
-            var outputFile = new PhysicalFileInfo(new FileInfo(@"c:\source\dist\all.css"));
             var asset = new Mock<IAsset>().SetupAllProperties();
             var env = new Mock<IWebHostEnvironment>();
             var fileProvider = new Mock<IFileProvider>();
+
+            env.SetupGet(s => s.WebRootPath)
+                .Returns(@"c:\source");
 
             context.SetupGet(s => s.Asset.Route)
                    .Returns("/my/route.css");
@@ -40,15 +42,11 @@ namespace WebOptimizer.Test.Processors
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IWebHostEnvironment)))
                    .Returns(env.Object);
 
-            context.SetupGet(s => s.Asset)
-                   .Returns(asset.Object);
-
             env.SetupGet(e => e.WebRootFileProvider)
                  .Returns(fileProvider.Object);
 
             fileProvider.SetupSequence(f => f.GetFileInfo(It.IsAny<string>()))
-                   .Returns(inputFile)
-                   .Returns(outputFile);
+                   .Returns(inputFile);
 
             context.Object.Content = new Dictionary<string, byte[]> { { "css/site.css", url.AsByteArray() } };
 
