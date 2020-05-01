@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
 using WebOptimizer;
@@ -24,9 +25,9 @@ namespace WebOptimizer
             foreach (string key in config.Content.Keys)
             {
                 IFileInfo input = fileProvider.GetFileInfo(key);
-                IFileInfo output = fileProvider.GetFileInfo(config.Asset.Route);
+                string outputPath = Path.Combine(env.WebRootPath, config.Asset.Route);
 
-                content[key] = Adjust(config.Content[key].AsString(), input.PhysicalPath, output.PhysicalPath);
+                content[key] = Adjust(config.Content[key].AsString(), input.PhysicalPath, outputPath);
             }
 
             config.Content = content;
@@ -36,8 +37,6 @@ namespace WebOptimizer
 
         private static byte[] Adjust(string cssFileContents, string inputFile, string outputPath)
         {
-            string absoluteOutputPath = new FileInfo(outputPath).FullName;
-
             // apply the RegEx to the file (to change relative paths)
             MatchCollection matches = _rxUrl.Matches(cssFileContents);
 
@@ -61,7 +60,7 @@ namespace WebOptimizer
                     string queryOnly = pathAndQuery.Length == 2 ? pathAndQuery[1] : string.Empty;
 
                     string absolutePath = GetAbsolutePath(cssDirectoryPath, pathOnly);
-                    string serverRelativeUrl = MakeRelative(absoluteOutputPath, absolutePath);
+                    string serverRelativeUrl = MakeRelative(outputPath, absolutePath);
 
                     if (!string.IsNullOrEmpty(queryOnly))
                     {
