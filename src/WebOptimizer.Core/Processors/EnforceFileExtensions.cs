@@ -56,7 +56,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IEnumerable<IAsset> EnforceFileExtensions(this IEnumerable<IAsset> assets, params string[] extensions)
         {
-            return assets.AddProcessor(asset => asset.EnforceFileExtensions());
+            return assets.AddProcessor(asset => asset.EnforceFileExtensions(extensions));
         }
     }
 }
