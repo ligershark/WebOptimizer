@@ -34,7 +34,7 @@ namespace WebOptimizer.Test.Processors
                 .Returns(@"//source");
 
             context.SetupGet(s => s.Asset.Route)
-                   .Returns(@"dist/all.css");
+                   .Returns(@"/dist/all.css");
 
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IAssetPipeline)))
                    .Returns(pipeline.Object);
