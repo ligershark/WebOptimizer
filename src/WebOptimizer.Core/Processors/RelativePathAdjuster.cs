@@ -25,7 +25,7 @@ namespace WebOptimizer
             foreach (string key in config.Content.Keys)
             {
                 IFileInfo input = fileProvider.GetFileInfo(key);
-                string outputPath = Path.Combine(env.WebRootPath, config.Asset.Route);
+                string outputPath = Path.Combine(env.WebRootPath, config.Asset.Route.TrimStart('/'));
 
                 content[key] = Adjust(config.Content[key].AsString(), input.PhysicalPath, outputPath);
             }
