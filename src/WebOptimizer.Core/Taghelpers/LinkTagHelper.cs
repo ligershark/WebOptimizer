@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -27,6 +29,13 @@ namespace WebOptimizer.Taghelpers
         { }
 
         /// <summary>
+        /// For HttpContext Access
+        /// </summary>
+        [HtmlAttributeNotBound]
+        [ViewContext]
+        public ViewContext CurrentViewContext { get; set; }
+        
+        /// <summary>
         /// Synchronously executes the TagHelper
         /// </summary>
         public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -37,12 +46,19 @@ namespace WebOptimizer.Taghelpers
             }
 
             string href = GetValue("href", output);
+            
+              if (CurrentViewContext.HttpContext.Request.PathBase.HasValue)
+                href = href.TrimStart(CurrentViewContext.HttpContext.Request.PathBase.Value.ToCharArray());
 
             if (Pipeline.TryGetAssetFromRoute(href, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
                 if (Options.EnableTagHelperBundling == true)
                 {
-                    href = GenerateHash(asset);
+                     if (CurrentViewContext.HttpContext.Request.PathBase.HasValue)
+                        href = CurrentViewContext.HttpContext.Request.PathBase.Value + GenerateHash(asset);
+                    else
+                        href = GenerateHash(asset);
+
                     output.Attributes.SetAttribute("href", href);
                 }
                 else
