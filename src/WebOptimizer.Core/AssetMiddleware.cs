@@ -23,7 +23,12 @@ namespace WebOptimizer
 
         public Task InvokeAsync(HttpContext context, IOptionsSnapshot<WebOptimizerOptions> options)
         {
-            if (_pipeline.TryGetAssetFromRoute(context.Request.Path, out IAsset asset))
+            string path = context.Request.Path.Value;
+
+            if (context.Request.PathBase.HasValue)
+                path = path.TrimStart(context.Request.PathBase.Value.ToCharArray());
+
+            if (_pipeline.TryGetAssetFromRoute(path, out IAsset asset))
             {
                 _logger.LogRequestForAssetStarted(context.Request.Path);
                 return HandleAssetAsync(context, asset, options.Value);
