@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -21,6 +23,13 @@ namespace WebOptimizer.Taghelpers
             : base(env, cache, pipeline, options)
         { }
 
+          /// <summary>
+        /// For HttpContext Access
+        /// </summary>
+        [HtmlAttributeNotBound]
+        [ViewContext]
+        public ViewContext CurrentViewContext { get; set; }
+        
         /// <summary>
         /// Synchronously executes the TagHelper
         /// </summary>
@@ -35,12 +44,20 @@ namespace WebOptimizer.Taghelpers
 
             if (string.IsNullOrEmpty(src))
                 return;
+                
+            if (CurrentViewContext.HttpContext.Request.PathBase.HasValue)
+                src = src.TrimStart(CurrentViewContext.HttpContext.Request.PathBase.Value.ToCharArray());
 
             if (Pipeline.TryGetAssetFromRoute(src, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
                 if (Options.EnableTagHelperBundling == true)
                 {
-                    src = GenerateHash(asset);
+                    if (CurrentViewContext.HttpContext.Request.PathBase.HasValue)
+                        src = CurrentViewContext.HttpContext.Request.PathBase.Value + GenerateHash(asset);
+                    else
+                        src = GenerateHash(asset);
+
+                    output.Attributes.SetAttribute("src", src);
                 }
                 else
                 {
@@ -48,7 +65,6 @@ namespace WebOptimizer.Taghelpers
                 }
             }
 
-            output.Attributes.SetAttribute("src", src);
         }
 
         private void WriteIndividualTags(TagHelperOutput output, IAsset asset)
