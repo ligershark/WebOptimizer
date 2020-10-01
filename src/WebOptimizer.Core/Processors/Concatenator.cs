@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using WebOptimizer;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace WebOptimizer
 {
@@ -18,8 +20,14 @@ namespace WebOptimizer
                 sb.AppendLine(bytes.AsString());
             }
 
-            // Use existing first key as new key to have a valid input for subsequent calls to GetFileInfo or a Guid, if there is no content
-            var newKey = context.Content.Keys.FirstOrDefault() ?? Guid.NewGuid().ToString();
+            // Use Guid as key and append .min if all the included files seem to be minified
+            var newKey = Guid.NewGuid().ToString();
+
+            Regex regex = new Regex(@"(?i:.min.(css|js|html)$)");            
+            if (context.Content.Keys.All(k => regex.IsMatch(k)))
+            {
+                newKey += ".min";
+            }
             context.Content = new Dictionary<string, byte[]>
             {
                 { newKey, sb.ToString().AsByteArray() }
