@@ -22,7 +22,10 @@ namespace WebOptimizer
             foreach (string key in config.Content.Keys)
             {
                 if (key.EndsWith(".min.html"))
+                {
+                    content[key] = config.Content[key];
                     continue;
+                }
 
                 string input = config.Content[key].AsString();
                 UglifyResult result = Uglify.Html(input, Settings);
