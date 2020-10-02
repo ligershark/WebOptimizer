@@ -26,7 +26,7 @@ deploy:
   - provider: NuGet
     artifact: /NuGet/
     api_key:
-      secure: 6xBu/05BWJDPa2PRkxEH3PHU/caLvy2lzf1eWdRBGXwSCTejHtI+6e0V4s2LaVri
+      secure: oy2inuap4zo4iqrna3galf3x3gtz42vuvii2pyetfbfwkq
     on:
       branch: master
       appveyor_repo_commit_message_extended: /\[release\]/
