@@ -21,7 +21,7 @@ namespace WebOptimizer.Test
         }
 
         [Theory2]
-        [InlineData("route", "/route")]
+        [InlineData("route", "route")]
         [InlineData("/route", "/route")]
         [InlineData("~/route", "/route")]
         [InlineData("~/route ", "/route")]
@@ -122,18 +122,16 @@ namespace WebOptimizer.Test
 
         [Theory2]
         [InlineData("css/*.css", "/css/ost.css")]
-        [InlineData("css/**/*.css", "/css/a/b/c/ost.css")]
         [InlineData("css/**/*.css", "css/a/b/c/ost.css")]
         [InlineData("**/*.css", "/css/a/b/c/ost.css")]
         [InlineData("*.css", "foo.css")]
-        [InlineData("*.css", "/foo.css")]
         public void FromRoute_Globbing_Success(string pattern, string path)
         {
             var pipeline = new AssetPipeline();
             pipeline.AddFiles("text/css", pattern);
 
             Assert.True(pipeline.TryGetAssetFromRoute(path, out var a1));
-            Assert.Equal($"/{path.TrimStart('/')}", a1.Route);
+            Assert.Equal($"{path}", a1.Route);
         }
 
         [Theory2]
