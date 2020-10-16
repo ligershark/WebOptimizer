@@ -40,5 +40,10 @@ namespace WebOptimizer
         /// Gets or sets the directory where assets will be stored if <see cref="EnableDiskCache"/> is <code>true</code>.
         /// </summary>
         public string CacheDirectory { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether empty bundle is allowed to generate instead of throwing an exception
+        /// </summary>
+        public bool? AllowEmptyBundle { get; set; }
     }
 }
