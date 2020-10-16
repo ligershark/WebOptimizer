@@ -58,7 +58,7 @@ namespace WebOptimizer
                     response.Headers.Add(name, context.Response.Headers[name]);
                 }
 
-                if (bytes == null || bytes.Length == 0)
+                if (options.AllowEmptyBundle == false && (bytes == null || bytes.Length == 0))
                 {
                     return null;
                 }

@@ -239,7 +239,8 @@ You can control the options from the appsettings.json file.
     "enableDiskCache": true,
     "cacheDirectory": "/var/temp/weboptimizercache",
     "enableTagHelperBundling": true,
-    "cdnUrl": "https://my-cdn.com/"
+    "cdnUrl": "https://my-cdn.com/",
+    "allowEmptyBundle": false
   }
 }
 ```
@@ -267,6 +268,10 @@ Default: `<ContentRootPath>/obj/WebOptimizerCache`
 **cdnUrl** is an absolute URL that, if present, is automatically adds a prefix to any script, stylesheet or media file on the page. A Tag Helper adds the prefix automatically when the Tag Helpers have been registered. See how to [register the Tag Helpers here](#tag-helpers).
 
 For example. if the cdnUrl is set to `"http://my-cdn.com"` then script and link tags will prepend the *cdnUrl* to the references. For instance, this script tag:
+
+**allowEmptyBundle** determines the behavior when there is no content in source file of a bundle, 404 exception will be thrown when the bundle is requested, set to true to get a bundle with empty content instead.
+
+Default: **false**
 
 ```html
 <script src="/js/file.js"></script>

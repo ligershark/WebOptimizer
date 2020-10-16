@@ -35,7 +35,7 @@ namespace WebOptimizer
             options.CacheDirectory = string.IsNullOrWhiteSpace(options.CacheDirectory)
                 ? Path.Combine(_hostingEnvironment.ContentRootPath, "obj", "WebOptimizerCache")
                 : options.CacheDirectory;
-
+            options.AllowEmptyBundle = options.AllowEmptyBundle ?? false;
         }
     }
 }

@@ -40,5 +40,10 @@ namespace WebOptimizer
         /// Gets the CDN url used for TagHelpers.
         /// </summary>
         string CdnUrl { get; }
+
+        /// <summary>
+        /// Gets or sets whether empty bundle is allowed to generate instead of throwing an exception
+        /// </summary>
+        public bool? AllowEmptyBundle { get; set; }
     }
 }
