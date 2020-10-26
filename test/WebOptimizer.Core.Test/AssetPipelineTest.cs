@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using NUglify.Helpers;
 using Xunit;
@@ -164,6 +166,20 @@ namespace WebOptimizer.Test
             Assert.Equal(1, a1.Processors.Count);
         }
 
+        [Fact2]
+        public void TryGetAssetFromRoute_Concurrency()
+        {
+            var pipeline = new AssetPipeline();
+            pipeline._assets = new ConcurrentDictionary<string, IAsset>();
+
+            pipeline._assets.TryAdd("/**/*.less", new Asset("/**/*.less", "text/css; charset=UFT-8", new [] { "**/*.less" }));
+            pipeline._assets.TryAdd("/**/*.css", new Asset("/**/*.css", "text/css; charset=UFT-8", new [] { "**/*.css" }));
+
+            Parallel.For(0, 100, iteration =>
+            {
+                pipeline.TryGetAssetFromRoute($"/some_file{iteration}.less", out var a1);
+            });
+        }
 
         [Fact2]
         public void FromRoute_Null_Success()

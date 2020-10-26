@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -45,8 +46,8 @@ namespace WebOptimizer.Test
             var env = new HostingEnvironment();
             var cache = new Mock<IMemoryCache>();
 
-            var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
-            member.SetValue(pipeline, new List<IAsset> { asset.Object });
+            pipeline._assets = new ConcurrentDictionary<string, IAsset>();
+            pipeline._assets.TryAdd(asset.Object.Route, asset.Object);
 
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
@@ -91,8 +92,8 @@ namespace WebOptimizer.Test
             var env = new HostingEnvironment();
             var cache = new Mock<IMemoryCache>();
 
-            var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
-            member.SetValue(pipeline, new List<IAsset> { asset.Object });
+            pipeline._assets = new ConcurrentDictionary<string, IAsset>();
+            pipeline._assets.TryAdd(asset.Object.Route, asset.Object);
 
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
@@ -140,8 +141,8 @@ namespace WebOptimizer.Test
             cache.Setup(c => c.TryGetValue(It.IsAny<string>(), out bytes))
                  .Returns(true);
 
-            var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
-            member.SetValue(pipeline, new List<IAsset> { asset.Object });
+            pipeline._assets = new ConcurrentDictionary<string, IAsset>();
+            pipeline._assets.TryAdd(asset.Object.Route, asset.Object);
 
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
@@ -198,8 +199,8 @@ namespace WebOptimizer.Test
             cache.Setup(c => c.TryGetValue(It.IsAny<string>(), out bytes))
                  .Returns(true);
 
-            var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
-            member.SetValue(pipeline, new List<IAsset> { asset.Object });
+            pipeline._assets = new ConcurrentDictionary<string, IAsset>();
+            pipeline._assets.TryAdd(asset.Object.Route, asset.Object);
 
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);

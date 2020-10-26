@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.FileSystemGlobbing;
@@ -7,9 +8,9 @@ namespace WebOptimizer
 {
     internal class AssetPipeline : IAssetPipeline
     {
-        private List<IAsset> _assets = new List<IAsset>();
+        internal ConcurrentDictionary<string, IAsset> _assets = new ConcurrentDictionary<string, IAsset>(StringComparer.OrdinalIgnoreCase);
 
-        public IReadOnlyList<IAsset> Assets => _assets;
+        public IReadOnlyList<IAsset> Assets => _assets.Values.ToList();
 
         public bool TryGetAssetFromRoute(string route, out IAsset asset)
         {
@@ -24,52 +25,55 @@ namespace WebOptimizer
             string cleanRoute = NormalizeRoute(route);
 
             // First check direct matches
-            foreach (IAsset existing in Assets)
+            if (_assets.TryGetValue(cleanRoute, out asset))
             {
-                if (existing.Route.Equals(cleanRoute, StringComparison.OrdinalIgnoreCase))
-                {
-                    asset = existing;
-                    return true;
-                }
+                return true;
             }
 
             // Then check globbing matches
             if (route != "/")
             {
-                foreach (IAsset existing in Assets)
+                IReadOnlyList<IAsset> list = Assets;
+                foreach (IAsset existing in list)
                 {
+                    PatternMatchingResult result;
                     try
                     {
                         var matcher = new Matcher();
                         matcher.AddInclude(existing.Route);
-
-                        if (matcher.Match(cleanRoute.TrimStart('/')).HasMatches)
-                        {
-                            asset = new Asset(cleanRoute, existing.ContentType, this, new[] { cleanRoute });
-
-                            foreach (IProcessor processor in existing.Processors)
-                            {
-                                asset.Processors.Add(processor);
-                            }
-
-                            foreach (KeyValuePair<string, object> items in existing.Items)
-                            {
-                                if (items.Key == Asset.PhysicalFilesKey)
-                                {
-                                    continue;
-                                }
-
-                                asset.Items.Add(items);
-                            }
-
-                            _assets.Add(asset);
-                            return true;
-                        }
+                        result = matcher.Match(cleanRoute.TrimStart('/'));
                     }
                     catch (Exception ex)
                     {
-                        //Some paths may be invalid and the call to matcher.Match will fail
+                        // Some paths may be invalid and the call to matcher.Match will fail
                         System.Diagnostics.Debug.Write(ex);
+                        continue;
+                    }
+
+                    if (result.HasMatches)
+                    {
+                        asset = new Asset(cleanRoute, existing.ContentType, this, new[]
+                        {
+                            cleanRoute
+                        });
+
+                        foreach (IProcessor processor in existing.Processors)
+                        {
+                            asset.Processors.Add(processor);
+                        }
+
+                        foreach (KeyValuePair<string, object> items in existing.Items)
+                        {
+                            if (items.Key == Asset.PhysicalFilesKey)
+                            {
+                                continue;
+                            }
+
+                            asset.Items.Add(items);
+                        }
+
+                        _assets.TryAdd(cleanRoute, asset);
+                        return true;
                     }
                 }
             }
@@ -115,7 +119,7 @@ namespace WebOptimizer
             }
 
             IAsset asset = new Asset(route, contentType, this, sourceFiles);
-            _assets.Add(asset);
+            _assets.TryAdd(route, asset);
 
             return asset;
         }
@@ -138,9 +142,8 @@ namespace WebOptimizer
             {
                 IAsset asset = new Asset(NormalizeRoute(file), contentType, this, new[] { file });
                 list.Add(asset);
+                _assets.TryAdd(asset.Route, asset);
             }
-
-            _assets.AddRange(list);
 
             return list;
         }

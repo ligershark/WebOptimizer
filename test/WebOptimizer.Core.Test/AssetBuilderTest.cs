@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -47,8 +48,8 @@ namespace WebOptimizer.Core.Test
 
             var store = new Mock<IAssetResponseStore>();
 
-            var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
-            member.SetValue(pipeline, new List<IAsset> { asset.Object });
+            pipeline._assets = new ConcurrentDictionary<string, IAsset>();
+            pipeline._assets.TryAdd(asset.Object.Route, asset.Object);
 
             var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
             amo.SetupGet(a => a.Value).Returns(options);
@@ -95,8 +96,8 @@ namespace WebOptimizer.Core.Test
             var store = new Mock<IAssetResponseStore>();
             store.Setup(s => s.TryGet(It.IsAny<string>(), It.IsAny<string>(), out ar)).Throws<InvalidOperationException>();
 
-            var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
-            member.SetValue(pipeline, new List<IAsset> { asset.Object });
+            pipeline._assets = new ConcurrentDictionary<string, IAsset>();
+            pipeline._assets.TryAdd(asset.Object.Route, asset.Object);
 
             var logger = new Mock<ILogger<AssetBuilder>>();
             var builder = new AssetBuilder(cache, store.Object, logger.Object, env.Object);
@@ -139,8 +140,8 @@ namespace WebOptimizer.Core.Test
             var store = new Mock<IAssetResponseStore>();
             store.Setup(s => s.TryGet(It.IsAny<string>(), It.IsAny<string>(), out ar)).Throws<InvalidOperationException>();
 
-            var member = pipeline.GetType().GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
-            member.SetValue(pipeline, new List<IAsset> { asset.Object });
+            pipeline._assets = new ConcurrentDictionary<string, IAsset>();
+            pipeline._assets.TryAdd(asset.Object.Route, asset.Object);
 
             var logger = new Mock<ILogger<AssetBuilder>>();
             var builder = new AssetBuilder(cache.Object, store.Object, logger.Object, env.Object);
