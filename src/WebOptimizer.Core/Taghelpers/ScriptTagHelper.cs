@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -44,19 +45,24 @@ namespace WebOptimizer.Taghelpers
 
             if (string.IsNullOrEmpty(src))
                 return;
+
+            string pathBase = null;
                 
             if (CurrentViewContext.HttpContext.Request.PathBase.HasValue)
-                src = src.TrimStart(CurrentViewContext.HttpContext.Request.PathBase.Value.ToCharArray());
+            {
+                pathBase = CurrentViewContext.HttpContext.Request.PathBase.Value;
+            }
+
+            if (pathBase != null && src.StartsWith(pathBase))
+            {
+                src = src.Substring(pathBase.Length);
+            }               
 
             if (Pipeline.TryGetAssetFromRoute(src, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
                 if (Options.EnableTagHelperBundling == true)
                 {
-                    if (CurrentViewContext.HttpContext.Request.PathBase.HasValue)
-                        src = CurrentViewContext.HttpContext.Request.PathBase.Value + GenerateHash(asset);
-                    else
-                        src = GenerateHash(asset);
-
+                    src = $"{pathBase}{GenerateHash(asset)}";
                     output.Attributes.SetAttribute("src", src);
                 }
                 else
