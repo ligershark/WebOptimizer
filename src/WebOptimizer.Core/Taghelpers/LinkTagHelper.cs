@@ -34,7 +34,7 @@ namespace WebOptimizer.Taghelpers
         [HtmlAttributeNotBound]
         [ViewContext]
         public ViewContext CurrentViewContext { get; set; }
-        
+
         /// <summary>
         /// Synchronously executes the TagHelper
         /// </summary>
@@ -46,19 +46,22 @@ namespace WebOptimizer.Taghelpers
             }
 
             string href = GetValue("href", output);
-            
-              if (CurrentViewContext.HttpContext.Request.PathBase.HasValue)
-                href = href.TrimStart(CurrentViewContext.HttpContext.Request.PathBase.Value.ToCharArray());
+            string pathBase = null;
+            if (CurrentViewContext.HttpContext.Request.PathBase.HasValue )
+            {
+                pathBase = CurrentViewContext.HttpContext.Request.PathBase.Value;
+            }
+
+            if (pathBase != null && href.StartsWith(pathBase))
+            {
+                href = href.Substring(pathBase.Length);
+            }                
 
             if (Pipeline.TryGetAssetFromRoute(href, out IAsset asset) && !output.Attributes.ContainsName("inline"))
             {
                 if (Options.EnableTagHelperBundling == true)
                 {
-                     if (CurrentViewContext.HttpContext.Request.PathBase.HasValue)
-                        href = CurrentViewContext.HttpContext.Request.PathBase.Value + GenerateHash(asset);
-                    else
-                        href = GenerateHash(asset);
-
+                    href = $"{pathBase}{GenerateHash(asset)}";
                     output.Attributes.SetAttribute("href", href);
                 }
                 else

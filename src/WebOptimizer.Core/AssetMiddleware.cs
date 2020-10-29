@@ -26,7 +26,13 @@ namespace WebOptimizer
             string path = context.Request.Path.Value;
 
             if (context.Request.PathBase.HasValue)
-                path = path.TrimStart(context.Request.PathBase.Value.ToCharArray());
+            {
+                string pathBase = context.Request.PathBase.Value;
+                if (path.StartsWith(pathBase))
+                {
+                    path = path.Substring(pathBase.Length);
+                }
+            }                
 
             if (_pipeline.TryGetAssetFromRoute(path, out IAsset asset))
             {
