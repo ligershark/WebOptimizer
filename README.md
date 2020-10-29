@@ -283,6 +283,10 @@ Default: **false**
 <script src="http://my-cdn.com/js/file.js"></script>
 ```
 
+**allowEmptyBundle** determines the behavior when there is no content in source file of a bundle, by default 404 exception will be thrown when the bundle is requested, set to true to get a bundle with empty content instead.
+
+Default: **false**
+
 ### Custom pipeline
 Read more in the [custom pipeline documentation](https://ligershark.github.io/WebOptimizer/custom-pipeline.html).
 
