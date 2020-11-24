@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
@@ -106,7 +107,18 @@ namespace WebOptimizer
 
             if (cachedResponse?.Body?.Length > 0)
             {
+                SetCompressionMode(context, options);
                 await context.Response.Body.WriteAsync(cachedResponse.Body, 0, cachedResponse.Body.Length);
+            }
+        }
+
+        // Only called when we expect to serve the body.
+        private static void SetCompressionMode(HttpContext context, IWebOptimizerOptions options)
+        {
+            IHttpsCompressionFeature responseCompressionFeature = context.Features.Get<IHttpsCompressionFeature>();
+            if (responseCompressionFeature != null)
+            {
+                responseCompressionFeature.Mode = options.HttpsCompression;
             }
         }
     }

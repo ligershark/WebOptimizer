@@ -1,10 +1,8 @@
 ﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -38,6 +36,7 @@ namespace WebOptimizer.Test
                    .Returns(response.Object);
 
             context.Setup(c => c.Request.Path).Returns("/file.css");
+            context.Setup(c => c.Features.Get<IHttpsCompressionFeature>()).Returns((IHttpsCompressionFeature) null);
 
             response.SetupGet(c => c.Headers)
                    .Returns(new HeaderDictionary());
@@ -131,6 +130,7 @@ namespace WebOptimizer.Test
                    .Returns(response.Object);
 
             context.Setup(c => c.Request.Path).Returns("/file.css");
+            context.Setup(c => c.Features.Get<IHttpsCompressionFeature>()).Returns((IHttpsCompressionFeature) null);
 
             var next = new Mock<RequestDelegate>();
             var env = new HostingEnvironment();
@@ -246,6 +246,67 @@ namespace WebOptimizer.Test
 
             next.Verify(n => n(context.Object), Times.Once);
 
+        }
+
+        [Fact2]
+        public async Task AssetMiddleware_Compression()
+        {
+            var cssContent = "*{color:red}".AsByteArray();
+
+            var pipeline = new AssetPipeline();
+            var options = new WebOptimizerOptions() { HttpsCompression = HttpsCompressionMode.Compress };
+            var asset = new Mock<IAsset>().SetupAllProperties();
+            asset.SetupGet(a => a.ContentType).Returns("text/css");
+            asset.SetupGet(a => a.Route).Returns("/file.css");
+            asset.Setup(a => a.ExecuteAsync(It.IsAny<HttpContext>(), options))
+                 .Returns(Task.FromResult(cssContent));
+
+            StringValues values;
+            var response = new Mock<HttpResponse>().SetupAllProperties();
+            var context = new Mock<HttpContext>().SetupAllProperties();
+            context.Setup(s => s.Request.Headers.TryGetValue("Accept-Encoding", out values))
+                   .Returns(false);
+            context.Setup(c => c.Response)
+                   .Returns(response.Object);
+
+            context.Setup(c => c.Request.Path).Returns("/file.css");
+
+            var compressionFeature = new HttpsCompressionFeature();
+            context.Setup(c => c.Features.Get<IHttpsCompressionFeature>()).Returns(compressionFeature);
+
+            var next = new Mock<RequestDelegate>();
+            var cache = new Mock<IMemoryCache>();
+            var mcr = new AssetResponse(cssContent, null);
+
+            object bytes = mcr;
+            cache.Setup(c => c.TryGetValue(It.IsAny<string>(), out bytes))
+                 .Returns(true);
+
+            pipeline._assets = new ConcurrentDictionary<string, IAsset>();
+            pipeline._assets.TryAdd(asset.Object.Route, asset.Object);
+
+            var amo = new Mock<IOptionsSnapshot<WebOptimizerOptions>>();
+            amo.SetupGet(a => a.Value).Returns(options);
+
+            var logger = new Mock<ILogger<AssetMiddleware>>();
+            var builder = new Mock<IAssetBuilder>();
+            builder.Setup(b => b.BuildAsync(It.IsAny<IAsset>(), context.Object, options)).Returns(Task.FromResult<IAssetResponse>(mcr));
+            var middleware = new AssetMiddleware(next.Object, pipeline, logger.Object, builder.Object);
+            var stream = new MemoryStream();
+
+            response.Setup(r => r.Body).Returns(stream);
+            await middleware.InvokeAsync(context.Object, amo.Object);
+
+            Assert.Equal("text/css", context.Object.Response.ContentType);
+            Assert.Equal(cssContent, await stream.AsBytesAsync());
+            Assert.Equal(0, response.Object.StatusCode);
+
+            Assert.Equal(HttpsCompressionMode.Compress, compressionFeature.Mode);
+        }
+
+        private class HttpsCompressionFeature : IHttpsCompressionFeature
+        {
+            public HttpsCompressionMode Mode { get; set; } = HttpsCompressionMode.Default;
         }
     }
 }
