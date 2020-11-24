@@ -24,7 +24,7 @@ namespace WebOptimizer.Core.Sample2
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-
+            services.AddResponseCompression();
 
             var cssSettings = new CssBundlingSettings();
             var codeSettings = new CodeBundlingSettings
@@ -47,9 +47,11 @@ namespace WebOptimizer.Core.Sample2
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            app.UseResponseCompression();
+
             const string scriptsPath1 = "Scripts1";
             const string scriptsPath2 = "Scripts2";
-            
+
             var currentDirectory = Directory.GetCurrentDirectory();
             app.UseWebOptimizer(HostingEnvironment, new[]
             {
@@ -69,7 +71,7 @@ namespace WebOptimizer.Core.Sample2
                     FileProvider = new EmbeddedFileProvider(Lib.AssemblyTools.GetCurrentAssembly()),
                 }
             });
-            
+
             app.UseStaticFiles();
 
             app.UseRouting();
