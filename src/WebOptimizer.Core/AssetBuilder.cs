@@ -16,7 +16,6 @@ namespace WebOptimizer
         private IMemoryCache _cache;
         private ILogger<AssetBuilder> _logger;
         private IWebHostEnvironment _env;
-        private string _cacheDir;
         private readonly IAssetResponseStore _assetResponseCache;
 
         /// <summary>

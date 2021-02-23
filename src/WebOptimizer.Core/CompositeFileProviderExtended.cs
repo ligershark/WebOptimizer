@@ -22,35 +22,32 @@ namespace WebOptimizer
             _fileProviderOptions = fileProviderOptions;
         }
 
-        public IDirectoryContents GetDirectoryContents(string subpath)
+        public IDirectoryContents GetDirectoryContents(string subPath)
         {
-            string outpath;
-            var provider = GetFileProvider(subpath, out outpath);
+            IFileProvider provider = GetFileProvider(subPath, out string outPath);
 
-            return provider.GetDirectoryContents(outpath);
+            return provider.GetDirectoryContents(outPath);
         }
 
-        public IFileInfo GetFileInfo(string subpath)
+        public IFileInfo GetFileInfo(string subPath)
         {
-            string outpath;
-            var provider = GetFileProvider(subpath, out outpath);
+            IFileProvider provider = GetFileProvider(subPath, out string outPath);
 
-            return provider.GetFileInfo(outpath);
+            return provider.GetFileInfo(outPath);
         }
 
         public IChangeToken Watch(string filter)
         {
-            string outpath;
-            var provider = GetFileProvider(filter, out outpath);
+            IFileProvider provider = GetFileProvider(filter, out string outPath);
 
-            return provider.Watch(outpath);
+            return provider.Watch(outPath);
         }
 
-        internal IFileProvider GetFileProvider(string path, out string outpath)
+        internal IFileProvider GetFileProvider(string path, out string outPath)
         {
-            outpath = path;
+            outPath = path;
 
-            var fileProviders = _fileProviderOptions;
+            FileProviderOptions[] fileProviders = _fileProviderOptions;
             if (fileProviders != null)
             {
                 for (var index = 0; index < fileProviders.Length; index++)
@@ -59,7 +56,7 @@ namespace WebOptimizer
 
                     if (path.StartsWith(item.RequestPath, StringComparison.OrdinalIgnoreCase))
                     {
-                        outpath = path.Substring(item.RequestPath.Value.Length, path.Length - item.RequestPath.Value.Length);
+                        outPath = path.Substring(item.RequestPath.Value.Length, path.Length - item.RequestPath.Value.Length);
 
                         return item.FileProvider;
                     }
