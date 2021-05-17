@@ -269,10 +269,6 @@ Default: `<ContentRootPath>/obj/WebOptimizerCache`
 
 For example. if the cdnUrl is set to `"http://my-cdn.com"` then script and link tags will prepend the *cdnUrl* to the references. For instance, this script tag:
 
-**allowEmptyBundle** determines the behavior when there is no content in source file of a bundle, 404 exception will be thrown when the bundle is requested, set to true to get a bundle with empty content instead.
-
-Default: **false**
-
 ```html
 <script src="/js/file.js"></script>
 ```
