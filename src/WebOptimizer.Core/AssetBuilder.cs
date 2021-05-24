@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -34,7 +35,16 @@ namespace WebOptimizer
         /// </summary>
         public async Task<IAssetResponse> BuildAsync(IAsset asset, HttpContext context, IWebOptimizerOptions options)
         {
-            string cacheKey = asset.GenerateCacheKey(context);
+            string cacheKey;
+            try
+            {
+                cacheKey = asset.GenerateCacheKey(context);
+            }
+            catch (FileNotFoundException)
+            {
+                _logger.LogFileNotFound(context.Request.Path);
+                return null;
+            }
 
             if (options.EnableMemoryCache == true && _cache.TryGetValue(cacheKey, out AssetResponse value))
             {
