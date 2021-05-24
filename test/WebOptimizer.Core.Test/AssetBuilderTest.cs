@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -149,6 +150,33 @@ namespace WebOptimizer.Core.Test
             var result = await builder.BuildAsync(asset.Object, context.Object, options).ConfigureAwait(false);
 
             Assert.Equal(cssContent, result.Body);
+        }
+        
+        [Fact2]
+        public async Task AssetBiulder_NonExistentFileRequested()
+        {
+            var options = new WebOptimizerOptions();
+            var asset = new Mock<IAsset>().SetupAllProperties();
+            asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>())).Throws<FileNotFoundException>();
+            
+            
+            StringValues values;
+            var response = new Mock<HttpResponse>().SetupAllProperties();
+            response.Setup(r => r.Headers.Keys).Returns(new string[] { });
+            var context = new Mock<HttpContext>().SetupAllProperties();
+            context.Setup(s => s.Request.Headers.TryGetValue("Accept-Encoding", out values)).Returns(false);
+            context.Setup(c => c.Response).Returns(response.Object);
+            context.Setup(c => c.Request.Path).Returns("/nonexist_file.css");
+            
+            var cache = new Mock<IMemoryCache>();
+
+            var store = new Mock<IAssetResponseStore>();
+            var logger = new Mock<ILogger<AssetBuilder>>();
+            var env = new Mock<IWebHostEnvironment>().SetupAllProperties();
+            var builder = new AssetBuilder(cache.Object, store.Object, logger.Object, env.Object);
+            var result = await builder.BuildAsync(asset.Object, context.Object, options).ConfigureAwait(false);
+
+            Assert.Null(result);
         }
     }
 }

@@ -25,7 +25,11 @@ namespace WebOptimizer
             logLevel: LogLevel.Information,
             eventId: 1004,
             formatString: "No response generated for '{Path}'. Passing on to next middleware.");
-
+        private static Action<ILogger, string, Exception> _logFileNotFound = LoggerMessage.Define<string>(
+            logLevel: LogLevel.Warning,
+            eventId: 1005,
+            formatString: "File '{Path}' not found. Passing on to next middleware.");
+        
         public static void LogRequestForAssetStarted(this ILogger logger, string path) =>
             _logRequestForAssetStarted(logger, path, null);
 
@@ -40,5 +44,8 @@ namespace WebOptimizer
 
         public static void LogZeroByteResponse(this ILogger logger, string path) =>
             _logZeroByteResponse(logger, path, null);
+        
+        public static void LogFileNotFound(this ILogger logger, string path) =>
+            _logFileNotFound(logger, path, null);
     }
 }
