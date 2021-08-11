@@ -38,6 +38,8 @@ namespace WebOptimizer
 
         public string Route { get; private set; }
 
+        public IList<string> ExcludeFiles { get; } = new List<string>();
+
         public IEnumerable<string> SourceFiles { get; internal set; }
 
         public string ContentType { get; private set; }
@@ -93,7 +95,7 @@ namespace WebOptimizer
                 string outSourceFile;
                 var provider = asset.GetFileProvider(env, sourceFile, out outSourceFile);
 
-                if (provider.GetFileInfo(outSourceFile).Exists)
+                if (asset.ExcludeFiles.Count == 0 && provider.GetFileInfo(outSourceFile).Exists)
                 {
                     if (!files.Contains(sourceFile))
                     {
@@ -110,12 +112,13 @@ namespace WebOptimizer
                         var dir = new DirectoryInfoWrapper(new DirectoryInfo(root));
                         var matcher = new Matcher();
                         matcher.AddInclude(outSourceFile);
+                        matcher.AddExcludePatterns(asset.ExcludeFiles);
                         PatternMatchingResult globbingResult = matcher.Execute(dir);
                         IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
 
                         if (!fileMatches.Any())
                         {
-                            throw new FileNotFoundException($"No files found matching \"{sourceFile}\" exist in \"{dir.FullName}\"");
+                            continue;
                         }
 
                         files.AddRange(fileMatches.Where(f => !files.Contains(f)));
@@ -129,6 +132,11 @@ namespace WebOptimizer
                         }
                     }
                 }
+            }
+
+            if (files.Count == 0)
+            {
+                throw new FileNotFoundException($"No files found matching exist in an asset");
             }
 
             asset.Items[PhysicalFilesKey] = files;
@@ -243,6 +251,22 @@ namespace WebOptimizer
         public static IFileProvider GetFileProvider(this IAsset asset, IWebHostEnvironment env)
         {
             return asset.GetCustomFileProvider(env) ?? env.WebRootFileProvider;
+        }
+
+        /// <summary>
+        /// Adds a file name pattern for files that should be excluded from the results
+        /// </summary>
+        public static IAsset ExcludeFiles(this IAsset asset, params string[] filesToExclude)
+        {
+            if (filesToExclude.Length == 0)
+            {
+                throw new ArgumentException("At least one file has to be specified", nameof(filesToExclude));
+            }
+
+            foreach (string file in filesToExclude)
+                asset.ExcludeFiles.Add(file);
+
+            return asset;
         }
 
         /// <summary>

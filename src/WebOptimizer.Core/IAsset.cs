@@ -30,6 +30,11 @@ namespace WebOptimizer
         string Route { get; }
 
         /// <summary>
+        /// Gets files to exclude from output results
+        /// </summary>
+        IList<string> ExcludeFiles { get; }
+
+        /// <summary>
         /// Gets the webroot relative source files.
         /// </summary>
         IEnumerable<string> SourceFiles { get; }
