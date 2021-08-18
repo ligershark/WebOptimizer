@@ -90,56 +90,58 @@ namespace WebOptimizer
         {
             var files = new List<string>();
 
-            foreach (string sourceFile in asset.SourceFiles)
+            if (asset.SourceFiles.Any())
             {
-                string outSourceFile;
-                var provider = asset.GetFileProvider(env, sourceFile, out outSourceFile);
-
-                if (asset.ExcludeFiles.Count == 0 && provider.GetFileInfo(outSourceFile).Exists)
+                foreach (string sourceFile in asset.SourceFiles)
                 {
-                    if (!files.Contains(sourceFile))
-                    {
-                        files.Add(sourceFile);
-                    }
-                }
-                else
-                {
-                    var fileInfo = provider.GetFileInfo("/");
-                    string root = fileInfo.PhysicalPath;
+                    var provider = asset.GetFileProvider(env, sourceFile, out string outSourceFile);
 
-                    if (root != null)
-                    {
-                        var dir = new DirectoryInfoWrapper(new DirectoryInfo(root));
-                        var matcher = new Matcher();
-                        matcher.AddInclude(outSourceFile);
-                        matcher.AddExcludePatterns(asset.ExcludeFiles);
-                        PatternMatchingResult globbingResult = matcher.Execute(dir);
-                        IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
-
-                        if (!fileMatches.Any())
-                        {
-                            continue;
-                        }
-
-                        files.AddRange(fileMatches.Where(f => !files.Contains(f)));
-
-                    }
-                    else
+                    if (asset.ExcludeFiles.Count == 0 && provider.GetFileInfo(outSourceFile).Exists)
                     {
                         if (!files.Contains(sourceFile))
                         {
                             files.Add(sourceFile);
                         }
                     }
+                    else
+                    {
+                        var fileInfo = provider.GetFileInfo("/");
+                        string root = fileInfo.PhysicalPath;
+
+                        if (root != null)
+                        {
+                            var dir = new DirectoryInfoWrapper(new DirectoryInfo(root));
+                            var matcher = new Matcher();
+                            matcher.AddInclude(outSourceFile);
+                            matcher.AddExcludePatterns(asset.ExcludeFiles);
+                            PatternMatchingResult globbingResult = matcher.Execute(dir);
+                            IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
+
+                            if (!fileMatches.Any())
+                            {
+                                continue;
+                            }
+
+                            files.AddRange(fileMatches.Where(f => !files.Contains(f)));
+
+                        }
+                        else
+                        {
+                            if (!files.Contains(sourceFile))
+                            {
+                                files.Add(sourceFile);
+                            }
+                        }
+                    }
                 }
-            }
 
-            if (files.Count == 0)
-            {
-                throw new FileNotFoundException($"No files found matching exist in an asset");
-            }
+                if (files.Count == 0)
+                {
+                    throw new FileNotFoundException($"No files found matching exist in an asset");
+                }
 
-            asset.Items[PhysicalFilesKey] = files;
+                asset.Items[PhysicalFilesKey] = files;
+            }
 
             return files;
         }
