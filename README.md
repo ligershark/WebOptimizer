@@ -182,7 +182,6 @@ services.AddWebOptimizer(pipeline =>
     pipeline.AddJavaScriptBundle("/js/scripts.js", "a.js", "b.js")
         .UseFileProvider(provider);
 });
-
 ```
 
 ## Tag Helpers
