@@ -20,7 +20,6 @@ namespace WebOptimizer
 {
     internal class Asset : IAsset
     {
-        private static FileVersionProvider _fileVersionProvider;
         internal const string PhysicalFilesKey = "PhysicalFiles";
 
         public Asset(string route, string contentType, IAssetPipeline pipeline, IEnumerable<string> sourceFiles)
@@ -176,16 +175,12 @@ namespace WebOptimizer
 
             IEnumerable<string> physicalFiles;
             var env = (IWebHostEnvironment)context.RequestServices.GetService(typeof(IWebHostEnvironment));
+            var cache = (IMemoryCache)context.RequestServices.GetService(typeof(IMemoryCache));
 
-            if (_fileVersionProvider == null)
-            {
-                var cache = (IMemoryCache)context.RequestServices.GetService(typeof(IMemoryCache));
-
-                _fileVersionProvider = new FileVersionProvider(
-                    this.GetFileProvider(env),
-                    cache,
-                    context.Request.PathBase);
-            }
+            var fileVersionProvider = new FileVersionProvider(
+                this.GetFileProvider(env),
+                cache,
+                context.Request.PathBase);
 
             if (!Items.ContainsKey(PhysicalFilesKey))
             {
@@ -200,7 +195,7 @@ namespace WebOptimizer
             {
                 foreach (string file in physicalFiles)
                 {
-                    cacheKey.Append(_fileVersionProvider.AddFileVersionToPath(file));
+                    cacheKey.Append(fileVersionProvider.AddFileVersionToPath(file));
                 }
             }
 
