@@ -244,9 +244,11 @@ namespace WebOptimizer.TagHelpersDynamic
                     var assetKey = GetKey(serviceProvider, destBundleKey);
                     var assetItem = GetOrCreateAssetByKey(pipeline, assetKey, createAsset);
                     assetItem.Initialized = true;
-                    attrValue = GenerateHash(assetItem.Asset, httpContext);
 
-                    output.Attributes.SetAttribute(attrName, attrValue);
+                    string pathBase = httpContext.Request?.PathBase.Value;
+
+                    output.Attributes.SetAttribute(attrName, $"{pathBase}{GenerateHash(assetItem.Asset, httpContext)}");
+
                     return true;
                 }
 

@@ -46,11 +46,7 @@ namespace WebOptimizer.Taghelpers
             }
 
             string href = GetValue("href", output);
-            string pathBase = null;
-            if (CurrentViewContext.HttpContext.Request.PathBase.HasValue )
-            {
-                pathBase = CurrentViewContext.HttpContext.Request.PathBase.Value;
-            }
+            string pathBase = CurrentViewContext.HttpContext?.Request?.PathBase.Value;
 
             if (pathBase != null && href.StartsWith(pathBase))
             {
