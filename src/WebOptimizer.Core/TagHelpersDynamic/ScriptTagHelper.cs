@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
+using WebOptimizer.Extensions;
 
 namespace WebOptimizer.TagHelpersDynamic
 {
@@ -38,6 +40,9 @@ namespace WebOptimizer.TagHelpersDynamic
         private const string BundleDestinationKeyName = "asp-bundle-dest-key";
         private const string BundleKeyName = "asp-bundle-key";
 
+        private readonly WebOptimizerOptions _webOptimizerOptions;
+        private readonly IAssetPipeline _pipeline;
+
         /// <summary>
         ///
         /// </summary>
@@ -53,25 +58,28 @@ namespace WebOptimizer.TagHelpersDynamic
         /// <summary>
         /// Creates a new <see cref="ScriptTagHelper"/>.
         /// </summary>
+        /// <param name="pipeline"></param>
         /// <param name="hostingEnvironment">The <see cref="IWebHostEnvironment"/>.</param>
         /// <param name="cache">The <see cref="IMemoryCache"/>.</param>
+        /// <param name="fileVersionProvider"></param>
         /// <param name="htmlEncoder">The <see cref="HtmlEncoder"/>.</param>
         /// <param name="javaScriptEncoder">The <see cref="JavaScriptEncoder"/>.</param>
         /// <param name="urlHelperFactory">The <see cref="IUrlHelperFactory"/>.</param>
+        /// <param name="webOptimizerOptions"></param>
         public ScriptTagHelper(
+            IAssetPipeline pipeline,
             IWebHostEnvironment hostingEnvironment,
             TagHelperMemoryCacheProvider cache,
             IFileVersionProvider fileVersionProvider,
             HtmlEncoder htmlEncoder,
             JavaScriptEncoder javaScriptEncoder,
-            IUrlHelperFactory urlHelperFactory, 
-            IServiceProvider serviceProvider)
-			: base(hostingEnvironment, cache, fileVersionProvider, htmlEncoder, javaScriptEncoder, urlHelperFactory)
+            IUrlHelperFactory urlHelperFactory,
+            IOptionsSnapshot<WebOptimizerOptions> webOptimizerOptions)
+            : base(hostingEnvironment, cache, fileVersionProvider, htmlEncoder, javaScriptEncoder, urlHelperFactory)
         {
-            if (serviceProvider == null) throw new ArgumentNullException(nameof(serviceProvider));
-            _serviceProvider = serviceProvider;
+            _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
+            _webOptimizerOptions = webOptimizerOptions?.Value ?? throw new ArgumentNullException(nameof(webOptimizerOptions));
         }
-		private IServiceProvider _serviceProvider;
 
         /// <inheritdoc />
         public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -79,14 +87,10 @@ namespace WebOptimizer.TagHelpersDynamic
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (output == null) throw new ArgumentNullException(nameof(output));
 
-            if (Helpers
-                    .HandleBundle(
-                        Helpers.CreateJsAsset,
-                        _serviceProvider,
-                        HostingEnvironment,
-                        output,
-                        ViewContext.HttpContext,
-                        "src", Src, BundleKey, BundleDestinationKey) == false)
+            if (!output.HandleJsBundle(
+                    _pipeline,
+                    ViewContext,
+                    _webOptimizerOptions, Src, BundleKey, BundleDestinationKey))
             {
                 base.Process(context, output);
             }
