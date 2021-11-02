@@ -27,7 +27,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers" Version="3.0.0-preview4-19123-01" />
         <PackageReference Include="Microsoft.AspNetCore.Razor.Runtime" Version="3.0.0-preview4-19123-01" />-->
         <!--<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0-alpha1.19418.1" />-->
-        <PackageReference Include="NUglify" Version="1.13.10" />
+        <PackageReference Include="NUglify" Version="1.16.1" />
         <PackageReference Include="System.Text.Json" Version="5.0.2" />
     </ItemGroup>
 
