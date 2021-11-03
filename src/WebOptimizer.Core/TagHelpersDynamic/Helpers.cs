@@ -2,15 +2,13 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-    
+
 namespace WebOptimizer.TagHelpersDynamic
 {
     internal static class Helpers
@@ -28,50 +26,15 @@ namespace WebOptimizer.TagHelpersDynamic
 
         #endregion
 
-
-
-        private static WebOptimizerOptions _webOptimizerOptions;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static WebOptimizerOptions GetWebOptimizerOptions(this IServiceProvider serviceProvider,
-            IWebHostEnvironment env)
+        private static string GetKey(ActionContext actionContext, string key)
         {
-            if (_webOptimizerOptions == null)
+            return actionContext.ActionDescriptor switch
             {
-                var options = ((IOptionsSnapshot<WebOptimizerOptions>)
-                        serviceProvider.GetService(typeof(IOptionsSnapshot<WebOptimizerOptions>)))
-                    .Value;
-
-                _webOptimizerOptions = options;
-            }
-
-            return _webOptimizerOptions;
-        }
-
-        private static string GetKey(IServiceProvider serviceProvider, string key)
-        {
-            var actionContextAccessor = (IActionContextAccessor) serviceProvider.GetService(typeof(IActionContextAccessor));
-            var type = actionContextAccessor.ActionContext.ActionDescriptor.GetType();
-            if (type == typeof(ControllerActionDescriptor))
-            {
-                var actionDescriptor = (ControllerActionDescriptor)actionContextAccessor.ActionContext.ActionDescriptor;
-                return string.Concat(actionDescriptor.ControllerName, actionDescriptor.ActionName, key);
-            }
-            else if (type == typeof(CompiledPageActionDescriptor))
-            {
-                var actionDescriptor = (CompiledPageActionDescriptor)actionContextAccessor.ActionContext.ActionDescriptor;
-                return string.Concat(actionDescriptor.AreaName, actionDescriptor.ViewEnginePath.Replace("/", ""), key);
-            }
-            else if (type == typeof(PageActionDescriptor))
-            {
-                var actionDescriptor = (PageActionDescriptor)actionContextAccessor.ActionContext.ActionDescriptor;
-                return string.Concat(actionDescriptor.AreaName, actionDescriptor.ViewEnginePath.Replace("/", ""), key);
-            }
-            else
-            {
-                var actionDescriptor = actionContextAccessor.ActionContext.ActionDescriptor;
-                return string.Concat(actionDescriptor.DisplayName.Replace("/", ""), key);
-            }
+                ControllerActionDescriptor controllerAction => string.Concat(controllerAction.ControllerName, controllerAction.ActionName, key),
+                CompiledPageActionDescriptor compiledPage => string.Concat(compiledPage.AreaName, compiledPage.ViewEnginePath.Replace("/", ""), key),
+                PageActionDescriptor pageAction => string.Concat(pageAction.AreaName, pageAction.ViewEnginePath.Replace("/", ""), key),
+                _ => string.Concat(actionContext.ActionDescriptor.DisplayName.Replace("/", ""), key)
+            };
         }
 
         private static readonly Concatenator Concatenator = new Concatenator();
@@ -111,7 +74,6 @@ namespace WebOptimizer.TagHelpersDynamic
             return asset;
         }
 
-
         internal static IAsset CreateJsAsset(IAssetPipeline pipeline, string key)
         {
             var route = string.Concat("/js/", key, ".js");
@@ -144,7 +106,7 @@ namespace WebOptimizer.TagHelpersDynamic
         }
 
 
-        private static readonly string[] EmptySourceFiles = {string.Empty};
+        private static readonly string[] EmptySourceFiles = { string.Empty };
 
         private static IAsset AddBundleByKey(IAssetPipeline pipeline, string route,
             string contentType)
@@ -173,15 +135,8 @@ namespace WebOptimizer.TagHelpersDynamic
             return assetItem;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static IAssetPipeline GetAssetPipeline(this IServiceProvider serviceProvider)
-        {
-            var pipeline = (IAssetPipeline) serviceProvider.GetService(typeof(IAssetPipeline));
-            return pipeline;
-        }
-
         /// <summary>
-        /// Generates a has of the files in the bundle.
+        /// Generates a hash of the files in the bundle.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string GenerateHash(IAsset asset, HttpContext httpContext)
@@ -193,66 +148,56 @@ namespace WebOptimizer.TagHelpersDynamic
 
 
         internal static bool HandleBundle(Func<IAssetPipeline, string, IAsset> createAsset,
-            IServiceProvider serviceProvider,
-            IWebHostEnvironment env,
+            IAssetPipeline pipeline,
             TagHelperOutput output,
-            HttpContext httpContext,
+            ActionContext actionContext,
+            WebOptimizerOptions options,
             string attrName,
             string attrValue,
             string bundleKey,
-            string destBundleKey
-        )
+            string destBundleKey)
         {
-            if (string.IsNullOrEmpty(bundleKey) == false)
+            if (!string.IsNullOrEmpty(bundleKey) && options.EnableTagHelperBundling == true)
             {
-                WebOptimizerOptions options = serviceProvider.GetWebOptimizerOptions(env);
-
-                if (options.EnableTagHelperBundling == true)
+                if (string.IsNullOrEmpty(attrValue))
                 {
-                    if (string.IsNullOrEmpty(attrValue))
-                    {
-                        return true;
-                    }
-
-                    output.SuppressOutput();
-
-                    IAssetPipeline pipeline = serviceProvider.GetAssetPipeline();
-                    var assetKey = GetKey(serviceProvider, bundleKey);
-                    var assetItem = GetOrCreateAssetByKey(pipeline, assetKey, createAsset);
-                    if (assetItem.Initialized)
-                    {
-                        return true;
-                    }
-                    string cleanRoute = attrValue.TrimStart('~');
-
-                    lock (assetItem.Asset.SourceFiles)
-                    {
-                        ((HashSet<string>) assetItem.Asset.SourceFiles).Add(cleanRoute);
-                    }
-
-                    return true;
-                }
-            }
-
-            if (string.IsNullOrEmpty(destBundleKey) == false)
-            {
-                WebOptimizerOptions options = serviceProvider.GetWebOptimizerOptions(env);
-
-                if (options.EnableTagHelperBundling == true)
-                {
-                    IAssetPipeline pipeline = serviceProvider.GetAssetPipeline();
-                    var assetKey = GetKey(serviceProvider, destBundleKey);
-                    var assetItem = GetOrCreateAssetByKey(pipeline, assetKey, createAsset);
-                    assetItem.Initialized = true;
-
-                    string pathBase = httpContext.Request?.PathBase.Value;
-
-                    output.Attributes.SetAttribute(attrName, $"{pathBase}{GenerateHash(assetItem.Asset, httpContext)}");
-
                     return true;
                 }
 
                 output.SuppressOutput();
+
+                var assetKey = GetKey(actionContext, bundleKey);
+                var assetItem = GetOrCreateAssetByKey(pipeline, assetKey, createAsset);
+                if (assetItem.Initialized)
+                {
+                    return true;
+                }
+                string cleanRoute = attrValue.TrimStart('~');
+
+                lock (assetItem.Asset.SourceFiles)
+                {
+                    ((HashSet<string>)assetItem.Asset.SourceFiles).Add(cleanRoute);
+                }
+
+                return true;
+            }
+
+            if (!string.IsNullOrEmpty(destBundleKey))
+            {
+                if (options.EnableTagHelperBundling == false)
+                {
+                    output.SuppressOutput();
+                    return true;
+                }
+
+                var assetKey = GetKey(actionContext, destBundleKey);
+                var assetItem = GetOrCreateAssetByKey(pipeline, assetKey, createAsset);
+                assetItem.Initialized = true;
+
+                string pathBase = actionContext.HttpContext?.Request?.PathBase.Value;
+
+                output.Attributes.SetAttribute(attrName, $"{pathBase}{GenerateHash(assetItem.Asset, actionContext.HttpContext)}");
+
                 return true;
             }
 
