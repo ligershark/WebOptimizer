@@ -56,14 +56,14 @@ namespace WebOptimizer.TagHelpersDynamic
                 asset = asset.AdjustRelativePaths();
             }
 
-            if (settings.Concatenate)
-            {
-                asset.Processors.Add(Concatenator);
-            }
-
             if (settings.FingerprintUrls)
             {
                 asset = asset.FingerprintUrls();
+            }
+
+            if (settings.Concatenate)
+            {
+                asset.Processors.Add(Concatenator);
             }
 
             if (settings.Minify)
