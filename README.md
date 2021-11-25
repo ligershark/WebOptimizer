@@ -212,6 +212,16 @@ This version string changes every time one or more of the source files are modif
 
 This technique is called *cache busting* and is a critical component to achieving high performance, since we cannot utilize browser caching of the CSS and JavaScript files without it. That is also why it can not be disabled when using WebOptimizer.
 
+#### HTTPS Compression Considerations
+When utilizes with the [`services.AddResponseCompression`](https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-6.0) middleware included in the [Feature](https://github.com/ligershark/WebOptimizer/pull/147), it's important to note that by default the *cache busted* assets may not be included as the *Response Header: content-type* is modified from the default **application/javascript** to **text/javascript**, which is not currently a supported default [ResponseCompressionDefaults.MimeTypes](https://github.com/aspnet/BasicMiddleware/blob/master/src/Microsoft.AspNetCore.ResponseCompression/ResponseCompressionDefaults.cs) and can be added in the *Startup.ConfigureServices* like so:
+```csharp
+services.AddResponseCompression( options => {
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "text/javascript"}
+    );
+});
+```
+*Note: `app.UseResponseCompression()` should be used prior to `app.UseWebOptimizer()`*
 ### Inlining content
 We can also use Web Optimizer to inline the content of the files directly into the Razor page. This is useful for creating high-performance websites that inlines the above-the-fold CSS and lazy loads the rest later.
 
