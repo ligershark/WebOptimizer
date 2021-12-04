@@ -104,33 +104,21 @@ namespace WebOptimizer
                     }
                     else
                     {
-                        var fileInfo = provider.GetFileInfo("/");
-                        string root = fileInfo.PhysicalPath;
+                        var virtualFilePaths = provider.GetAllFiles("/");
 
-                        if (root != null)
+                        var matcher = new Matcher();
+                        matcher.AddInclude(outSourceFile);
+                        matcher.AddExcludePatterns(asset.ExcludeFiles);
+                        PatternMatchingResult globbingResult = matcher.Match(virtualFilePaths);
+
+                        IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path);
+
+                        if (!fileMatches.Any())
                         {
-                            var dir = new DirectoryInfoWrapper(new DirectoryInfo(root));
-                            var matcher = new Matcher();
-                            matcher.AddInclude(outSourceFile);
-                            matcher.AddExcludePatterns(asset.ExcludeFiles);
-                            PatternMatchingResult globbingResult = matcher.Execute(dir);
-                            IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path.Replace(root, string.Empty));
-
-                            if (!fileMatches.Any())
-                            {
-                                continue;
-                            }
-
-                            files.AddRange(fileMatches.Where(f => !files.Contains(f)));
-
+                            continue;
                         }
-                        else
-                        {
-                            if (!files.Contains(sourceFile))
-                            {
-                                files.Add(sourceFile);
-                            }
-                        }
+
+                        files.AddRange(fileMatches.Where(f => !files.Contains(f)));
                     }
                 }
 
@@ -280,6 +268,55 @@ namespace WebOptimizer
 
             outpath = path;
             return provider;
+        }
+
+        /// <summary>
+        /// Returns all files from the file provider, beginning with <paramref name="start"/>
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="start"></param>
+        /// <returns></returns>
+        internal static IReadOnlyList<string> GetAllFiles(this IFileProvider provider, string start)
+        {
+            var files = new List<string>();
+            var dirs = new Queue<string>();
+
+            var infos = provider.GetDirectoryContents(start);
+
+            foreach (var info in infos)
+            {
+                if (info.IsDirectory)
+                {
+                    dirs.Enqueue(info.Name);
+                }
+                else if (info.Exists)
+                {
+                    files.Add(info.Name);
+                }
+            }
+
+            while (dirs.Count > 0)
+            {
+                var path = dirs.Dequeue();
+
+                infos = provider.GetDirectoryContents(path);
+
+                foreach (var info in infos)
+                {
+                    if (info.IsDirectory)
+                    {
+                        dirs.Enqueue(Path.Combine(path, info.Name));
+                    }
+                    else if (info.Exists)
+                    {
+                        files.Add(Path.Combine(path, info.Name));
+                    }
+                }
+
+            }
+
+
+            return files;
         }
     }
 }
