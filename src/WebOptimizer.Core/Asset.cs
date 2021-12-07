@@ -113,6 +113,12 @@ namespace WebOptimizer
 
                         IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path);
 
+                        var sourceIsRooted = outSourceFile.StartsWith('/');
+                        if(sourceIsRooted)
+                        {
+                            fileMatches = fileMatches.Select(f => "/" + f);
+                        }
+
                         if (!fileMatches.Any())
                         {
                             continue;
