@@ -113,11 +113,6 @@ namespace WebOptimizer
 
             route = NormalizeRoute(route);
 
-            if (Assets.Any(a => a.Route.Equals(route, StringComparison.OrdinalIgnoreCase)))
-            {
-                throw new ArgumentException($"The route \"{route}\" was already specified", nameof(route));
-            }
-
             IAsset asset = new Asset(route, contentType, this, sourceFiles);
             _assets.TryAdd(route, asset);
 
