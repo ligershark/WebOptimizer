@@ -52,16 +52,16 @@ namespace WebOptimizer.Test
         }
 
         [Fact2]
-        public void AddTwoSameRoutes_Throws()
+        public void AddTwoSameRoutes_Ignore()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            var asset1 = new Asset("/route", "text/css", new[] { "file.css" });
-            var asset2 = new Asset("/route", "text/css", new[] { "file.css" });
+            var route = "/route";
+            var asset1 = new Asset(route, "text/css", new[] { "file.css" });
+            var asset2 = new Asset(route, "text/css", new[] { "file.css" });
             var pipeline = new AssetPipeline();
 
-            var ex = Assert.Throws<ArgumentException>(() => pipeline.AddBundle(new[] { asset1, asset2 }));
+            pipeline.AddBundle(new[] { asset1, asset2 });
 
-            Assert.Equal("route", ex.ParamName);
             Assert.Equal(1, pipeline.Assets.Count);
         }
 
