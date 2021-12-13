@@ -12,7 +12,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 
@@ -21,6 +20,7 @@ namespace WebOptimizer
     internal class Asset : IAsset
     {
         internal const string PhysicalFilesKey = "PhysicalFiles";
+        private readonly object _sync = new object();
 
         public Asset(string route, string contentType, IAssetPipeline pipeline, IEnumerable<string> sourceFiles)
             : this(route, contentType, sourceFiles)
@@ -30,7 +30,7 @@ namespace WebOptimizer
         {
             Route = route ?? throw new ArgumentNullException(nameof(route));
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            SourceFiles = sourceFiles ?? throw new ArgumentNullException(nameof(sourceFiles));
+            SourceFiles = new HashSet<string>(sourceFiles ?? throw new ArgumentNullException(nameof(sourceFiles)));
             Processors = new List<IProcessor>();
             Items = new Dictionary<string, object>();
         }
@@ -39,14 +39,13 @@ namespace WebOptimizer
 
         public IList<string> ExcludeFiles { get; } = new List<string>();
 
-        public IEnumerable<string> SourceFiles { get; internal set; }
+        public HashSet<string> SourceFiles { get; }
 
         public string ContentType { get; private set; }
 
         public IList<IProcessor> Processors { get; }
 
         public IDictionary<string, object> Items { get; }
-
 
         public async Task<byte[]> ExecuteAsync(HttpContext context, IWebOptimizerOptions options)
         {
@@ -216,6 +215,24 @@ namespace WebOptimizer
         public override string ToString()
         {
             return Route;
+        }
+
+        /// <summary>
+        /// Adds a source file to the asset
+        /// </summary>
+        /// <param name="route">Relative path of a source file</param>
+        public void TryAddSourceFile(string route)
+        {
+            if (string.IsNullOrEmpty(route))
+                throw new ArgumentNullException(nameof(route));
+
+            string cleanRoute = route.TrimStart('~');
+
+            lock (_sync)
+            {
+                if (SourceFiles.Add(cleanRoute) && Items.ContainsKey(PhysicalFilesKey))
+                    Items.Remove(Asset.PhysicalFilesKey); //remove to calc a new cache key
+            }
         }
     }
 
