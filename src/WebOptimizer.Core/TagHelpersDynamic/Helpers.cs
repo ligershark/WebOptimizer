@@ -14,15 +14,7 @@ namespace WebOptimizer.TagHelpersDynamic
     internal static class Helpers
     {
         #region AssetCache
-
-        private class AssetItem
-        {
-            public IAsset Asset { get; set; }
-            public bool Initialized { get; set; }
-        }
-
-        private static ConcurrentDictionary<string, AssetItem> AssetCache =
-            new ConcurrentDictionary<string, AssetItem>();
+        private static readonly ConcurrentDictionary<string, IAsset> _assetCache = new ConcurrentDictionary<string, IAsset>();
 
         #endregion
 
@@ -105,39 +97,19 @@ namespace WebOptimizer.TagHelpersDynamic
             return asset;
         }
 
-
         private static readonly string[] EmptySourceFiles = { string.Empty };
 
         private static IAsset AddBundleByKey(IAssetPipeline pipeline, string route,
             string contentType)
         {
             var asset = (Asset)pipeline.AddBundle(route, contentType, EmptySourceFiles);
-            asset.SourceFiles = new HashSet<string>();
+            asset.SourceFiles.Clear();
             return asset;
-        }
-
-        private static AssetItem GetOrCreateAssetByKey(IAssetPipeline pipeline, string key,
-            Func<IAssetPipeline, string, IAsset> createAsset)
-        {
-            AssetItem assetItem;
-
-            if (AssetCache.TryGetValue(key, out assetItem) == false)
-            {
-                lock (AssetCache)
-                {
-                    assetItem = AssetCache.GetOrAdd(key, new AssetItem
-                    {
-                        Asset = createAsset(pipeline, key)
-                    });
-                }
-            }
-
-            return assetItem;
         }
 
         /// <summary>
         /// Generates a hash of the files in the bundle.
-        /// </summary>
+        /// /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string GenerateHash(IAsset asset, HttpContext httpContext)
         {
@@ -167,17 +139,8 @@ namespace WebOptimizer.TagHelpersDynamic
                 output.SuppressOutput();
 
                 var assetKey = GetKey(actionContext, bundleKey);
-                var assetItem = GetOrCreateAssetByKey(pipeline, assetKey, createAsset);
-                if (assetItem.Initialized)
-                {
-                    return true;
-                }
-                string cleanRoute = attrValue.TrimStart('~');
-
-                lock (assetItem.Asset.SourceFiles)
-                {
-                    ((HashSet<string>)assetItem.Asset.SourceFiles).Add(cleanRoute);
-                }
+                var assetItem = _assetCache.GetOrAdd(assetKey, createAsset(pipeline, assetKey));
+                assetItem.TryAddSourceFile(attrValue);
 
                 return true;
             }
@@ -191,12 +154,11 @@ namespace WebOptimizer.TagHelpersDynamic
                 }
 
                 var assetKey = GetKey(actionContext, destBundleKey);
-                var assetItem = GetOrCreateAssetByKey(pipeline, assetKey, createAsset);
-                assetItem.Initialized = true;
+                var assetItem = _assetCache.GetOrAdd(assetKey, createAsset(pipeline, assetKey));
 
                 string pathBase = actionContext.HttpContext?.Request?.PathBase.Value;
 
-                output.Attributes.SetAttribute(attrName, $"{pathBase}{GenerateHash(assetItem.Asset, actionContext.HttpContext)}");
+                output.Attributes.SetAttribute(attrName, $"{pathBase}{GenerateHash(assetItem, actionContext.HttpContext)}");
 
                 return true;
             }

@@ -37,7 +37,7 @@ namespace WebOptimizer
         /// <summary>
         /// Gets the webroot relative source files.
         /// </summary>
-        IEnumerable<string> SourceFiles { get; }
+        HashSet<string> SourceFiles { get; }
 
         /// <summary>
         /// Executes the processors and returns the modified content.
@@ -48,5 +48,11 @@ namespace WebOptimizer
         /// Gets the cache key associated with this version of the asset.
         /// </summary>
         string GenerateCacheKey(HttpContext context);
+
+        /// <summary>
+        /// Adds a source file to the asset
+        /// </summary>
+        /// <param name="route">Relative path of a source file</param>
+        void TryAddSourceFile(string route);
     }
 }
