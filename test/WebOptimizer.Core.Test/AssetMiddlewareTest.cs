@@ -173,7 +173,7 @@ namespace WebOptimizer.Test
             asset.SetupGet(a => a.Route).Returns("/file.css");
             asset.Setup(a => a.ExecuteAsync(It.IsAny<HttpContext>(), options))
                  .Returns(Task.FromResult(cssContent));
-            asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>())).Returns("etag");
+            asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>(), options)).Returns("etag");
 
             StringValues values = "etag";
             var response = new Mock<HttpResponse>().SetupAllProperties();

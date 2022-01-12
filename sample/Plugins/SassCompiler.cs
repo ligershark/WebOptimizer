@@ -18,7 +18,7 @@ namespace WebOptimizerDemo
         /// <summary>
         /// Gets the custom key that should be used when calculating the memory cache key.
         /// </summary>
-        public string CacheKey(HttpContext context) => string.Empty;
+        public string CacheKey(HttpContext context, IAssetContext config) => string.Empty;
 
         /// <summary>
         /// Executes the processor on the specified configuration.
