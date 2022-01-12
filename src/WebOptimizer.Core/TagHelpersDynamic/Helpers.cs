@@ -111,9 +111,9 @@ namespace WebOptimizer.TagHelpersDynamic
         /// Generates a hash of the files in the bundle.
         /// /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string GenerateHash(IAsset asset, HttpContext httpContext)
+        private static string GenerateHash(IAsset asset, HttpContext httpContext, IWebOptimizerOptions options)
         {
-            string hash = asset.GenerateCacheKey(httpContext);
+            string hash = asset.GenerateCacheKey(httpContext, options);
 
             return $"{asset.Route}?v={hash}";
         }
@@ -158,7 +158,7 @@ namespace WebOptimizer.TagHelpersDynamic
 
                 string pathBase = actionContext.HttpContext?.Request?.PathBase.Value;
 
-                output.Attributes.SetAttribute(attrName, $"{pathBase}{GenerateHash(assetItem, actionContext.HttpContext)}");
+                output.Attributes.SetAttribute(attrName, $"{pathBase}{GenerateHash(assetItem, actionContext.HttpContext, options)}");
 
                 return true;
             }

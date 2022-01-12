@@ -22,7 +22,7 @@ namespace WebOptimizer.Test.Processors
             await minifier.ExecuteAsync(context.Object);
 
             Assert.Equal("var i=0", context.Object.Content.First().Value.AsString());
-            Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
+            Assert.Equal("", minifier.CacheKey(new DefaultHttpContext(), context.Object));
         }
 
         [Theory2]
@@ -41,7 +41,7 @@ namespace WebOptimizer.Test.Processors
             await minifier.ExecuteAsync(context.Object);
 
             Assert.Equal("", context.Object.Content.First().Value.AsString());
-            Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
+            Assert.Equal("", minifier.CacheKey(new DefaultHttpContext(), context.Object));
         }
 
         [Fact2]
@@ -56,7 +56,7 @@ namespace WebOptimizer.Test.Processors
             await minifier.ExecuteAsync(context.Object);
 
             Assert.Equal("var i=0;", context.Object.Content.First().Value.AsString());
-            Assert.Equal("", minifier.CacheKey(new DefaultHttpContext()));
+            Assert.Equal("", minifier.CacheKey(new DefaultHttpContext(), context.Object));
         }
 
         [Fact2]

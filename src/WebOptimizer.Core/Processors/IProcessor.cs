@@ -16,6 +16,6 @@ namespace WebOptimizer
         /// <summary>
         /// Gets the custom key that should be used when calculating the memory cache key.
         /// </summary>
-        string CacheKey(HttpContext context);
+        string CacheKey(HttpContext context, IAssetContext config);
     }
 }

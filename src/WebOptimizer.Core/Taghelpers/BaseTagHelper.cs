@@ -96,7 +96,7 @@ namespace WebOptimizer.Taghelpers
         /// </summary>
         protected string GenerateHash(IAsset asset)
         {
-            string hash = asset.GenerateCacheKey(ViewContext.HttpContext);
+            string hash = asset.GenerateCacheKey(ViewContext.HttpContext, Options);
 
             return $"{asset.Route}?v={hash}";
         }

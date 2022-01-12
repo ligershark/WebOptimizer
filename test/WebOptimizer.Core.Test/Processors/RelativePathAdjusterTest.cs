@@ -53,7 +53,7 @@ namespace WebOptimizer.Test.Processors
             await adjuster.ExecuteAsync(context.Object);
 
             Assert.Equal(newUrl, context.Object.Content.First().Value.AsString());
-            Assert.Equal("", adjuster.CacheKey(new DefaultHttpContext()));
+            Assert.Equal("", adjuster.CacheKey(new DefaultHttpContext(), context.Object));
         }
     }
 }

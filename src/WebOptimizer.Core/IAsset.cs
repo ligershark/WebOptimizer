@@ -47,7 +47,7 @@ namespace WebOptimizer
         /// <summary>
         /// Gets the cache key associated with this version of the asset.
         /// </summary>
-        string GenerateCacheKey(HttpContext context);
+        string GenerateCacheKey(HttpContext context, IWebOptimizerOptions options);
 
         /// <summary>
         /// Adds a source file to the asset

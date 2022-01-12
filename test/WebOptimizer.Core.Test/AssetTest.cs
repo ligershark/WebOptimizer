@@ -34,6 +34,7 @@ namespace WebOptimizer.Test
             string contentType = "text/css";
             var sourcefiles = new[] { "file1.css" };
             var context = new Mock<HttpContext>().SetupAllProperties();
+            var options = new WebOptimizerOptions() { EnableCaching = true };
             var env = new Mock<IWebHostEnvironment>();
             var cache = new Mock<IMemoryCache>();
             var fileProvider = new PhysicalFileProvider(Path.GetTempPath());
@@ -56,11 +57,11 @@ namespace WebOptimizer.Test
                 .Returns(fileProvider);
 
             // Check non-gzip value
-            string key = asset.GenerateCacheKey(context.Object);
+            string key = asset.GenerateCacheKey(context.Object, options);
             Assert.Equal("_BZuuBNh_zEXnNPIPaO_4Ii4UdM", key);
 
             // Check gzip value
-            string gzipKey = asset.GenerateCacheKey(context.Object);
+            string gzipKey = asset.GenerateCacheKey(context.Object, options);
             Assert.Equal("SvH6WGVAapgMXiPenaOGnKS_oMI", gzipKey);
         }
 

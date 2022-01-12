@@ -67,7 +67,7 @@ namespace WebOptimizer.Test.Processors
             string result = context.Object.Content.First().Value.AsString();
 
             Assert.Equal(newUrl, result);
-            Assert.Equal("", adjuster.CacheKey(new DefaultHttpContext()));
+            Assert.Equal("", adjuster.CacheKey(new DefaultHttpContext(), context.Object));
         }
     }
 }

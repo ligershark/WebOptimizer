@@ -157,8 +157,10 @@ namespace WebOptimizer
             return file.LastModified.UtcDateTime;
         }
 
-        public string GenerateCacheKey(HttpContext context)
+        public string GenerateCacheKey(HttpContext context, IWebOptimizerOptions options)
         {
+            var config = new AssetContext(context, this, options);
+            
             var cacheKey = new StringBuilder(Route);
 
             if (context.Request.Headers.TryGetValue("Accept-Encoding", out StringValues enc))
@@ -196,7 +198,7 @@ namespace WebOptimizer
             {
                 try
                 {
-                    cacheKey.Append(processors.CacheKey(context) ?? string.Empty);
+                    cacheKey.Append(processors.CacheKey(context, config) ?? string.Empty);
                 }
                 catch (Exception ex)
                 {

@@ -38,7 +38,7 @@ namespace WebOptimizer
             string cacheKey;
             try
             {
-                cacheKey = asset.GenerateCacheKey(context);
+                cacheKey = asset.GenerateCacheKey(context, options);
             }
             catch (FileNotFoundException)
             {
