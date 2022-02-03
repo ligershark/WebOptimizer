@@ -92,6 +92,18 @@ namespace WebOptimizer.Taghelpers
         }
 
         /// <summary>
+        /// Adds current the PathBase to a Url
+        /// </summary>
+        protected string AddPathBase(string url)
+        {
+            var pathBase = ViewContext.HttpContext.Request.PathBase;
+            if (string.IsNullOrEmpty(pathBase))
+                return url;
+
+            return pathBase + (url.StartsWith("/") ? url : ("/" + url));
+        }
+
+        /// <summary>
         /// Generates a has of the files in the bundle.
         /// </summary>
         protected string GenerateHash(IAsset asset)
