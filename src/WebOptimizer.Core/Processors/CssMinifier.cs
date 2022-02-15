@@ -21,7 +21,7 @@ namespace WebOptimizer
 
             foreach (string key in config.Content.Keys)
             {
-                if (key.EndsWith(".min"))
+                if (key.EndsWith(".min") || key.EndsWith(".min.css"))
                 {
                     content[key] = config.Content[key];
                     continue;

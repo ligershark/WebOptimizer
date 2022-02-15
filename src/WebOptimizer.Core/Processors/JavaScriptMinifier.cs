@@ -21,7 +21,7 @@ namespace WebOptimizer
 
             foreach (string key in config.Content.Keys)
             {
-                if (key.EndsWith(".min"))
+                if (key.EndsWith(".min") || key.EndsWith(".min.js"))
                 {
                     content[key] = config.Content[key];
                     continue;
@@ -41,7 +41,7 @@ namespace WebOptimizer
                 catch
                 {
                     //If there's an error minifying, then use the original uminified value
-                    minified = input + "/* Exception caught attempting to minify */"; 
+                    minified = input + "/* Exception caught attempting to minify */";
                 }
 
                 content[key] = minified.AsByteArray();
