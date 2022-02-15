@@ -21,19 +21,27 @@ namespace WebOptimizer
 
             foreach (string key in config.Content.Keys)
             {
-                if (key.EndsWith(".min"))
+                if (key.EndsWith(".min") || key.EndsWith(".min.js"))
                 {
                     content[key] = config.Content[key];
                     continue;
                 }
 
                 string input = config.Content[key].AsString();
-                UglifyResult result = Uglify.Js(input, Settings);
-                string minified = result.Code;
-
-                if (result.HasErrors)
+                string minified;
+                try
                 {
-                    minified = $"/* {string.Join("\r\n", result.Errors)} */\r\n" + input;
+                    UglifyResult result = Uglify.Js(input, Settings);
+                    minified = result.Code;
+                    if (result.HasErrors)
+                    {
+                        minified = $"/* {string.Join("\r\n", result.Errors)} */\r\n" + input;
+                    }
+                }
+                catch
+                {
+                    //If there's an error minifying, then use the original uminified value
+                    minified = input + "/* Exception caught attempting to minify */";
                 }
 
                 content[key] = minified.AsByteArray();
