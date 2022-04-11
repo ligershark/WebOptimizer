@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace WebOptimizer
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             SourceFiles = new HashSet<string>(sourceFiles ?? throw new ArgumentNullException(nameof(sourceFiles)));
             Processors = new List<IProcessor>();
-            Items = new Dictionary<string, object>();
+            Items = new ConcurrentDictionary<string, object>();
         }
 
         public string Route { get; private set; }
@@ -340,9 +341,7 @@ namespace WebOptimizer
                         files.Add(Path.Combine(path, info.Name));
                     }
                 }
-
             }
-
 
             return files;
         }
