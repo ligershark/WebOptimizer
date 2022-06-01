@@ -113,7 +113,7 @@ namespace WebOptimizer
                         IEnumerable<string> fileMatches = globbingResult.Files.Select(f => f.Path);
 
                         var sourceIsRooted = outSourceFile.StartsWith('/');
-                        if(sourceIsRooted)
+                        if (sourceIsRooted)
                         {
                             fileMatches = fileMatches.Select(f => "/" + f);
                         }
@@ -160,7 +160,7 @@ namespace WebOptimizer
         public string GenerateCacheKey(HttpContext context, IWebOptimizerOptions options)
         {
             var config = new AssetContext(context, this, options);
-            
+
             var cacheKey = new StringBuilder(Route);
 
             if (context.Request.Headers.TryGetValue("Accept-Encoding", out StringValues enc))
@@ -262,7 +262,7 @@ namespace WebOptimizer
         {
             return asset.GetCustomFileProvider(env) ??
                    (env.WebRootFileProvider is CompositeFileProvider
-                       ? new PhysicalFileProvider(env.WebRootPath)
+                       ? (env.WebRootFileProvider as CompositeFileProvider).FileProviders.Last()
                        : env.WebRootFileProvider);
         }
 
