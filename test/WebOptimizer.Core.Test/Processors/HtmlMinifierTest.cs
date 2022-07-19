@@ -106,7 +106,7 @@ namespace WebOptimizer.Test.Processors
             var pipeline = new AssetPipeline();
             var asset = pipeline.MinifyHtmlFiles().First();
 
-            Assert.Equal("**/*.html", asset.Route);
+            Assert.Equal("/**/*.html", asset.Route);
             Assert.Equal("text/html; charset=UTF-8", asset.ContentType);
             Assert.True(1 == asset.SourceFiles.Count);
             Assert.True(1 == asset.Processors.Count);
