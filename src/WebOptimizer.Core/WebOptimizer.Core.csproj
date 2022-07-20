@@ -1,44 +1,47 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
-        <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\WebOptimizer.Core.xml</DocumentationFile>
-        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-        <PackageTags>bundle, minify, optimize, asp.net core</PackageTags>
-        <Version>3.0.0</Version>
-        <Authors>LigerShark</Authors>
-        <Company>LigerShark</Company>
-        <Description>A runtime bundler and minifier for ASP.NET Core</Description>
-        <Copyright>Copyright © LigerShark</Copyright>
-        <PackageId>LigerShark.WebOptimizer.Core</PackageId>
-        <Product>LigerShark.WebOptimizer.Core</Product>
-        <PackageIconUrl>https://raw.githubusercontent.com/ligershark/WebOptimizer/master/art/logo64x64.png</PackageIconUrl>
-        <PackageProjectUrl>https://github.com/ligershark/WebOptimizer</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/ligershark/WebOptimizer/blob/master/LICENSE.txt</PackageLicenseUrl>
-        <RepositoryUrl>https://github.com/ligershark/WebOptimizer</RepositoryUrl>
-        <RootNamespace>WebOptimizer</RootNamespace>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\WebOptimizer.Core.xml</DocumentationFile>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageTags>bundle, minify, optimize, asp.net core</PackageTags>
+    <Version>3.0.0</Version>
+    <Authors>LigerShark</Authors>
+    <Company>LigerShark</Company>
+    <Description>A runtime bundler and minifier for ASP.NET Core</Description>
+    <Copyright>Copyright © LigerShark</Copyright>
+    <PackageId>LigerShark.WebOptimizer.Core</PackageId>
+    <Product>LigerShark.WebOptimizer.Core</Product>
+    <PackageIconUrl>https://raw.githubusercontent.com/ligershark/WebOptimizer/master/art/logo64x64.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/ligershark/WebOptimizer</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/ligershark/WebOptimizer/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/ligershark/WebOptimizer</RepositoryUrl>
+    <RootNamespace>WebOptimizer</RootNamespace>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <FrameworkReference Include="Microsoft.AspNetCore.App" />
-      <!--<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="3.0.0-preview4-19123-01" />
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <!--<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="3.0.0-preview4-19123-01" />
         <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="3.0.0-preview4-19123-01" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.RazorPages" Version="3.0.0-preview4-19123-01" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers" Version="3.0.0-preview4-19123-01" />
         <PackageReference Include="Microsoft.AspNetCore.Razor.Runtime" Version="3.0.0-preview4-19123-01" />-->
-        <!--<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0-alpha1.19418.1" />-->
-        <PackageReference Include="NUglify" Version="1.16.1" />
-        <PackageReference Include="System.Text.Json" Version="5.0.2" />
-    </ItemGroup>
+    <!--<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0-alpha1.19418.1" />-->
+    <PackageReference Include="NUglify" Version="1.16.1" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Content Include="Build/$(PackageId).targets">
-            <Pack>true</Pack>
-            <PackagePath>build</PackagePath>
-        </Content>
-        <Content Include="Build/$(PackageId).props">
-          <PackagePath>build</PackagePath>
-          <Pack>true</Pack>
-        </Content>
-    </ItemGroup>
+  <ItemGroup>
+    <Content Include="Build/$(PackageId).targets">
+      <Pack>true</Pack>
+      <PackagePath>build</PackagePath>
+    </Content>
+    <Content Include="Build/$(PackageId).props">
+      <PackagePath>build</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+  </ItemGroup>
 </Project>

@@ -22,9 +22,12 @@ artifacts:
   - path: src\WebOptimizer.Core\bin\release\*.nupkg
     name: NuGet package
 
+  - path: src\WebOptimizer.Core\bin\release\*.snupkg
+    name: Symbol package
+    
 deploy:
   - provider: NuGet
-    artifact: /NuGet/
+    artifact: /package/
     api_key:
       secure: ykKSUjAVYCP1SdG2u5b7S7jiRhFrTBbnwdvwLYmY6T6sivZk33zHuPEQGQz6gp7X
     on:
