@@ -24,25 +24,40 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="env"></param>
         /// <param name="cssBundlingSettings"></param>
         /// <param name="codeBundlingSettings"></param>
+        /// <param name="assetPipeline">The web optimization pipeline</param>
         public static IServiceCollection AddWebOptimizer(this IServiceCollection services,
             IWebHostEnvironment env,
             CssBundlingSettings cssBundlingSettings,
-            CodeBundlingSettings codeBundlingSettings, Action<IAssetPipeline> assetPipeline = null)
+            CodeBundlingSettings codeBundlingSettings,
+            Action<IAssetPipeline> assetPipeline = null)
         {
-            if (cssBundlingSettings == null) throw new ArgumentNullException(nameof(cssBundlingSettings));
-            if (codeBundlingSettings == null) throw new ArgumentNullException(nameof(codeBundlingSettings));
+            UpdateCssAndCodeBundlingSettings(services, cssBundlingSettings, codeBundlingSettings);
 
-            CssBundlingSettings = cssBundlingSettings;
-            CodeBundlingSettings = codeBundlingSettings;
+            return services.AddWebOptimizer(pipeline => { assetPipeline?.Invoke(pipeline); });
+        }
 
-            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+        /// <summary>
+        /// Adds WebOptimizer to the specified <see cref="IServiceCollection"/> and enables CSS and JavaScript minification.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="env"></param>
+        /// <param name="cssBundlingSettings"></param>
+        /// <param name="codeBundlingSettings"></param>
+        /// <param name="configureWebOptimizer">WebOptimizer settings</param>
+        /// <param name="assetPipeline">The web optimization pipeline</param>
+        public static IServiceCollection AddWebOptimizer(this IServiceCollection services,
+            IWebHostEnvironment env,
+            CssBundlingSettings cssBundlingSettings,
+            CodeBundlingSettings codeBundlingSettings,
+            Action<WebOptimizerOptions> configureWebOptimizer,
+            Action<IAssetPipeline> assetPipeline = null)
+        {
+            UpdateCssAndCodeBundlingSettings(services, cssBundlingSettings, codeBundlingSettings);
 
-            services.AddWebOptimizer(pipeline =>
-            {
-                assetPipeline?.Invoke(pipeline);
-            });
-
-            return services;
+            return services
+                .AddWebOptimizer(
+                    pipeline => { assetPipeline?.Invoke(pipeline); },
+                    configureWebOptimizer);
         }
 
         /// <summary>
@@ -53,26 +68,50 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="minifyCss">If <code>true</code>; calls <code>AddCss()</code> on the pipeline.</param>
         public static IServiceCollection AddWebOptimizer(this IServiceCollection services, bool minifyJavaScript = true, bool minifyCss = true)
         {
-            services.AddWebOptimizer(pipeline =>
-            {
-                if (minifyCss)
-                {
-                    pipeline.MinifyCssFiles();
-                }
+            return services.AddWebOptimizer(pipeline => ConfigurePipeline(pipeline, minifyJavaScript, minifyCss));
+        }
 
-                if (minifyJavaScript)
-                {
-                    pipeline.MinifyJsFiles();
-                }
-            });
-
-            return services;
+        /// <summary>
+        /// Adds WebOptimizer to the specified <see cref="IServiceCollection"/> and enables CSS and JavaScript minification.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="minifyJavaScript">If <code>true</code>; calls <code>AddJs()</code> on the pipeline.</param>
+        /// <param name="minifyCss">If <code>true</code>; calls <code>AddCss()</code> on the pipeline.</param>
+        /// <param name="configureWebOptimizer">WebOptimizer settings</param>
+        public static IServiceCollection AddWebOptimizer(this IServiceCollection services, Action<WebOptimizerOptions> configureWebOptimizer, bool minifyJavaScript = true, bool minifyCss = true)
+        {
+            return services
+                .AddWebOptimizer(
+                    pipeline => ConfigurePipeline(pipeline, minifyJavaScript, minifyCss),
+                    configureWebOptimizer);
         }
 
         /// <summary>
         /// Adds WebOptimizer to the specified <see cref="IServiceCollection"/>.
         /// </summary>
-        public static IServiceCollection AddWebOptimizer(this IServiceCollection services, Action<IAssetPipeline> assetPipeline)
+        /// <param name="services">The service collection.</param>
+        /// <param name="assetPipeline">The web optimization pipeline</param>
+        /// <param name="configureWebOptimizer">WebOptimizer settings</param>
+        public static IServiceCollection AddWebOptimizer(this IServiceCollection services, Action<IAssetPipeline> assetPipeline, Action<WebOptimizerOptions> configureWebOptimizer)
+        {
+            return services.RegisterComponents(assetPipeline,
+                ServiceDescriptor.Singleton<IConfigureOptions<WebOptimizerOptions>>(_ =>
+                    new InCodeWebOptimizerConfig(configureWebOptimizer)));
+        }
+
+
+        /// <summary>
+        /// Adds WebOptimizer to the specified <see cref="IServiceCollection"/>.
+        /// </summary>
+        public static IServiceCollection AddWebOptimizer(this IServiceCollection services,
+            Action<IAssetPipeline> assetPipeline)
+        {
+            return services.RegisterComponents(assetPipeline,
+                ServiceDescriptor.Transient<IConfigureOptions<WebOptimizerOptions>, WebOptimizerConfig>());
+        }
+
+        private static IServiceCollection RegisterComponents(this IServiceCollection services,
+            Action<IAssetPipeline> assetPipeline, ServiceDescriptor configureOptions)
         {
             if (services == null)
             {
@@ -91,9 +130,34 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddSingleton<IAssetResponseStore, AssetResponseStore>();
             services.TryAddSingleton<IAssetPipeline>(factory => pipeline);
             services.TryAddSingleton<IAssetBuilder, AssetBuilder>();
-            services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<WebOptimizerOptions>, WebOptimizerConfig>());
+            services.TryAddEnumerable(configureOptions);
 
             return services;
+        }
+
+        private static void ConfigurePipeline(IAssetPipeline pipeline, bool minifyJavaScript, bool minifyCss)
+        {
+            if (minifyCss)
+            {
+                pipeline.MinifyCssFiles();
+            }
+
+            if (minifyJavaScript)
+            {
+                pipeline.MinifyJsFiles();
+            }
+        }
+
+        private static void UpdateCssAndCodeBundlingSettings(IServiceCollection services,
+            CssBundlingSettings cssBundlingSettings, CodeBundlingSettings codeBundlingSettings)
+        {
+            if (cssBundlingSettings == null) throw new ArgumentNullException(nameof(cssBundlingSettings));
+            if (codeBundlingSettings == null) throw new ArgumentNullException(nameof(codeBundlingSettings));
+
+            CssBundlingSettings = cssBundlingSettings;
+            CodeBundlingSettings = codeBundlingSettings;
+
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         }
     }
 }
