@@ -34,7 +34,10 @@ namespace WebOptimizer.Test
             var asset = new Asset(inputRoute, "text/css", new[] { "file.css" });
             var pipeline = new AssetPipeline();
             pipeline.AddBundle(asset);
-
+            if (!normalizedRoute.StartsWith("/"))
+            {
+                normalizedRoute = "/" + normalizedRoute;
+            }
             Assert.Equal(normalizedRoute, pipeline.Assets.First().Route);
         }
 
@@ -131,7 +134,10 @@ namespace WebOptimizer.Test
         {
             var pipeline = new AssetPipeline();
             pipeline.AddFiles("text/css", pattern);
-
+            if (!path.StartsWith("/"))
+            {
+                path = "/" + path;
+            }
             Assert.True(pipeline.TryGetAssetFromRoute(path, out var a1));
             Assert.Equal($"{path}", a1.Route);
         }

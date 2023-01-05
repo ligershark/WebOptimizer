@@ -146,7 +146,7 @@ namespace WebOptimizer
         public static string NormalizeRoute(string route)
         {
             string trimmedRoute = route.Trim();
-            string cleanRoute = trimmedRoute.StartsWith( '/') || trimmedRoute.StartsWith("~")
+            string cleanRoute = trimmedRoute.StartsWith('/') || trimmedRoute.StartsWith("~")
                 ? "/" + route.Trim().TrimStart('~', '/')
                 : trimmedRoute;
 
@@ -155,6 +155,11 @@ namespace WebOptimizer
             if (index > -1)
             {
                 cleanRoute = cleanRoute.Substring(0, index);
+            }
+            
+            if(!cleanRoute.StartsWith("/"))
+            {
+                cleanRoute = "/" + cleanRoute;
             }
 
             return cleanRoute;

@@ -91,7 +91,7 @@ namespace WebOptimizer.Test.Processors
             var pipeline = new AssetPipeline();
             var asset = pipeline.AddCssBundle("foo.css", "file1.css", "file2.css");
 
-            Assert.Equal("foo.css", asset.Route);
+            Assert.Equal("/foo.css", asset.Route);
             Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
             Assert.Equal(2, asset.SourceFiles.Count);
             Assert.Equal(6, asset.Processors.Count);
@@ -116,7 +116,7 @@ namespace WebOptimizer.Test.Processors
             var pipeline = new AssetPipeline();
             var asset = pipeline.MinifyCssFiles().First();
 
-            Assert.Equal("**/*.css", asset.Route);
+            Assert.Equal("/**/*.css", asset.Route);
             Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
             Assert.True(1 == asset.SourceFiles.Count);
             Assert.True(3 == asset.Processors.Count);
