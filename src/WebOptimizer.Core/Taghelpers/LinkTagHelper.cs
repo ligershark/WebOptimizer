@@ -45,6 +45,11 @@ namespace WebOptimizer.Taghelpers
                 return;
             }
 
+            if (output.Attributes.ContainsName("inline"))
+            {
+                return;
+            }
+
             string href = GetValue("href", output);
             string pathBase = CurrentViewContext.HttpContext?.Request?.PathBase.Value;
 
@@ -53,7 +58,7 @@ namespace WebOptimizer.Taghelpers
                 href = href.Substring(pathBase.Length);
             }                
 
-            if (Pipeline.TryGetAssetFromRoute(href, out IAsset asset) && !output.Attributes.ContainsName("inline"))
+            if (Pipeline.TryGetAssetFromRoute(href, out IAsset asset))
             {
                 if (Options.EnableTagHelperBundling == true)
                 {
