@@ -95,10 +95,9 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddWebOptimizer(this IServiceCollection services, Action<IAssetPipeline> assetPipeline, Action<WebOptimizerOptions> configureWebOptimizer)
         {
             return services.RegisterComponents(assetPipeline,
-                ServiceDescriptor.Singleton<IConfigureOptions<WebOptimizerOptions>>(_ =>
+                ServiceDescriptor.Singleton<IConfigureOptions<WebOptimizerOptions>, InCodeWebOptimizerConfig>(_ =>
                     new InCodeWebOptimizerConfig(configureWebOptimizer)));
         }
-
 
         /// <summary>
         /// Adds WebOptimizer to the specified <see cref="IServiceCollection"/>.
