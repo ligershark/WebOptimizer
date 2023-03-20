@@ -15,7 +15,7 @@
     <Product>LigerShark.WebOptimizer.Core</Product>
     <PackageIconUrl>https://raw.githubusercontent.com/ligershark/WebOptimizer/master/art/logo64x64.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/ligershark/WebOptimizer</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/ligershark/WebOptimizer/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageLicenseUrl>https://github.com/ligershark/WebOptimizer/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/ligershark/WebOptimizer</RepositoryUrl>
     <RootNamespace>WebOptimizer</RootNamespace>
     <IncludeSymbols>true</IncludeSymbols>
