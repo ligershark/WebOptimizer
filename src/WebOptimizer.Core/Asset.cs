@@ -310,7 +310,7 @@ namespace WebOptimizer
             var files = new List<string>();
             var dirs = new Queue<string>();
 
-            var infos = provider.GetDirectoryContents(start);
+            var infos = provider.GetDirectoryContents(start) ?? NotFoundDirectoryContents.Singleton;
 
             foreach (var info in infos)
             {
@@ -328,7 +328,7 @@ namespace WebOptimizer
             {
                 var path = dirs.Dequeue();
 
-                infos = provider.GetDirectoryContents(path);
+                infos = provider.GetDirectoryContents(path) ?? NotFoundDirectoryContents.Singleton;
 
                 foreach (var info in infos)
                 {
