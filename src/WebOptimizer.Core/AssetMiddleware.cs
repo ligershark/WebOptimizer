@@ -29,7 +29,7 @@ namespace WebOptimizer
             if (context.Request.PathBase.HasValue)
             {
                 string pathBase = context.Request.PathBase.Value;
-                if (path.StartsWith(pathBase))
+                if (context.Request.Path.StartsWithSegments(pathBase))
                 {
                     path = path.Substring(pathBase.Length);
                 }
