@@ -213,7 +213,7 @@ This version string changes every time one or more of the source files are modif
 This technique is called *cache busting* and is a critical component to achieving high performance, since we cannot utilize browser caching of the CSS and JavaScript files without it. That is also why it can not be disabled when using WebOptimizer.
 
 #### HTTPS Compression Considerations
-When utilized with the [`services.AddResponseCompression`](https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-6.0) middleware included in the [Feature](https://github.com/ligershark/WebOptimizer/pull/147), it's important to note that by default the *cache busted* assets may not be included as the *Response Header: content-type* is modified from the default **application/javascript** to **text/javascript**, which is not currently a supported default [ResponseCompressionDefaults.MimeTypes](https://github.com/aspnet/BasicMiddleware/blob/master/src/Microsoft.AspNetCore.ResponseCompression/ResponseCompressionDefaults.cs) and can be added in the *Startup.ConfigureServices* like so:
+When utilized with the [`services.AddResponseCompression`](https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-6.0) middleware included in the [Feature](https://github.com/ligershark/WebOptimizer/pull/147), it's important to note that by default the *cache busted* assets may not be included as the *Response Header: content-type* is modified from the default **application/javascript** to **text/javascript**, which is not a supported default [ResponseCompressionDefaults.MimeTypes](https://github.com/aspnet/BasicMiddleware/blob/master/src/Microsoft.AspNetCore.ResponseCompression/ResponseCompressionDefaults.cs) before ASP.NET Core 7.0 and can be added in the *Startup.ConfigureServices* like so:
 ```csharp
 services.AddResponseCompression( options => {
     options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
@@ -222,6 +222,8 @@ services.AddResponseCompression( options => {
 });
 ```
 *Note: `app.UseResponseCompression()` should be used prior to `app.UseWebOptimizer()`*
+
+*Note: If you're using [ASP.NET Core 7.0 or later](https://github.com/dotnet/aspnetcore/blob/v7.0.0-preview.4.22251.1/src/Middleware/ResponseCompression/src/ResponseCompressionDefaults.cs), you don't need to add this, as support for `text/javascript` is included by default.*
 ### Inlining content
 We can also use Web Optimizer to inline the content of the files directly into the Razor page. This is useful for creating high-performance websites that inlines the above-the-fold CSS and lazy loads the rest later.
 
