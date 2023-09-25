@@ -8,9 +8,9 @@
   <Target Name="PublishWebOptimizer" BeforeTargets="BeforePublish" Condition=" '$(PublishWebOptimizerCache)' == 'True' ">
     <Message Text="Adding WebOptimizer cache files to publish output" Importance="high" />
     <ItemGroup>
-      <DistFiles Include="$(MSBuildProjectDirectory)\$(_WebOptimizerCacheDirectory)/*.cache" />
+      <DistFiles Include="$(MSBuildProjectDirectory)\$(_WebOptimizerCacheDirectory)\*.cache" />
       <DotNetPublishFiles Include="%(DistFiles.Identity)">
-        <DestinationRelativePath>$(_WebOptimizerCacheDirectory)\%(Filename)%(Extension)</DestinationRelativePath>
+        <DestinationRelativePath>$(_WebOptimizerCacheDirectory)\%(DistFiles.Filename)%(DistFiles.Extension)</DestinationRelativePath>
       </DotNetPublishFiles>
     </ItemGroup>
   </Target>
