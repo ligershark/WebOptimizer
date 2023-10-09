@@ -62,7 +62,7 @@ namespace WebOptimizer
             {
                 if (!config.Content.ContainsKey(file))
                 {
-                    DateTime dateChanged = await LoadFileContentAsync(this.GetFileProvider(env), config, file);
+                    DateTime dateChanged = await LoadFileContentAsync(this.GetAssetFileProvider(env), config, file);
 
                     if (dateChanged > lastModified)
                     {
@@ -174,7 +174,7 @@ namespace WebOptimizer
             var cache = (IMemoryCache)context.RequestServices.GetService(typeof(IMemoryCache));
 
             var fileVersionProvider = new FileVersionProvider(
-                this.GetFileProvider(env),
+                this.GetAssetFileProvider(env),
                 cache,
                 context.Request.PathBase);
 
@@ -262,9 +262,18 @@ namespace WebOptimizer
         public static IFileProvider GetFileProvider(this IAsset asset, IWebHostEnvironment env)
         {
             return asset.GetCustomFileProvider(env) ??
-                   (env.WebRootFileProvider is CompositeFileProvider
-                       ? (env.WebRootFileProvider as CompositeFileProvider).FileProviders.Last()
+                   (env.WebRootFileProvider is CompositeFileProvider provider
+                       ? provider.FileProviders.Last()
                        : env.WebRootFileProvider);
+        }
+        
+        /// <summary>
+        /// Gets the asset file provider. This method works for _content locations in RCL projects.
+        /// </summary>
+        public static IFileProvider GetAssetFileProvider(this IAsset asset, IWebHostEnvironment env)
+        {
+            return asset.GetCustomFileProvider(env) ??
+                   env.WebRootFileProvider as CompositeFileProvider ?? env.WebRootFileProvider;
         }
 
         /// <summary>
