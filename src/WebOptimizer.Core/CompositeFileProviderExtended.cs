@@ -50,10 +50,8 @@ namespace WebOptimizer
             FileProviderOptions[] fileProviders = _fileProviderOptions;
             if (fileProviders != null)
             {
-                for (var index = 0; index < fileProviders.Length; index++)
+                foreach (var item in fileProviders)
                 {
-                    var item = fileProviders[index];
-
                     if (path.StartsWith(item.RequestPath, StringComparison.OrdinalIgnoreCase))
                     {
                         outPath = path.Substring(item.RequestPath.Value.Length, path.Length - item.RequestPath.Value.Length);
