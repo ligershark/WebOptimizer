@@ -210,6 +210,16 @@ They will get a version string added as a URL parameter:
 
 This version string changes every time one or more of the source files are modified. 
 
+**NOTE:** TagHelpers will only work on files registered as assets on the pipeline (will not work for all files in your <sctipt> and <link> tags out of the blue). make sure to add all required files as assets (glob is supported to add wildcard paths).
+
+```csharp
+services.AddWebOptimizer(pipeline =>
+{
+    pipeline.AddFiles("text/javascript", "/dist/*");
+    pipeline.AddFiles("text/css", "/css/*");
+});
+``` 
+
 This technique is called *cache busting* and is a critical component to achieving high performance, since we cannot utilize browser caching of the CSS and JavaScript files without it. That is also why it can not be disabled when using WebOptimizer.
 
 #### HTTPS Compression Considerations
