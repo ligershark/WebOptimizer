@@ -13,9 +13,11 @@
     <Copyright>Copyright © LigerShark</Copyright>
     <PackageId>LigerShark.WebOptimizer.Core</PackageId>
     <Product>LigerShark.WebOptimizer.Core</Product>
+    <PackageIcon>logo.png</PackageIcon>
     <PackageIconUrl>https://raw.githubusercontent.com/ligershark/WebOptimizer/master/art/logo64x64.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/ligershark/WebOptimizer</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/ligershark/WebOptimizer/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/ligershark/WebOptimizer</RepositoryUrl>
     <RootNamespace>WebOptimizer</RootNamespace>
     <IncludeSymbols>true</IncludeSymbols>
@@ -43,5 +45,7 @@
       <PackagePath>build</PackagePath>
       <Pack>true</Pack>
     </Content>
+    <None Include="../../README.md" Pack="true" PackagePath="" />
+    <None Include="../../art/logo64x64.png" Pack="true" Visible="false" PackagePath="logo.png"/>
   </ItemGroup>
 </Project>
