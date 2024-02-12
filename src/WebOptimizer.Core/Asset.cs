@@ -130,7 +130,7 @@ namespace WebOptimizer
 
                 if (files.Count == 0)
                 {
-                    throw new FileNotFoundException($"No files found matching exist in an asset");
+                    throw new FileNotFoundException($"No files found matching exist in an asset {asset}");
                 }
 
                 asset.Items[PhysicalFilesKey] = files;
