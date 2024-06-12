@@ -119,6 +119,17 @@ namespace WebOptimizer
             return asset;
         }
 
+
+        public IAsset AddAsset(string route, string contentType)
+        {
+            route = NormalizeRoute(route);
+
+            IAsset asset = new Asset(route, contentType, this, new string[0]);
+            _assets.TryAdd(route, asset);
+
+            return asset;
+        }
+
         public IEnumerable<IAsset> AddFiles(string contentType, params string[] sourceFiles)
         {
             if (string.IsNullOrEmpty(contentType))

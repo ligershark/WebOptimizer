@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
+using WebOptimizer.Processors;
 
 namespace WebOptimizer.TagHelpersDynamic
 {
@@ -91,7 +92,7 @@ namespace WebOptimizer.TagHelpersDynamic
 
             if (settings.Minify)
             {
-                asset = asset.MinifyJavaScript(settings.CodeSettings);
+                asset = asset.MinifyJavaScript(new JsSettings(settings.CodeSettings));
             }
 
             return asset;
