@@ -43,6 +43,6 @@
       <Pack>true</Pack>
     </Content>
     <None Include="../../README.md" Pack="true" PackagePath="" />
-    <None Include="../../art/logo64x64.png" Pack="true" Visible="false" PackagePath="logo.png"/>
+    <None Include="../../art/logo64x64.png" Pack="true" Visible="false" PackagePath="logo.png" />
   </ItemGroup>
 </Project>

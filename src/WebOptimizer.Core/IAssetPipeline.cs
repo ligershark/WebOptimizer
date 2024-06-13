@@ -32,6 +32,17 @@ namespace WebOptimizer
         IAsset AddBundle(string route, string contentType, params string[] sourceFiles);
 
         /// <summary>
+        /// Add a generalized Asset, that has just a Route and a ContentType
+        /// 
+        /// Typically used to fill in with content details later by Processors
+        /// 
+        /// Used by AddJavaScriptBundle() to emit Source Maps on their own route
+        /// </summary>
+        /// <param name="route">The route that should cause the pipeline to respond with this Asset</param>
+        /// <param name="contentType">Content-Type of the response</param>
+        IAsset AddAsset(string route, string contentType);
+
+        /// <summary>
         /// Adds an array of files to the optimization pipeline.
         /// </summary>
         /// <param name="contentType">The content type of the response. Example: text/css or text/javascript.</param>
