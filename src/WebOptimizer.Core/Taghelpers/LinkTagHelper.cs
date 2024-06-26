@@ -62,7 +62,7 @@ namespace WebOptimizer.Taghelpers
             {
                 if (Options.EnableTagHelperBundling == true)
                 {
-                    href = $"{pathBase}{GenerateHash(asset)}";
+                    href = AddCdn($"{pathBase}{GenerateHash(asset)}");
                     output.Attributes.SetAttribute("href", href);
                 }
                 else
@@ -102,7 +102,7 @@ namespace WebOptimizer.Taghelpers
 
                     fileToAdd = Path.ChangeExtension(file, "css");
                 }
-                string href = AddPathBase(AddFileVersionToPath(fileToAdd, asset));
+                string href = AddCdn(AddPathBase(AddFileVersionToPath(fileToAdd, asset)));
                 output.PostElement.AppendHtml($"<link href=\"{href}\" {string.Join(" ", attrs)} />" + Environment.NewLine);
             }
         }

@@ -127,5 +127,16 @@ namespace WebOptimizer.Taghelpers
 
             Cache.Set(cacheKey, value, cacheOptions);
         }
+
+        /// <summary>
+        /// Adds the CdnUrl defined in Options to a Url
+        /// </summary>
+        /// <returns></returns>
+        protected string AddCdn(string url)
+        {
+            if (string.IsNullOrEmpty(Options.CdnUrl))
+                return url;
+            return Options.CdnUrl + (url.StartsWith("/") ? url : "/" + url);
+        }
     }
 }

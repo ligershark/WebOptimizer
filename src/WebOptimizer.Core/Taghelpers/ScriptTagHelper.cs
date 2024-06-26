@@ -62,7 +62,7 @@ namespace WebOptimizer.Taghelpers
             {
                 if (Options.EnableTagHelperBundling == true)
                 {
-                    src = $"{pathBase}{GenerateHash(asset)}";
+                    src = AddCdn($"{pathBase}{GenerateHash(asset)}");
                     output.Attributes.SetAttribute("src", src);
                 }
                 else
@@ -96,7 +96,7 @@ namespace WebOptimizer.Taghelpers
 
             foreach (string file in sourceFiles)
             {
-                string src = AddPathBase(AddFileVersionToPath(file, asset));
+                string src = AddCdn(AddPathBase(AddFileVersionToPath(file, asset)));
                 output.PostElement.AppendHtml($"<script src=\"{src}\" {string.Join(" ", attrs)}></script>" + Environment.NewLine);
             }
         }
