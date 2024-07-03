@@ -62,13 +62,18 @@ namespace WebOptimizer.Taghelpers
             {
                 if (Options.EnableTagHelperBundling == true)
                 {
-                    src = $"{pathBase}{GenerateHash(asset)}";
+                    src = AddCdn(AddPathBase(GenerateHash(asset)));
                     output.Attributes.SetAttribute("src", src);
                 }
                 else
                 {
                     WriteIndividualTags(output, asset);
                 }
+            }
+            else
+            {
+                src = AddCdn(AddPathBase(src));
+                output.Attributes.SetAttribute("src", src);
             }
 
         }
@@ -96,7 +101,7 @@ namespace WebOptimizer.Taghelpers
 
             foreach (string file in sourceFiles)
             {
-                string src = AddPathBase(AddFileVersionToPath(file, asset));
+                string src = AddCdn(AddPathBase(AddFileVersionToPath(file, asset)));
                 output.PostElement.AppendHtml($"<script src=\"{src}\" {string.Join(" ", attrs)}></script>" + Environment.NewLine);
             }
         }
