@@ -62,13 +62,18 @@ namespace WebOptimizer.Taghelpers
             {
                 if (Options.EnableTagHelperBundling == true)
                 {
-                    src = AddCdn($"{pathBase}{GenerateHash(asset)}");
+                    src = AddCdn(AddPathBase(GenerateHash(asset)));
                     output.Attributes.SetAttribute("src", src);
                 }
                 else
                 {
                     WriteIndividualTags(output, asset);
                 }
+            }
+            else
+            {
+                src = AddCdn(AddPathBase(src));
+                output.Attributes.SetAttribute("src", src);
             }
 
         }
