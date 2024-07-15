@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;net5.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\WebOptimizer.Core.xml</DocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -23,16 +22,11 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
-
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="NUglify" Version="1.20.7" />
+    <PackageReference Include="NUglify" Version="1.21.9" />
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
   </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'== 'netcoreapp3.0'">
-    <PackageReference Include="System.Text.Json" Version="5.0.2" />
-  </ItemGroup>
-
   <ItemGroup>
     <Content Include="Build/$(PackageId).targets">
       <Pack>true</Pack>

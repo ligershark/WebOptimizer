@@ -1,18 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
-
-
-	<ItemGroup>
-		<None Remove="Scripts\EmbeddedScript2.js" />
-		<None Remove="EmbeddedScript1.js" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="Scripts\EmbeddedScript2.js" />
-		<EmbeddedResource Include="EmbeddedScript1.js" />
-	</ItemGroup>
-
+  <ItemGroup>
+    <None Remove="Scripts\EmbeddedScript2.js" />
+    <None Remove="EmbeddedScript1.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Scripts\EmbeddedScript2.js" />
+    <EmbeddedResource Include="EmbeddedScript1.js" />
+  </ItemGroup>
 </Project>
