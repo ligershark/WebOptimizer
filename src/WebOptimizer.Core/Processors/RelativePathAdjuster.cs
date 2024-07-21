@@ -7,26 +7,25 @@ using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
 using WebOptimizer;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using WebOptimizer.Utils;
 
 namespace WebOptimizer
 {
     internal class RelativePathAdjuster : Processor
     {
-        private static readonly Regex _rxUrl = new Regex(@"url\s*\(\s*([""']?)([^:)]+)\1\s*\)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex _rxUrl = new Regex(@"(url\s*\(\s*)([""']?)([^:)]+)(\2\s*\))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly string _protocol = "file:///";
 
         public override Task ExecuteAsync(IAssetContext config)
         {
             var content = new Dictionary<string, byte[]>();
             var env = (IWebHostEnvironment)config.HttpContext.RequestServices.GetService(typeof(IWebHostEnvironment));
-            var pipeline = (IAssetPipeline)config.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
-            IFileProvider fileProvider = config.Asset.GetFileProvider(env);
+            IFileProvider fileProvider = config.Asset.GetAssetFileProvider(env);
 
             foreach (string key in config.Content.Keys)
             {
-                string inputPath = Path.Combine(env.WebRootPath, key.TrimStart('/'));
-                string outputPath = Path.Combine(env.WebRootPath, config.Asset.Route.TrimStart('/'));
-                content[key] = Adjust(config.Content[key].AsString(), inputPath, outputPath);
+                content[key] = Adjust(config, key);
             }
 
             config.Content = content;
@@ -34,50 +33,63 @@ namespace WebOptimizer
             return Task.CompletedTask;
         }
 
-        private static byte[] Adjust(string cssFileContents, string inputFile, string outputPath)
+        private static byte[] Adjust(IAssetContext config, string key)
         {
-            // apply the RegEx to the file (to change relative paths)
-            MatchCollection matches = _rxUrl.Matches(cssFileContents);
+            string content = config.Content[key].AsString();
 
-            // Ignore the file if no match
-            if (matches.Count > 0)
+            return _rxUrl.Replace(content, match =>
             {
-                string cssDirectoryPath = Path.GetDirectoryName(inputFile);
+                // no change on inline data
+                if (match.Value.StartsWith("data:"))
+                    return match.Value;
 
-                foreach (Match match in matches)
-                {
-                    string quoteDelimiter = match.Groups[1].Value; //url('') vs url("")
-                    string urlValue = match.Groups[2].Value;
+                string urlValue = match.Groups[3].Value;
 
-                    // Ignore root relative references
-                    if (urlValue.StartsWith("/", StringComparison.Ordinal) || urlValue.StartsWith("data:"))
-                        continue;
+                // no change on absolute urls
+                if (Uri.IsWellFormedUriString(urlValue, UriKind.Absolute))
+                    return match.Value;
 
-                    //prevent query string from causing error
-                    string[] pathAndQuery = urlValue.Split(new[] { '?' }, 2, StringSplitOptions.RemoveEmptyEntries);
-                    string pathOnly = pathAndQuery[0];
-                    string queryOnly = pathAndQuery.Length == 2 ? pathAndQuery[1] : string.Empty;
+                // no change if other host
+                if (urlValue.StartsWith("//"))
+                    return match.Value;
 
-                    string absolutePath = GetAbsolutePath(cssDirectoryPath, pathOnly);
-                    string serverRelativeUrl = MakeRelative(outputPath, absolutePath);
+                // no change, if absolute path
+                if (UrlPathUtils.IsAbsolutePath(urlValue))
+                    return match.Value;
 
-                    if (!string.IsNullOrEmpty(queryOnly))
-                    {
-                        serverRelativeUrl += "?" + queryOnly;
-                    }
+                // get absolute path of content file
+                string appPath = (config.HttpContext?.Request?.PathBase.HasValue ?? false)
+                    ? config.HttpContext.Request.PathBase.Value
+                    : "/";
 
-                    string replace = string.Format("url({0}{1}{0})", quoteDelimiter, serverRelativeUrl);
+                string routeRelativePath =
+                    config.Asset.Route.StartsWith("~/")
+                    ? config.Asset.Route.Substring(2)
+                    : config.Asset.Route;
 
-                    cssFileContents = cssFileContents.Replace(match.Groups[0].Value, replace);
-                }
-            }
+                string routePath = UrlPathUtils.MakeAbsolute(appPath, routeRelativePath);
 
-            return cssFileContents.AsByteArray();
-        }
+                // prevent query string from causing error
+                string[] pathAndQuery = urlValue.Split(new[] { '?' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                string pathOnly = pathAndQuery[0];
+                string queryOnly = pathAndQuery.Length == 2 ? ("?" + pathAndQuery[1]) : string.Empty;
 
-        private static string GetAbsolutePath(string cssFilePath, string pathOnly)
-        {
-            return Path.GetFullPath(Path.Combine(cssFilePath, pathOnly));
+                // get filepath of included file
+                if (!UrlPathUtils.TryMakeAbsolutePathFromInclude(appPath, key, pathOnly, out string filePath))
+                    // path to included file is invalid
+                    return match.Value;
+
+                string relativePath = MakeRelative(routePath, filePath);
+
+                string replaced =
+                    match.Groups[1].Value +
+                    match.Groups[2].Value +
+                    relativePath + queryOnly +
+                    match.Groups[4].Value;
+
+                return replaced;
+
+            }).AsByteArray();
         }
 
         private static string MakeRelative(string baseFile, string file)
@@ -87,8 +99,8 @@ namespace WebOptimizer
 
             // The file:// protocol is to make it work on Linux.
             // See https://github.com/madskristensen/BundlerMinifier/commit/01fe7a050eda073f8949caa90eedc4c23e04d0ce
-            var baseUri = new Uri(_protocol + baseFile, UriKind.RelativeOrAbsolute);
-            var fileUri = new Uri(_protocol + file, UriKind.RelativeOrAbsolute);
+            var baseUri = new Uri(_protocol + baseFile.TrimStart('/'), UriKind.RelativeOrAbsolute);
+            var fileUri = new Uri(_protocol + file.TrimStart('/'), UriKind.RelativeOrAbsolute);
 
             if (baseUri.IsAbsoluteUri)
             {

@@ -13,6 +13,7 @@ namespace WebOptimizer.Test.Processors
         [InlineData("fo.hat", ".js")]
         [InlineData("fo.hat", ".js", ".jsx")]
         [InlineData(".js", ".jsx")]
+        [InlineData("/foo/bar.js/fo.hat", ".js", ".jsx")]
         public async Task EnforceExtension_Throws(string fileName, params string[] extensions)
         {
             var minifier = new EnforceFileExtensions(extensions);
@@ -27,6 +28,7 @@ namespace WebOptimizer.Test.Processors
         [InlineData("fo.js", ".js")]
         [InlineData("fo.jsx", ".js", ".jsx")]
         [InlineData(".js", ".js")]
+        [InlineData("/foo/bar/fo.jsx", ".js", ".jsx")]
         public async Task EnforceExtension_Success(string fileName, params string[] extensions)
         {
             var minifier = new EnforceFileExtensions(extensions);
