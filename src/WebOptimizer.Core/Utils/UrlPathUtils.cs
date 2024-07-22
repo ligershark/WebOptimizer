@@ -7,7 +7,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace WebOptimizer.Utils
 {
-    internal static class UrlPathUtils
+    public static class UrlPathUtils
     {
         public static bool IsAbsolutePath(string path)
         {
