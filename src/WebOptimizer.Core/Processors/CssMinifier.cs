@@ -108,8 +108,8 @@ namespace Microsoft.Extensions.DependencyInjection
             return pipeline.AddBundle(route, "text/css; charset=UTF-8", sourceFiles)
                            .EnforceFileExtensions(".css")
                            .AdjustRelativePaths()
-                           .Concatenate()
                            .FingerprintUrls()
+                           .Concatenate()
                            .AddResponseHeader("X-Content-Type-Options", "nosniff")
                            .MinifyCss(settings);
         }

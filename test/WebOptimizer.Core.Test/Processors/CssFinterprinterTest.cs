@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.FileProviders.Physical;
 using Moq;
+using WebOptimizer.Core.Test.Mocks;
+using WebOptimizer.Utils;
 using Xunit;
 
 namespace WebOptimizer.Test.Processors
@@ -19,7 +20,13 @@ namespace WebOptimizer.Test.Processors
         [InlineData("url(/css/img/foo.png?1=1)", "url(/css/img/foo.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI&1=1)")]
         [InlineData("url('/css/img/foo.png')", "url('/css/img/foo.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI')")]
         [InlineData("url('/img/doesntexist.png')", "url('/img/doesntexist.png')")]
-        [InlineData("url(http://foo.png)", "url(http://foo.png)")]
+        [InlineData("url(http://example.com/foo.png)", "url(http://example.com/foo.png)")]
+        [InlineData("url(//example.com/foo.png)", "url(//example.com/foo.png)")]
+        [InlineData("url(img/foo.png)", "url(img/foo.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI)")]
+        [InlineData("url(../img/foo2.png)", "url(../img/foo2.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI)")]
+        [InlineData("url(../img/foo2.png?1=1)", "url(../img/foo2.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI&1=1)")]
+        [InlineData("url(../img/doesntexist.png)", "url(../img/doesntexist.png)")]
+        [InlineData("url(../../img/doesntexist.png)", "url(../../img/doesntexist.png)")]
         public async Task CssFingerprint_Success(string url, string newUrl)
         {
             var adjuster = new CssFingerprinter();
@@ -29,37 +36,29 @@ namespace WebOptimizer.Test.Processors
             var env = new Mock<IWebHostEnvironment>();
             var fileProvider = new Mock<IFileProvider>();
 
-            string temp = Path.GetTempPath();
-            string path = Path.Combine(temp, "css", "img");
-            Directory.CreateDirectory(path);
-            string imagePath = Path.Combine(path, "foo.png");
-            File.WriteAllText(imagePath, string.Empty);
-            File.SetLastWriteTime(imagePath, new DateTime(2017, 1, 1));
-
-            var inputFile = new PhysicalFileInfo(new FileInfo(Path.Combine(temp, "css", "site.css")));
-            var outputFile = new PhysicalFileInfo(new FileInfo(Path.Combine(temp, "dist", "all.css")));
-
             context.SetupGet(s => s.Asset.Route)
-                   .Returns("/my/route.css");
+                .Returns("~/css/site.css");
 
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IAssetPipeline)))
-                   .Returns(pipeline.Object);
+                .Returns(pipeline.Object);
 
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IWebHostEnvironment)))
-                   .Returns(env.Object);
-
-            context.SetupGet(s => s.Asset)
-                   .Returns(asset.Object);
+                .Returns(env.Object);
 
             env.SetupGet(e => e.WebRootFileProvider)
-                 .Returns(fileProvider.Object);
+                .Returns(fileProvider.Object);
 
             env.SetupGet(e => e.WebRootPath)
-                .Returns(temp);
+                .Returns("/wwwroot");
 
-            fileProvider.SetupSequence(f => f.GetFileInfo(It.IsAny<string>()))
-                   .Returns(inputFile)
-                   .Returns(outputFile);
+            fileProvider.Setup(f => f.GetFileInfo(It.IsAny<string>()))
+                .Returns((string path) => new NotFoundFileInfo(UrlPathUtils.GetFileName(path)));
+
+            fileProvider.Setup(f => f.GetFileInfo(It.Is<string>(value => value.Equals("/css/img/foo.png", StringComparison.InvariantCultureIgnoreCase))))
+                .Returns(new MockFileInfo("foo.png", new DateTime(2017, 1, 1), []));
+
+            fileProvider.Setup(f => f.GetFileInfo(It.Is<string>(value => value.Equals("/img/foo2.png", StringComparison.InvariantCultureIgnoreCase))))
+                .Returns(new MockFileInfo("foo2.png", new DateTime(2017, 1, 1), []));
 
             context.Object.Content = new Dictionary<string, byte[]> { { "css/site.css", url.AsByteArray() } };
 

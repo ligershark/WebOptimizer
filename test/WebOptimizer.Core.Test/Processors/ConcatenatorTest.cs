@@ -16,7 +16,7 @@ namespace WebOptimizer.Test.Processors
             var context = new Mock<IAssetContext>().SetupAllProperties();
             context.Object.Content = new Dictionary<string, byte[]> {
                 { "/route1", "content".AsByteArray() },
-                { "/route2", "content".AsByteArray() }
+                { "/route2", "content2".AsByteArray() }
             };
 
             var options = new Mock<WebOptimizerOptions>();
@@ -24,6 +24,7 @@ namespace WebOptimizer.Test.Processors
             await processor.ExecuteAsync(context.Object);
 
             Assert.Equal(1, context.Object.Content.Count);
+            Assert.Equal("content\r\ncontent2\r\n", context.Object.Content.Values.First().AsString());
         }
 
         [Fact2]
@@ -37,6 +38,7 @@ namespace WebOptimizer.Test.Processors
             await processor.ExecuteAsync(context.Object);
 
             Assert.Equal(1, context.Object.Content.Count);
+            Assert.Equal(string.Empty, context.Object.Content.Values.First().AsString());
         }
 
         [Fact2]

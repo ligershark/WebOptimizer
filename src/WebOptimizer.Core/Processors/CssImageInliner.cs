@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
 using WebOptimizer;
+using WebOptimizer.Utils;
 
 namespace WebOptimizer
 {
     internal class CssImageInliner : Processor
     {
-        private static readonly Regex _rxUrl = new Regex(@"url\s*\(\s*([""']?)([^:)]+)\1\s*\)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex _rxUrl = new Regex(@"(url\s*\(\s*)([""']?)([^:)]+)(\2\s*\))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static int _maxFileSize;
 
         public CssImageInliner(int maxFileSize)
@@ -23,70 +26,109 @@ namespace WebOptimizer
         {
             var content = new Dictionary<string, byte[]>();
             var env = (IWebHostEnvironment)config.HttpContext.RequestServices.GetService(typeof(IWebHostEnvironment));
-            var pipeline = (IAssetPipeline)config.HttpContext.RequestServices.GetService(typeof(IAssetPipeline));
-            IFileProvider fileProvider = config.Asset.GetFileProvider(env);
+            IFileProvider fileProvider = config.Asset.GetAssetFileProvider(env);
 
             foreach (string key in config.Content.Keys)
             {
                 IFileInfo input = fileProvider.GetFileInfo(key);
 
-                content[key] = await InlineAsync(config.Content[key].AsString(), input, env);
+                content[key] = await InlineAsync(config, key, fileProvider);
             }
 
             config.Content = content;
         }
 
-        private static async Task<byte[]> InlineAsync(string content, IFileInfo input, IWebHostEnvironment env)
+        private static async Task<byte[]> InlineAsync(IAssetContext config, string key, IFileProvider fileProvider)
         {
-            MatchCollection matches = _rxUrl.Matches(content);
-            string inputDir = Path.GetDirectoryName(input.PhysicalPath);
+            string content = config.Content[key].AsString();
 
-            foreach (Match match in matches)
+            var sb = new StringBuilder();
+            int lastIndex = 0;
+
+            foreach (Match match in _rxUrl.Matches(content))
             {
-                string urlValue = match.Groups[2].Value;
-                string dir = inputDir;
-
-                if (urlValue.Contains("://") || urlValue.StartsWith("//"))
-                {
-                    continue;
-                }
-
-                string[] pathAndQuery = urlValue.Split(new[] { '?' }, 2, StringSplitOptions.RemoveEmptyEntries);
-                string pathOnly = pathAndQuery[0];
-                string queryOnly = pathAndQuery.Length == 2 ? pathAndQuery[1] : string.Empty;
-
-                if (pathOnly.StartsWith("/", StringComparison.Ordinal))
-                {
-                    dir = env.WebRootPath;
-                }
-
-                var info = new FileInfo(Path.Combine(dir, pathOnly.TrimStart('/')));
-
-                if (!info.Exists)
-                {
-                    continue;
-                }
-
-                if (info.Length > _maxFileSize && (!queryOnly.Contains("&inline") && !queryOnly.Contains("?inline")))
-                    continue;
-
-                string mimeType = GetMimeTypeFromFileExtension(info.Name);
-
-                if (!string.IsNullOrEmpty(mimeType))
-                {
-                    using (Stream fs = info.OpenRead())
-                    {
-                        string base64 = Convert.ToBase64String(await fs.AsBytesAsync());
-                        string dataUri = $"url('data:{mimeType};base64,{base64}')";
-                        content = content.Replace(match.Value, dataUri);
-                    }
-                }
+                sb.Append(content, lastIndex, match.Index - lastIndex);
+                sb.Append(await ReplaceMatch(config, key, fileProvider, match));
+                lastIndex = match.Index + match.Length;
             }
 
-            return content.AsByteArray();
+            sb.Append(content, lastIndex, content.Length - lastIndex);
+
+            return sb.ToString().AsByteArray();
         }
 
-        static string GetMimeTypeFromFileExtension(string file)
+        private static async Task<string> ReplaceMatch(IAssetContext config, string key, IFileProvider fileProvider, Match match)
+        {
+            // no fingerprint on inline data
+            if (match.Value.StartsWith("data:"))
+                return match.Value;
+
+            string urlValue = match.Groups[3].Value;
+
+            // no fingerprint on absolute urls
+            if (Uri.IsWellFormedUriString(urlValue, UriKind.Absolute))
+                return match.Value;
+
+            // no fingerprint if other host
+            if (urlValue.StartsWith("//"))
+                return match.Value;
+
+            // get absolute path of content file
+            string appPath = (config.HttpContext?.Request?.PathBase.HasValue ?? false)
+                ? config.HttpContext.Request.PathBase.Value
+                : "/";
+
+            string routeRelativePath =
+                config.Asset.Route.StartsWith("~/")
+                    ? config.Asset.Route.Substring(2)
+                    : config.Asset.Route;
+
+            string routePath = UrlPathUtils.MakeAbsolute(appPath, routeRelativePath);
+
+            string routeBasePath = UrlPathUtils.GetDirectory(routePath);
+
+            // prevent query string from causing error
+            string[] pathAndQuery = urlValue.Split(new[] { '?' }, 2, StringSplitOptions.RemoveEmptyEntries);
+            string pathOnly = pathAndQuery[0];
+            string queryOnly = pathAndQuery.Length == 2 ? pathAndQuery[1] : string.Empty;
+
+            // get filepath of included file
+            if (!UrlPathUtils.TryMakeAbsolutePathFromInclude(appPath, routeBasePath, pathOnly, out string filePath))
+                // path to included file is invalid
+                return match.Value;
+
+            // get FileInfo of included file
+            IFileInfo linkedFileInfo = fileProvider.GetFileInfo(filePath);
+
+            // no fingerprint if file is not found
+            if (!linkedFileInfo.Exists)
+                return match.Value;
+
+            if (linkedFileInfo.Length > _maxFileSize &&
+                (!queryOnly.Contains("&inline") && !queryOnly.Contains("?inline")))
+                return match.Value;
+
+            string mimeType = GetMimeTypeFromFileExtension(linkedFileInfo.Name);
+
+            if (string.IsNullOrEmpty(mimeType))
+                return match.Value;
+
+            using (Stream fs = linkedFileInfo.CreateReadStream())
+            {
+                string base64 = Convert.ToBase64String(await fs.AsBytesAsync());
+                string dataUri = $"data:{mimeType};base64,{base64}";
+
+                string replaced =
+                    match.Groups[1].Value +
+                    match.Groups[2].Value +
+                    dataUri +
+                    match.Groups[4].Value;
+
+                return replaced;
+            }
+        }
+
+        private static string GetMimeTypeFromFileExtension(string file)
         {
             string ext = Path.GetExtension(file).TrimStart('.');
 

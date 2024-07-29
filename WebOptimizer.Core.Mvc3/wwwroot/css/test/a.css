@@ -25,6 +25,12 @@ h1 {
     padding-left: 64px;
 }
 
+h6 {
+    height: 64px;
+    background: url(../../img/a.png) no-repeat left center;
+    padding-left: 64px;
+}
+
 nav {
     background: #e5e5e5;
 }
