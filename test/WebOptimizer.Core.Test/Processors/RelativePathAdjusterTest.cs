@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -28,6 +27,11 @@ namespace WebOptimizer.Test.Processors
         [InlineData("/dist/all.css", "css/site.css", "url(../img/foo.png)", "url(../img/foo.png)")]
         [InlineData("dist/all.css", "css/site.css", "url(img/foo.png)", "url(../css/img/foo.png)")]
         [InlineData("dist/all.css", "css/site.css", "url(../img/foo.png)", "url(../img/foo.png)")]
+        [InlineData("/css/all.css", "css/site.css", "url(~/img/foo.png)", "url(../img/foo.png)")]
+        [InlineData("/css/all.css", "css/sub/site.css", "url(~/img/foo.png)", "url(../img/foo.png)")]
+        [InlineData("/dist/sub/all.css", "css/sub/site.css", "url(~/img/foo.png)", "url(../../img/foo.png)")]
+        [InlineData("/dist/sub/all.css", "css/site.css", "url(~/img/foo.png)", "url(../../img/foo.png)")]
+        [InlineData("dist/sub/all.css", "css/site.css", "url(~/img/foo.png)", "url(../../img/foo.png)")]
         public async Task AdjustRelativePaths_Success(string route, string inputPath, string url, string newUrl)
         {
             var adjuster = new RelativePathAdjuster();
