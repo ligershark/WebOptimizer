@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
 using WebOptimizer;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using WebOptimizer.Utils;
 
 namespace WebOptimizer
@@ -75,9 +72,17 @@ namespace WebOptimizer
                 string queryOnly = pathAndQuery.Length == 2 ? ("?" + pathAndQuery[1]) : string.Empty;
 
                 // get filepath of included file
-                if (!UrlPathUtils.TryMakeAbsolutePathFromInclude(appPath, key, pathOnly, out string filePath))
-                    // path to included file is invalid
-                    return match.Value;
+                string filePath;
+                if (pathOnly.StartsWith("~/"))
+                {
+                    filePath = UrlPathUtils.MakeAbsolute(appPath, pathOnly.Substring(2));
+                }
+                else
+                {
+                    if (!UrlPathUtils.TryMakeAbsolutePathFromInclude(appPath, key, pathOnly, out filePath))
+                        // path to included file is invalid
+                        return match.Value;
+                }
 
                 string relativePath = MakeRelative(routePath, filePath);
 
