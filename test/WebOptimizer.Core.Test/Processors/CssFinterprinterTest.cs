@@ -37,13 +37,16 @@ namespace WebOptimizer.Test.Processors
             var fileProvider = new Mock<IFileProvider>();
 
             context.SetupGet(s => s.Asset.Route)
-                .Returns("~/css/site.css");
+                .Returns(AssetPipeline.NormalizeRoute("~/css/site.css"));
 
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IAssetPipeline)))
                 .Returns(pipeline.Object);
 
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IWebHostEnvironment)))
                 .Returns(env.Object);
+
+            context.Setup(s => s.HttpContext.Request.PathBase)
+                .Returns("/parent");
 
             env.SetupGet(e => e.WebRootFileProvider)
                 .Returns(fileProvider.Object);

@@ -57,6 +57,9 @@ namespace WebOptimizer.Test.Processors
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IWebHostEnvironment)))
                 .Returns(env.Object);
 
+            context.Setup(s => s.HttpContext.Request.PathBase)
+                .Returns("/parent");
+
             env.SetupGet(e => e.WebRootFileProvider)
                 .Returns(fileProvider.Object);
 

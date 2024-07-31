@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -13,26 +14,24 @@ namespace WebOptimizer.Test.Processors
     public class RelativePathAdjusterTest
     {
         [Theory2]
-        [InlineData("/dist/all.css", "css/site.css", "url(/img/foo.png)", "url(/img/foo.png)")]
-        [InlineData("/dist/all.css", "css/site.css", "url(/img/foo.png?1=1)", "url(/img/foo.png?1=1)")]
-        [InlineData("/dist/all.css", "css/site.css", "url(img/foo.png)", "url(../css/img/foo.png)")]
-        [InlineData("/dist/all.css", "css/site.css", "url(http://foo.png)", "url(http://foo.png)")]
-        [InlineData("/dist/all.css", "css/site.css", "url('img/foo.png')", "url('../css/img/foo.png')")]
-        [InlineData("/dist/all.css", "css/site.css", "url(\"img/foo.png\")", "url(\"../css/img/foo.png\")")]
-        [InlineData("/dist/all.css", "css/sub/site.css", "url(img/foo.png)", "url(../css/sub/img/foo.png)")]
-        [InlineData("/css/all.css", "css/site.css", "url(img/foo.png)", "url(img/foo.png)")]
-        [InlineData("/css/all.css", "css/site.css", "url(../img/foo.png)", "url(../img/foo.png)")]
-        [InlineData("/css/all.css", "css/site.css", "url(../../img/foo.png)", "url(../../img/foo.png)")]
-        [InlineData("/dist/sub/all.css", "css/sub/site.css", "url(img/foo.png)", "url(../../css/sub/img/foo.png)")]
-        [InlineData("/dist/all.css", "css/site.css", "url(../img/foo.png)", "url(../img/foo.png)")]
-        [InlineData("dist/all.css", "css/site.css", "url(img/foo.png)", "url(../css/img/foo.png)")]
-        [InlineData("dist/all.css", "css/site.css", "url(../img/foo.png)", "url(../img/foo.png)")]
-        [InlineData("/css/all.css", "css/site.css", "url(~/img/foo.png)", "url(../img/foo.png)")]
-        [InlineData("/css/all.css", "css/sub/site.css", "url(~/img/foo.png)", "url(../img/foo.png)")]
-        [InlineData("/dist/sub/all.css", "css/sub/site.css", "url(~/img/foo.png)", "url(../../img/foo.png)")]
-        [InlineData("/dist/sub/all.css", "css/site.css", "url(~/img/foo.png)", "url(../../img/foo.png)")]
-        [InlineData("dist/sub/all.css", "css/site.css", "url(~/img/foo.png)", "url(../../img/foo.png)")]
-        public async Task AdjustRelativePaths_Success(string route, string inputPath, string url, string newUrl)
+        [InlineData(null, "/dist/all.css", "css/site.css", "url(/img/foo.png)", "url(/img/foo.png)")]
+        [InlineData(null, "/dist/all.css", "css/site.css", "url(/img/foo.png?1=1)", "url(/img/foo.png?1=1)")]
+        [InlineData(null, "/dist/all.css", "css/site.css", "url(img/foo.png)", "url(../css/img/foo.png)")]
+        [InlineData(null, "/dist/all.css", "css/site.css", "url(http://foo.png)", "url(http://foo.png)")]
+        [InlineData(null, "/dist/all.css", "css/site.css", "url('img/foo.png')", "url('../css/img/foo.png')")]
+        [InlineData(null, "/dist/all.css", "css/site.css", "url(\"img/foo.png\")", "url(\"../css/img/foo.png\")")]
+        [InlineData(null, "/dist/all.css", "css/sub/site.css", "url(img/foo.png)", "url(../css/sub/img/foo.png)")]
+        [InlineData(null, "/css/all.css", "css/site.css", "url(img/foo.png)", "url(img/foo.png)")]
+        [InlineData(null, "/css/all.css", "css/site.css", "url(../img/foo.png)", "url(../img/foo.png)")]
+        [InlineData(null, "/css/all.css", "css/site.css", "url(../../img/foo.png)", "url(../../img/foo.png)")]
+        [InlineData(null, "/dist/sub/all.css", "css/sub/site.css", "url(img/foo.png)", "url(../../css/sub/img/foo.png)")]
+        [InlineData(null, "/dist/all.css", "css/site.css", "url(../img/foo.png)", "url(../img/foo.png)")]
+        [InlineData(null, "dist/all.css", "css/site.css", "url(img/foo.png)", "url(../css/img/foo.png)")]
+        [InlineData(null, "dist/all.css", "css/site.css", "url(../img/foo.png)", "url(../img/foo.png)")]
+        [InlineData("/parent", "/css/all.css", "css/site.css", "url(../img/foo.png)", "url(../img/foo.png)")]
+        [InlineData("/parent", "/css/all.css", "css/site.css", "url(img/foo.png)", "url(img/foo.png)")]
+        [InlineData("/parent", "/dist/all.css", "css/site.css", "url(/img/foo.png)", "url(/img/foo.png)")]
+        public async Task AdjustRelativePaths_Success(string? requestPathBase, string route, string inputPath, string url, string newUrl)
         {
             var adjuster = new RelativePathAdjuster();
             var context = new Mock<IAssetContext>().SetupAllProperties();
@@ -51,6 +50,12 @@ namespace WebOptimizer.Test.Processors
 
             context.Setup(s => s.HttpContext.RequestServices.GetService(typeof(IWebHostEnvironment)))
                    .Returns(env.Object);
+
+            if (requestPathBase != null)
+            {
+                context.Setup(s => s.HttpContext.Request.PathBase)
+                    .Returns(requestPathBase);
+            }
 
             env.SetupGet(e => e.WebRootFileProvider)
                  .Returns(fileProvider.Object);
