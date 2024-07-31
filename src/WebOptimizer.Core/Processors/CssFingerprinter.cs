@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Primitives;
 using WebOptimizer;
 using WebOptimizer.Utils;
 
@@ -55,19 +52,7 @@ namespace WebOptimizer
                 if (urlValue.StartsWith("//"))
                     return match.Value;
 
-                // get absolute path of content file
-                string appPath = (config.HttpContext?.Request?.PathBase.HasValue ?? false)
-                    ? config.HttpContext.Request.PathBase.Value
-                    : "/";
-
-                string routeRelativePath =
-                    config.Asset.Route.StartsWith("~/")
-                        ? config.Asset.Route.Substring(2)
-                        : config.Asset.Route;
-
-                string routePath = UrlPathUtils.MakeAbsolute(appPath, routeRelativePath);
-
-                string routeBasePath = UrlPathUtils.GetDirectory(routePath);
+                string routeBasePath = UrlPathUtils.GetDirectory(config.Asset.Route);
 
                 // prevent query string from causing error
                 string[] pathAndQuery = urlValue.Split(new[] { '?' }, 2, StringSplitOptions.RemoveEmptyEntries);
@@ -75,7 +60,7 @@ namespace WebOptimizer
                 string queryOnly = pathAndQuery.Length == 2 ? pathAndQuery[1] : string.Empty;
 
                 // get filepath of included file
-                if (!UrlPathUtils.TryMakeAbsolutePathFromInclude(appPath, routeBasePath, pathOnly, out string filePath))
+                if (!UrlPathUtils.TryMakeAbsolute(routeBasePath, pathOnly, out string filePath))
                     // path to included file is invalid
                     return match.Value;
 

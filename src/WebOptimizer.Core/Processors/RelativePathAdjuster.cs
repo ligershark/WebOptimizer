@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.FileProviders;
 using WebOptimizer;
 using WebOptimizer.Utils;
 
@@ -17,8 +15,6 @@ namespace WebOptimizer
         public override Task ExecuteAsync(IAssetContext config)
         {
             var content = new Dictionary<string, byte[]>();
-            var env = (IWebHostEnvironment)config.HttpContext.RequestServices.GetService(typeof(IWebHostEnvironment));
-            IFileProvider fileProvider = config.Asset.GetAssetFileProvider(env);
 
             foreach (string key in config.Content.Keys)
             {
@@ -59,12 +55,7 @@ namespace WebOptimizer
                     ? config.HttpContext.Request.PathBase.Value
                     : "/";
 
-                string routeRelativePath =
-                    config.Asset.Route.StartsWith("~/")
-                    ? config.Asset.Route.Substring(2)
-                    : config.Asset.Route;
-
-                string routePath = UrlPathUtils.MakeAbsolute(appPath, routeRelativePath);
+                string routePath = UrlPathUtils.MakeAbsolute(appPath, config.Asset.Route.TrimStart('/'));
 
                 // prevent query string from causing error
                 string[] pathAndQuery = urlValue.Split(new[] { '?' }, 2, StringSplitOptions.RemoveEmptyEntries);
