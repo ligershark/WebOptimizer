@@ -72,7 +72,10 @@ namespace WebOptimizer.Taghelpers
             }
             else
             {
-                src = AddCdn(AddPathBase(src));
+                if (!Uri.TryCreate(src, UriKind.Absolute, out Uri _))
+                {
+                    src = AddCdn(AddPathBase(src));
+                }
                 output.Attributes.SetAttribute("src", src);
             }
 

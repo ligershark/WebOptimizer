@@ -72,7 +72,10 @@ namespace WebOptimizer.Taghelpers
             }
             else
             {
-                href = AddCdn(AddPathBase(href));
+                if (!Uri.TryCreate(href, UriKind.Absolute, out Uri _))
+                {
+                    href = AddCdn(AddPathBase(href));
+                }
                 output.Attributes.SetAttribute("href", href);
             }
         }
