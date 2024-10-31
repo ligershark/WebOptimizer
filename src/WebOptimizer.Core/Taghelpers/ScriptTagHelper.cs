@@ -75,10 +75,9 @@ namespace WebOptimizer.Taghelpers
                 if (!Uri.TryCreate(src, UriKind.Absolute, out Uri _))
                 {
                     src = AddCdn(AddPathBase(src));
+                    output.Attributes.SetAttribute("src", src);
                 }
-                output.Attributes.SetAttribute("src", src);
             }
-
         }
 
         private void WriteIndividualTags(TagHelperOutput output, IAsset asset)
