@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -18,6 +19,14 @@ namespace WebOptimizer.Core.Test.TagHelpers
 {
     public class LinkTagHelperTest
     {
+
+        public static IEnumerable<object[]> GetUrls()
+        {
+            yield return new object[] { "/test.css" };
+            yield return new object[] { new HtmlString("https://host.com/path?query&amp;parameter=val") };
+        }
+
+
         [Theory2]
         [InlineData("https://my-cdn.com", "")]
         [InlineData("https://my-cdn.com", "/myapp")]
@@ -295,7 +304,63 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var hrefValue = tagHelperOutput.Attributes.First(x => x.Name == "href").Value;
             Assert.Equal(absoluteUrl, hrefValue);
         }
-        
+
+
+        [Theory2]
+        [MemberData(nameof(GetUrls))]
+        public void RouteIsNotAsset_DoesNotChangeAttributeType(object route)
+        {
+            var fileInfo = new Mock<IFileInfo>();
+            fileInfo.SetupGet(fi => fi.Exists).Returns(true);
+            var fileProvider = new Mock<IFileProvider>();
+            fileProvider.Setup(fp => fp.GetFileInfo(It.IsAny<string>())).Returns(fileInfo.Object);
+            var env = new Mock<IWebHostEnvironment>();
+            env.Setup(e => e.WebRootFileProvider).Returns(fileProvider.Object);
+
+            var options = new WebOptimizerOptions
+            {
+                CdnUrl = "https://mycdn.com"
+            };
+            var optionsFactory = new Mock<IOptionsFactory<WebOptimizerOptions>>();
+            optionsFactory.Setup(x => x.Create(It.IsAny<string>())).Returns(options);
+            var optionsMonitor = new Mock<OptionsMonitor<WebOptimizerOptions>>(optionsFactory.Object, new List<IOptionsChangeTokenSource<WebOptimizerOptions>>(), new Mock<IOptionsMonitorCache<WebOptimizerOptions>>().Object);
+            optionsMonitor.Setup(x => x.Get(It.IsAny<string>())).Returns(options);
+            var linkTagHelper = new LinkTagHelper(env.Object, new Mock<IMemoryCache>().Object, 
+                new Mock<IAssetPipeline>().Object, optionsMonitor.Object);
+            var context = new Mock<HttpContext>().SetupAllProperties();
+            StringValues ae = "gzip, deflate";
+
+            context.SetupSequence(c => c.Request.Headers.TryGetValue("Accept-Encoding", out ae))
+                .Returns(false)
+                .Returns(true);
+            context.Setup(c => c.RequestServices.GetService(typeof(IWebHostEnvironment)))
+                .Returns(env.Object);
+            var pathBase = "/myApp";
+            context.SetupGet(c => c.Request.PathBase).Returns(pathBase);
+
+            var viewContext = new ViewContext
+            {
+                HttpContext = context.Object
+            };
+            linkTagHelper.ViewContext = viewContext;
+            linkTagHelper.CurrentViewContext = viewContext;
+
+            var tagHelperContext = new Mock<TagHelperContext>(
+                "link",
+                new TagHelperAttributeList(),
+                new Dictionary<object, object>(),
+                "unique");
+
+            var attributes = new TagHelperAttributeList { new TagHelperAttribute("href", route) };
+
+            var tagHelperOutput = new TagHelperOutput("scripts", attributes, (useCachedResult, encoder) => Task.Factory.StartNew<TagHelperContent>(
+                () => new DefaultTagHelperContent()));
+            linkTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
+            object hrefValue = tagHelperOutput.Attributes.First(x => x.Name == "href").Value;
+            Assert.IsType(route.GetType(), hrefValue);
+            Assert.Contains(route.ToString(), hrefValue.ToString());
+        }
+
         [Fact2]
         public void RelativeUrl_RouteIsNotAsset_DoesAddCdnAndPath()
         {
