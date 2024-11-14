@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -41,7 +43,7 @@ namespace WebOptimizer.Taghelpers
                 return;
             }
 
-            string src = LinkTagHelper.GetValue("src", output);
+            string src = LinkTagHelper.GetValue("src", output, out bool encoded );
 
             if (string.IsNullOrEmpty(src))
                 return;
@@ -75,7 +77,8 @@ namespace WebOptimizer.Taghelpers
                 if (!Uri.TryCreate(src, UriKind.Absolute, out Uri _))
                 {
                     src = AddCdn(AddPathBase(src));
-                    output.Attributes.SetAttribute("src", src);
+                    object value = encoded ? new HtmlString(src) : src;
+                    output.Attributes.SetAttribute("src", value);
                 }
             }
         }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Html;
@@ -50,7 +51,7 @@ namespace WebOptimizer.Taghelpers
                 return;
             }
 
-            string href = GetValue("href", output);
+            string href = GetValue("href", output, out bool encoded);
             string pathBase = CurrentViewContext.HttpContext?.Request?.PathBase.Value;
 
             if (!string.IsNullOrEmpty(pathBase) && href.StartsWith(pathBase))
@@ -74,9 +75,14 @@ namespace WebOptimizer.Taghelpers
             {
                 if (!Uri.TryCreate(href, UriKind.Absolute, out Uri _))
                 {
+                    string unmodifiedHref = href;
                     href = AddCdn(AddPathBase(href));
+                    if (href != unmodifiedHref)
+                    {
+                        object value = encoded ? new HtmlString(href) : href;
+                        output.Attributes.SetAttribute("href", value);
+                    }
                 }
-                output.Attributes.SetAttribute("href", href);
             }
         }
 
@@ -115,8 +121,9 @@ namespace WebOptimizer.Taghelpers
             }
         }
 
-        internal static string GetValue(string attrName, TagHelperOutput output)
+        internal static string GetValue(string attrName, TagHelperOutput output, out bool encoded)
         {
+            encoded = false;
             if (string.IsNullOrEmpty(attrName) || !output.Attributes.TryGetAttribute(attrName, out var attr))
             {
                 return null;
@@ -128,6 +135,7 @@ namespace WebOptimizer.Taghelpers
             }
             else if (attr.Value is IHtmlContent content)
             {
+                encoded = true;
                 if (content is HtmlString htmlString)
                 {
                     return htmlString.ToString();
