@@ -102,7 +102,7 @@ namespace WebOptimizer.Taghelpers
                 attrs.Add(attr);
             }
 
-            IEnumerable<string> sourceFiles = Asset.ExpandGlobs(asset, HostingEnvironment);
+            IEnumerable<string> sourceFiles = Asset.ExpandGlobs(asset, HostingEnvironment, CurrentViewContext.HttpContext);
 
             foreach (string file in sourceFiles)
             {
