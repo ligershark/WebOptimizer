@@ -196,6 +196,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             context.Setup(c => c.RequestServices.GetService(typeof(IMemoryCache)))
                 .Returns(cache.Object);
             context.SetupGet(c => c.Request.PathBase).Returns(pathBase);
+            context.SetupGet(c => c.Items).Returns(new Dictionary<object, object>());
             
             var options = new WebOptimizerOptions
             {
