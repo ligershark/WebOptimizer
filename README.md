@@ -200,7 +200,8 @@ To do that, go to `_ViewImports.cshtml` and register the Tag Helpers by adding `
 ### Cache busting
 As soon as the Tag Helpers are registered in your project, you'll notice how the `<script>` and `<link>` tags starts to render a little differently when they are referencing a file or bundle.
 
-**NOTE:** Unlike other ASP.NET Core Tag Helpers, `<script>` and `<link>` tags don't need an `asp-` attribute to be rendered as a Tag Helper. 
+> [!NOTE]
+> Unlike other ASP.NET Core Tag Helpers, `<script>` and `<link>` tags don't need an `asp-` attribute to be rendered as a Tag Helper. 
 
 They will get a version string added as a URL parameter:
 
@@ -210,7 +211,8 @@ They will get a version string added as a URL parameter:
 
 This version string changes every time one or more of the source files are modified. 
 
-**NOTE:** TagHelpers will only work on files registered as assets on the pipeline (will not work for all files in your <sctipt> and <link> tags out of the blue). make sure to add all required files as assets (glob is supported to add wildcard paths).
+> [!NOTE]
+> TagHelpers will only work on files registered as assets on the pipeline (will not work for all files in your <sctipt> and <link> tags out of the blue). make sure to add all required files as assets (glob is supported to add wildcard paths).
 
 ```csharp
 services.AddWebOptimizer(pipeline =>
@@ -231,9 +233,12 @@ services.AddResponseCompression( options => {
     );
 });
 ```
-*Note: `app.UseResponseCompression()` should be used prior to `app.UseWebOptimizer()`*
+> [!NOTE]
+> `app.UseResponseCompression()` should be used prior to `app.UseWebOptimizer()`*
 
-*Note: If you're using [ASP.NET Core 7.0 or later](https://github.com/dotnet/aspnetcore/blob/v7.0.0-preview.4.22251.1/src/Middleware/ResponseCompression/src/ResponseCompressionDefaults.cs), you don't need to add this, as support for `text/javascript` is included by default.*
+> [!NOTE]
+> If you're using [ASP.NET Core 7.0 or later](https://github.com/dotnet/aspnetcore/blob/v7.0.0-preview.4.22251.1/src/Middleware/ResponseCompression/src/ResponseCompressionDefaults.cs), you don't need to add this, as support for `text/javascript` is included by default.*
+
 ### Inlining content
 We can also use Web Optimizer to inline the content of the files directly into the Razor page. This is useful for creating high-performance websites that inlines the above-the-fold CSS and lazy loads the rest later.
 
