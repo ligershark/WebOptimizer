@@ -255,7 +255,7 @@ There is a Tag Helper that understands what the `inline` attribute means and han
 WebOptimizer can also compile [Scss](http://sass-lang.com/) files into CSS. For that you need to install the `LigerShark.WebOptimizer.Sass` NuGet package and hooking it up is a breeze. Read more on the [WebOptimizer.Sass](https://github.com/ligershark/WebOptimizer.sass) website.
 
 ## Options
-You can control the options from the appsettings.json file or in code 
+You can control the options from the appsettings.json file or in code. The following JSON and C# are equivalent:
 
 ```json
 {
@@ -266,7 +266,8 @@ You can control the options from the appsettings.json file or in code
     "cacheDirectory": "/var/temp/weboptimizercache",
     "enableTagHelperBundling": true,
     "cdnUrl": "https://my-cdn.com/",
-    "allowEmptyBundle": false
+    "allowEmptyBundle": false,
+    "httpsCompression": "Compress"
   }
 }
 ```
@@ -280,9 +281,13 @@ services.AddWebOptimizer(pipeline =>
     option =>
     {
         option.EnableCaching = true;
-        option.EnableDiskCache = false;
         option.EnableMemoryCache = true;
-        option.AllowEmptyBundle = true;
+        option.EnableDiskCache = true;
+        option.CacheDirectory = "/var/temp/weboptimizercache";
+        option.EnableTagHelperBundling = true;
+        option.CdnUrl = "https://my-cdn.com/";
+        option.AllowEmptyBundle = false;
+        option.HttpsCompression = HttpsCompressionMode.Compress;
     });
 ```
 
