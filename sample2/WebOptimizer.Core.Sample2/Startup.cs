@@ -32,7 +32,7 @@ namespace WebOptimizer.Core.Sample2
                 Minify = true,
             };
 
-            services.AddWebOptimizer(HostingEnvironment, cssSettings, codeSettings);
+            services.AddWebOptimizer(HostingEnvironment, cssSettings, codeSettings, options => options.CacheControlAccess = HttpResponseCacheControlAccessDirective.Public);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
