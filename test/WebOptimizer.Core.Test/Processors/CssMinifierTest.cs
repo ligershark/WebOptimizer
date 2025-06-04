@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUglify.Css;
 using Xunit;
@@ -77,6 +78,8 @@ namespace WebOptimizer.Test.Processors
         public void AddCssBundle_DefaultSettings_Success()
         {
             var pipeline = new AssetPipeline();
+            var logger = new Mock<ILogger<Asset>>();
+            pipeline._assetLogger = logger.Object;
             var asset = pipeline.AddCssBundle("/foo.css", "file1.css", "file2.css");
 
             Assert.Equal("/foo.css", asset.Route);
@@ -89,6 +92,8 @@ namespace WebOptimizer.Test.Processors
         public void AddCssBundle_DefaultSettings_SuccessRelative()
         {
             var pipeline = new AssetPipeline();
+            var logger = new Mock<ILogger<Asset>>();
+            pipeline._assetLogger = logger.Object;
             var asset = pipeline.AddCssBundle("foo.css", "file1.css", "file2.css");
 
             Assert.Equal("/foo.css", asset.Route);
@@ -102,6 +107,8 @@ namespace WebOptimizer.Test.Processors
         {
             var settings = new CssSettings();
             var pipeline = new AssetPipeline();
+            var logger = new Mock<ILogger<Asset>>();
+            pipeline._assetLogger = logger.Object;
             var asset = pipeline.AddCssBundle("/foo.css", settings, "file1.css", "file2.css");
 
             Assert.Equal("/foo.css", asset.Route);
@@ -114,6 +121,8 @@ namespace WebOptimizer.Test.Processors
         public void AddCssFiles_DefaultSettings_Success()
         {
             var pipeline = new AssetPipeline();
+            var logger = new Mock<ILogger<Asset>>();
+            pipeline._assetLogger = logger.Object;
             var asset = pipeline.MinifyCssFiles().First();
 
             Assert.Equal("/**/*.css", asset.Route);

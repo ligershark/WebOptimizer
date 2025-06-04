@@ -50,6 +50,7 @@ namespace WebOptimizer.Test.Processors
             var asset1 = new Asset("/file1", "text/css", new[] { "file.css" }, logger.Object);
             var asset2 = new Asset("/file2", "text/css", new[] { "file.css" }, logger.Object);
             var pipeline = new AssetPipeline();
+            pipeline._assetLogger = logger.Object;
             var assets = pipeline.AddBundle(new[] { asset1, asset2 });
 
             assets = assets.Concatenate();
