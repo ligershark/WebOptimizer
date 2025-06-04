@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -26,7 +25,6 @@ namespace WebOptimizer.Test.Processors
         [InlineData("url('img/doesntexist.png')", "url('img/doesntexist.png')")]
         [InlineData("url(../../css/img/test.png)", "url(../../css/img/test.png)")]
         [InlineData("url(/css/img/bigfile.png)", "url(/css/img/bigfile.png)")]
-        [InlineData("url(/css/img/test.jpg)", "url(data:image/jpeg;base64,ZW1wdHk=)")]
         [InlineData("url(/css/img/test.jpg)", "url(data:image/jpeg;base64,ZW1wdHk=)")]
         [InlineData("url(/css/img/test.jpeg)", "url(data:image/jpeg;base64,ZW1wdHk=)")]
         [InlineData("url(/css/img/test.gif)", "url(data:image/gif;base64,ZW1wdHk=)")]
