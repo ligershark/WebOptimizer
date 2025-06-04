@@ -28,7 +28,7 @@ namespace WebOptimizer
 
             if (context.Request.PathBase.HasValue)
             {
-                string pathBase = context.Request.PathBase.Value;
+                string pathBase = context.Request.PathBase.Value!;
                 if (context.Request.Path.StartsWithSegments(pathBase))
                 {
                     path = path.Substring(pathBase.Length);
@@ -88,7 +88,7 @@ namespace WebOptimizer
             {
                 if (options.EnableCaching == true)
                 {
-                    context.Response.Headers[HeaderNames.CacheControl] = "max-age=31536000,immutable"; // 1 year, immutable
+                    context.Response.Headers[HeaderNames.CacheControl] = $"{(options.CacheControlAccess != null ? $"{options.CacheControlAccess}," : string.Empty)}max-age=31536000,immutable"; // 1 year, immutable
                 }
 
                 context.Response.Headers[HeaderNames.ETag] = $"\"{cacheKey}\"";
@@ -100,7 +100,7 @@ namespace WebOptimizer
                 }
             }
 
-            if (cachedResponse?.Body?.Length > 0)
+            if (cachedResponse.Body?.Length > 0)
             {
                 SetCompressionMode(context, options);
                 await context.Response.Body.WriteAsync(cachedResponse.Body, 0, cachedResponse.Body.Length);

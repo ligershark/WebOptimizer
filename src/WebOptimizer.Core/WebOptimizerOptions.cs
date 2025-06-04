@@ -9,6 +9,14 @@ namespace WebOptimizer
     public class WebOptimizerOptions : IWebOptimizerOptions
     {
         /// <summary>
+        /// Gets or sets a value indicating whether the cache is private, public or unspecified.
+        /// </summary>
+        /// <remarks>
+        /// For performance, recommendation is to set to <see cref="HttpResponseCacheControlAccessDirective.Public" />.
+        /// </remarks>
+        public HttpResponseCacheControlAccessDirective? CacheControlAccess { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether server-side caching is enabled.
         /// Default is <code>false</code> when running in a development environment.
         /// </summary>
