@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -11,7 +12,8 @@ namespace WebOptimizer.Test.Processors
         public void UseContentRoot_Success()
         {
             var minifier = new UseContentRoot();
-            var asset = new Asset("", "", new[] { "" });
+            var logger = new Mock<ILogger<Asset>>();
+            var asset = new Asset("", "", new[] { "" }, logger.Object);
 
             Assert.Equal(0, asset.Items.Count);
             asset.UseContentRoot();
@@ -22,7 +24,8 @@ namespace WebOptimizer.Test.Processors
         public void UseFileProvider_Success()
         {
             var minifier = new UseContentRoot();
-            var asset = new Asset("", "", new[] { "" });
+            var logger = new Mock<ILogger<Asset>>();
+            var asset = new Asset("", "", new[] { "" }, logger.Object);
 
             Assert.Equal(0, asset.Items.Count);
             asset.UseFileProvider(null);

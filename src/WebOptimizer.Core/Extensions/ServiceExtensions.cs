@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WebOptimizer;
 
@@ -127,7 +128,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.TryAddSingleton<IMemoryCache, MemoryCache>();
             services.TryAddSingleton<IAssetResponseStore, AssetResponseStore>();
-            services.TryAddSingleton<IAssetPipeline>(factory => pipeline);
+            services.TryAddSingleton<IAssetPipeline>(factory =>
+            {
+                pipeline._assetLogger = factory.GetService<ILogger<Asset>>();
+                return pipeline;
+            });
             services.TryAddSingleton<IAssetBuilder, AssetBuilder>();
             services.TryAddEnumerable(configureOptions);
 

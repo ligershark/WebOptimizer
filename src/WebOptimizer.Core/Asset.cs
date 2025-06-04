@@ -25,19 +25,14 @@ namespace WebOptimizer
         internal const string PhysicalFilesKey = "PhysicalFiles";
         private readonly object _sync = new object();
 
-        public Asset(string route, string contentType, IEnumerable<string> sourceFiles)
+        public Asset(string route, string contentType, IEnumerable<string> sourceFiles, ILogger<Asset> logger)
         {
+            ArgumentNullException.ThrowIfNull(logger);
             Route = route ?? throw new ArgumentNullException(nameof(route));
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             SourceFiles = sourceFiles?.ToList() ?? throw new ArgumentNullException(nameof(sourceFiles));
             Processors = new List<IProcessor>();
             Items = new ConcurrentDictionary<string, object>();
-        }
-
-        public Asset(string route, string contentType, IEnumerable<string> sourceFiles, ILogger<Asset> logger)
-            : this(route, contentType, sourceFiles)
-        {
-            ArgumentNullException.ThrowIfNull(logger);
             _logger = logger;
         }
 
@@ -273,7 +268,7 @@ namespace WebOptimizer
                        ? provider.FileProviders.Last()
                        : env.WebRootFileProvider);
         }
-        
+
         /// <summary>
         /// Gets the asset file provider. This method works for _content locations in RCL projects.
         /// </summary>

@@ -1,5 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace WebOptimizer.Test
@@ -13,8 +15,9 @@ namespace WebOptimizer.Test
             string contentType = "text/css";
             var sourcefiles = new[] { "file1.css" };
             var httpContext = new DefaultHttpContext();
+            var logger = new Mock<ILogger<Asset>>();
 
-            var asset = new Asset(route, contentType, sourcefiles);
+            var asset = new Asset(route, contentType, sourcefiles, logger.Object);
             var assetContext = new AssetContext(httpContext, asset, new WebOptimizerOptions());
 
             Assert.Equal(asset, assetContext.Asset);
@@ -37,8 +40,9 @@ namespace WebOptimizer.Test
             string contentType = "text/css";
             var sourcefiles = new[] { "file1.css" };
             var httpContext = new DefaultHttpContext();
+            var logger = new Mock<ILogger<Asset>>();
 
-            var asset = new Asset(route, contentType, sourcefiles);
+            var asset = new Asset(route, contentType, sourcefiles, logger.Object);
 
             Assert.Throws<ArgumentNullException>(() => new AssetContext(null, asset, null));
         }

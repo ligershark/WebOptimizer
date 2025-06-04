@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUglify.Helpers;
 using Xunit;
 
@@ -14,7 +16,8 @@ namespace WebOptimizer.Test
         public void AddSingeAsset_Success()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            var asset = new Asset("/route", "text/css", new[] { "file.css" });
+            var logger = new Mock<ILogger<Asset>>();
+            var asset = new Asset("/route", "text/css", new[] { "file.css" }, logger.Object);
             var pipeline = new AssetPipeline();
 
             pipeline.AddBundle(asset);
@@ -31,7 +34,8 @@ namespace WebOptimizer.Test
         [InlineData(" ~/route ", "/route")]
         public void AddBundle_Success(string inputRoute, string normalizedRoute)
         {
-            var asset = new Asset(inputRoute, "text/css", new[] { "file.css" });
+            var logger = new Mock<ILogger<Asset>>();
+            var asset = new Asset(inputRoute, "text/css", new[] { "file.css" }, logger.Object);
             var pipeline = new AssetPipeline();
             pipeline.AddBundle(asset);
             if (!normalizedRoute.StartsWith("/"))
@@ -45,8 +49,9 @@ namespace WebOptimizer.Test
         public void AddTwoAsset_Succes()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            var asset1 = new Asset("/route1", "text/css", new[] { "file.css" });
-            var asset2 = new Asset("/route2", "text/css", new[] { "file.css" });
+            var logger = new Mock<ILogger<Asset>>();
+            var asset1 = new Asset("/route1", "text/css", new[] { "file.css" }, logger.Object);
+            var asset2 = new Asset("/route2", "text/css", new[] { "file.css" }, logger.Object);
             var pipeline = new AssetPipeline();
 
             pipeline.AddBundle(new[] { asset1, asset2 });
@@ -58,9 +63,10 @@ namespace WebOptimizer.Test
         public void AddTwoSameRoutes_Ignore()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
+            var logger = new Mock<ILogger<Asset>>();
             var route = "/route";
-            var asset1 = new Asset(route, "text/css", new[] { "file.css" });
-            var asset2 = new Asset(route, "text/css", new[] { "file.css" });
+            var asset1 = new Asset(route, "text/css", new[] { "file.css" }, logger.Object);
+            var asset2 = new Asset(route, "text/css", new[] { "file.css" }, logger.Object);
             var pipeline = new AssetPipeline();
 
             pipeline.AddBundle(new[] { asset1, asset2 });
@@ -83,7 +89,8 @@ namespace WebOptimizer.Test
         public void AddZeroSourceFilesToBundle_Fail()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            IAsset asset = new Asset("/file.css", "text/css", new string[0]);
+            var logger = new Mock<ILogger<Asset>>();
+            IAsset asset = new Asset("/file.css", "text/css", Array.Empty<string>(), logger.Object);
             var pipeline = new AssetPipeline();
 
             Assert.Throws<ArgumentException>(() => pipeline.AddBundle(asset));
@@ -177,9 +184,10 @@ namespace WebOptimizer.Test
         {
             var pipeline = new AssetPipeline();
             pipeline._assets = new ConcurrentDictionary<string, IAsset>();
+            var logger = new Mock<ILogger<Asset>>();
 
-            pipeline._assets.TryAdd("/**/*.less", new Asset("/**/*.less", "text/css; charset=UFT-8", new [] { "**/*.less" }));
-            pipeline._assets.TryAdd("/**/*.css", new Asset("/**/*.css", "text/css; charset=UFT-8", new [] { "**/*.css" }));
+            pipeline._assets.TryAdd("/**/*.less", new Asset("/**/*.less", "text/css; charset=UFT-8", new [] { "**/*.less" }, logger.Object));
+            pipeline._assets.TryAdd("/**/*.css", new Asset("/**/*.css", "text/css; charset=UFT-8", new [] { "**/*.css" }, logger.Object));
 
             Parallel.For(0, 100, iteration =>
             {
