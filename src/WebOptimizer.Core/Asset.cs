@@ -21,6 +21,8 @@ namespace WebOptimizer
     internal class Asset : IAsset
     {
         internal const string PhysicalFilesKey = "PhysicalFiles";
+        internal const string AllFilesCacheKey = nameof(WebOptimizer) + "_AllFilesCache";
+        private static readonly object _allFilesCacheKeySync = new object();
         private readonly object _sync = new object();
 
         public Asset(string route, string contentType, IAssetPipeline pipeline, IEnumerable<string> sourceFiles)
@@ -53,7 +55,7 @@ namespace WebOptimizer
             var env = (IWebHostEnvironment)context.RequestServices.GetService(typeof(IWebHostEnvironment));
             var config = new AssetContext(context, this, options);
 
-            IEnumerable<string> files = ExpandGlobs(this, env);
+            IEnumerable<string> files = ExpandGlobs(this, env, context);
 
             DateTime lastModified = DateTime.MinValue;
 
@@ -85,8 +87,24 @@ namespace WebOptimizer
             return config.Content.FirstOrDefault().Value;
         }
 
-        public static IEnumerable<string> ExpandGlobs(IAsset asset, IWebHostEnvironment env)
+        public static IEnumerable<string> ExpandGlobs(IAsset asset, IWebHostEnvironment env, HttpContext context)
         {
+            ConcurrentDictionary<IFileProvider, IReadOnlyList<string>> virtualFilePathsCache;
+
+            lock (_allFilesCacheKeySync)
+            {
+                if (context.Items.TryGetValue(AllFilesCacheKey, out var item)
+                    && item is ConcurrentDictionary<IFileProvider, IReadOnlyList<string>> dict)
+                {
+                    virtualFilePathsCache = dict;
+                }
+                else
+                {
+                    virtualFilePathsCache = new ConcurrentDictionary<IFileProvider, IReadOnlyList<string>>();
+                    context.Items[AllFilesCacheKey] = virtualFilePathsCache;
+                }
+            }
+
             var files = new List<string>();
 
             if (asset.SourceFiles.Any())
@@ -104,7 +122,11 @@ namespace WebOptimizer
                     }
                     else
                     {
-                        var virtualFilePaths = provider.GetAllFiles("/");
+                        IReadOnlyList<string> virtualFilePaths =
+                            virtualFilePathsCache
+                                .GetOrAdd(
+                                    provider,
+                                    provider => provider.GetAllFiles("/"));
 
                         var matcher = new Matcher();
                         matcher.AddInclude(outSourceFile);
@@ -180,7 +202,7 @@ namespace WebOptimizer
 
             if (!Items.ContainsKey(PhysicalFilesKey))
             {
-                physicalFiles = ExpandGlobs(this, env);
+                physicalFiles = ExpandGlobs(this, env, context);
             }
             else
             {
