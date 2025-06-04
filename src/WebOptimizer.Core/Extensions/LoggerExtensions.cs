@@ -26,7 +26,7 @@ namespace WebOptimizer
             eventId: 1004,
             formatString: "No response generated for '{Path}'. Passing on to next middleware.");
         private static Action<ILogger, string, Exception> _logFileNotFound = LoggerMessage.Define<string>(
-            logLevel: LogLevel.Warning,
+            logLevel: LogLevel.Information,
             eventId: 1005,
             formatString: "File '{Path}' not found. Passing on to next middleware.");
         
