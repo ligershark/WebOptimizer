@@ -184,6 +184,19 @@ services.AddWebOptimizer(pipeline =>
 });
 ```
 
+### Source Maps
+By default, all bundled assets do not also generate a source map asset, but you can change this behavior:
+
+```csharp
+services.AddWebOptimizer(pipeline =>
+{
+	. . .	
+	pipeline.AddJavaScriptBundle("/js/scripts.js",
+		new WebOptimizer.Processors.JsSettings { GenerateSourceMap = true },
+		"a.js", "b.js");
+});
+```
+
 ## Tag Helpers
 WebOptimizer ships with a few [Tag Helpers](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/intro) that helps with a few important tasks.
 
