@@ -73,7 +73,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns(route);
-            asset.SetupGet(a => a.SourceFiles).Returns(new HashSet<string>(new []{"file.css"}));
+            asset.SetupGet(a => a.SourceFiles).Returns(new List<string>(new []{"file.css"}));
             asset.SetupGet(a => a.ExcludeFiles).Returns(new List<string>());
             asset.SetupGet(a => a.Items).Returns(new Dictionary<string, object>{ {"fileprovider", fileProvider.Object}});
             asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>(), It.IsAny<IWebOptimizerOptions>()))
@@ -219,7 +219,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns(route);
-            asset.SetupGet(a => a.SourceFiles).Returns(new HashSet<string>(new []{"file1.css", "file2.css"}));
+            asset.SetupGet(a => a.SourceFiles).Returns(new List<string>(new []{"file1.css", "file2.css"}));
             asset.SetupGet(a => a.ExcludeFiles).Returns(new List<string>());
             asset.SetupGet(a => a.Items).Returns(new Dictionary<string, object>{ {"fileprovider", fileProvider.Object}});
             var assetObject = asset.Object;

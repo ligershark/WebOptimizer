@@ -28,6 +28,22 @@ namespace WebOptimizer.Test
         }
 
         [Fact2]
+        public void AssetCreateMultipleSourceFiles_Success()
+        {
+            string route = "route";
+            string contentType = "text/css";
+            var sourcefiles = new[] { "file1.css", "file2.css" };
+
+            var asset = new Asset(route, contentType, sourcefiles);
+
+            Assert.Equal(route, asset.Route);
+            Assert.Equal(contentType, asset.ContentType);
+            Assert.Equal(sourcefiles, asset.SourceFiles);
+            Assert.Equal(0, asset.Processors.Count);
+        }
+
+
+        [Fact2]
         public void GenerateCacheKey_Success()
         {
             string route = "route";

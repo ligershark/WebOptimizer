@@ -52,7 +52,7 @@ namespace WebOptimizer
 
                     if (result.HasMatches)
                     {
-                        asset = new Asset(cleanRoute, existing.ContentType, this, new[]
+                        asset = new Asset(cleanRoute, existing.ContentType, new[]
                         {
                             cleanRoute
                         });
@@ -113,7 +113,7 @@ namespace WebOptimizer
 
             route = NormalizeRoute(route);
 
-            IAsset asset = new Asset(route, contentType, this, sourceFiles);
+            IAsset asset = new Asset(route, contentType, sourceFiles);
             _assets.TryAdd(route, asset);
 
             return asset;
@@ -124,7 +124,7 @@ namespace WebOptimizer
         {
             route = NormalizeRoute(route);
 
-            IAsset asset = new Asset(route, contentType, this, new string[0]);
+            IAsset asset = new Asset(route, contentType, new string[0]);
             _assets.TryAdd(route, asset);
 
             return asset;
@@ -146,7 +146,7 @@ namespace WebOptimizer
 
             foreach (string file in sourceFiles)
             {
-                IAsset asset = new Asset(NormalizeRoute(file), contentType, this, new[] { file });
+                IAsset asset = new Asset(NormalizeRoute(file), contentType, [file]);
                 list.Add(asset);
                 _assets.TryAdd(asset.Route, asset);
             }

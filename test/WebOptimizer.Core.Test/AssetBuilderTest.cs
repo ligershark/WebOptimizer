@@ -71,7 +71,7 @@ namespace WebOptimizer.Core.Test
             var pipeline = new AssetPipeline();
             var options = new WebOptimizerOptions() { EnableDiskCache = false };
             var asset = new Mock<IAsset>().SetupAllProperties();
-            asset.SetupGet(a => a.SourceFiles).Returns(new HashSet<string>());
+            asset.SetupGet(a => a.SourceFiles).Returns(new List<string>());
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns("/file.css");
             asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>(), options)).Returns("cachekey");
@@ -117,7 +117,7 @@ namespace WebOptimizer.Core.Test
             var pipeline = new AssetPipeline();
             var options = new WebOptimizerOptions() { EnableMemoryCache = false, EnableDiskCache = false };
             var asset = new Mock<IAsset>().SetupAllProperties();
-            asset.SetupGet(a => a.SourceFiles).Returns(new HashSet<string>());
+            asset.SetupGet(a => a.SourceFiles).Returns(new List<string>());
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns("/file.css");
             asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>(), options)).Returns("cachekey");

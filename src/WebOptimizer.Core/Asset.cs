@@ -13,6 +13,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 
@@ -20,27 +21,31 @@ namespace WebOptimizer
 {
     internal class Asset : IAsset
     {
+        private readonly ILogger<Asset> _logger;
         internal const string PhysicalFilesKey = "PhysicalFiles";
         private readonly object _sync = new object();
-
-        public Asset(string route, string contentType, IAssetPipeline pipeline, IEnumerable<string> sourceFiles)
-            : this(route, contentType, sourceFiles)
-        { }
 
         public Asset(string route, string contentType, IEnumerable<string> sourceFiles)
         {
             Route = route ?? throw new ArgumentNullException(nameof(route));
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            SourceFiles = new HashSet<string>(sourceFiles ?? throw new ArgumentNullException(nameof(sourceFiles)));
+            SourceFiles = sourceFiles?.ToList() ?? throw new ArgumentNullException(nameof(sourceFiles));
             Processors = new List<IProcessor>();
             Items = new ConcurrentDictionary<string, object>();
+        }
+
+        public Asset(string route, string contentType, IEnumerable<string> sourceFiles, ILogger<Asset> logger)
+            : this(route, contentType, sourceFiles)
+        {
+            ArgumentNullException.ThrowIfNull(logger);
+            _logger = logger;
         }
 
         public string Route { get; private set; }
 
         public IList<string> ExcludeFiles { get; } = new List<string>();
 
-        public HashSet<string> SourceFiles { get; }
+        public IList<string> SourceFiles { get; }
 
         public string ContentType { get; private set; }
 
@@ -233,7 +238,9 @@ namespace WebOptimizer
 
             lock (_sync)
             {
-                if (SourceFiles.Add(cleanRoute) && Items.ContainsKey(PhysicalFilesKey))
+                if (SourceFiles.Contains(cleanRoute))
+                    _logger.LogSourceFileAlreadyAdded(route, cleanRoute);
+                if (SourceFiles.Contains(cleanRoute) && Items.ContainsKey(PhysicalFilesKey))
                     Items.Remove(Asset.PhysicalFilesKey); //remove to calc a new cache key
             }
         }
