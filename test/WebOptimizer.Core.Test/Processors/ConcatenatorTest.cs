@@ -11,7 +11,7 @@ namespace WebOptimizer.Test.Processors
     public class ConcatenatorTest
     {
         [Fact2]
-        public async Task Concatinate_MultipleSources_Success()
+        public async Task Concatenate_MultipleSources_Success()
         {
             var processor = new Concatenator();
             var context = new Mock<IAssetContext>().SetupAllProperties();
@@ -29,7 +29,7 @@ namespace WebOptimizer.Test.Processors
         }
 
         [Fact2]
-        public async Task Concatinate_NoSources_Success()
+        public async Task Concatenate_NoSources_Success()
         {
             var processor = new Concatenator();
             var context = new Mock<IAssetContext>().SetupAllProperties();
@@ -43,7 +43,7 @@ namespace WebOptimizer.Test.Processors
         }
 
         [Fact2]
-        public void AddConcatinate_Assets_Success()
+        public void AddConcatenate_Assets_Success()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
             var logger = new Mock<ILogger<Asset>>();
