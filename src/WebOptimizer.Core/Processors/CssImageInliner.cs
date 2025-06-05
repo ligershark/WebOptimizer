@@ -11,9 +11,12 @@ using WebOptimizer.Utils;
 
 namespace WebOptimizer
 {
-    internal class CssImageInliner : Processor
+    internal partial class CssImageInliner : Processor
     {
-        private static readonly Regex _rxUrl = new Regex(@"(url\s*\(\s*)([""']?)([^:)]+)(\2\s*\))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        [GeneratedRegex(@"(url\s*\(\s*)([""']?)([^:)]+)(\2\s*\))", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+        private static partial Regex UrlRegex();
+
+        private static readonly Regex _rxUrl = UrlRegex();
         private static int _maxFileSize;
 
         public CssImageInliner(int maxFileSize)
