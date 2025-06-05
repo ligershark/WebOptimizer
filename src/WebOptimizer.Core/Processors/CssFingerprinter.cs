@@ -111,7 +111,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         /// <summary>
         /// Adds a fingerprint to local url() references.
-        /// NOTE: Make sure to call this method before Concatinate()
+        /// NOTE: Make sure to call this method before Concatenate()
         /// </summary>
         public static IAsset FingerprintUrls(this IAsset bundle)
         {
@@ -123,7 +123,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         /// <summary>
         /// Adds a fingerprint to local url() references.
-        /// NOTE: Make sure to call this method before Concatinate()
+        /// NOTE: Make sure to call this method before Concatenate()
         /// </summary>
         public static IEnumerable<IAsset> FingerprintUrls(this IEnumerable<IAsset> assets)
         {

@@ -171,7 +171,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         /// <summary>
         /// Adds a fingerprint to local url() references.
-        /// NOTE: Make sure to call Concatinate() before this method
+        /// NOTE: Make sure to call Concatenate() before this method
         /// </summary>
         public static IEnumerable<IAsset> InlineImages(this IEnumerable<IAsset> assets, int maxFileSize = 5120)
         {

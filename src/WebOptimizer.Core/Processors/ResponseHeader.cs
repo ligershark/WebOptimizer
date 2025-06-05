@@ -34,7 +34,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         /// <summary>
         /// Adds a fingerprint to local url() references.
-        /// NOTE: Make sure to call Concatinate() before this method
+        /// NOTE: Make sure to call Concatenate() before this method
         /// </summary>
         public static IAsset AddResponseHeader(this IAsset bundle, string name, string value)
         {
@@ -46,7 +46,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         /// <summary>
         /// Adds a fingerprint to local url() references.
-        /// NOTE: Make sure to call Concatinate() before this method
+        /// NOTE: Make sure to call Concatenate() before this method
         /// </summary>
         public static IEnumerable<IAsset> AddResponseHeader(this IEnumerable<IAsset> assets, string name, string value)
         {
