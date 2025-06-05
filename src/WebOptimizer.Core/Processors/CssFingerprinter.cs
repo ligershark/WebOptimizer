@@ -11,9 +11,12 @@ using WebOptimizer.Utils;
 
 namespace WebOptimizer
 {
-    internal class CssFingerprinter : Processor
+    internal partial class CssFingerprinter : Processor
     {
-        private static readonly Regex _rxUrl = new Regex(@"(url\s*\(\s*)([""']?)([^:)]+)(\2\s*\))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        [GeneratedRegex(@"(url\s*\(\s*)([""']?)([^:)]+)(\2\s*\))", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+        private static partial Regex UrlRegex();
+
+        private static readonly Regex _rxUrl = UrlRegex();
 
         public override Task ExecuteAsync(IAssetContext config)
         {
