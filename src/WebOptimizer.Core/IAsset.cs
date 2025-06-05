@@ -37,7 +37,7 @@ namespace WebOptimizer
         /// <summary>
         /// Gets the webroot relative source files.
         /// </summary>
-        HashSet<string> SourceFiles { get; }
+        IList<string> SourceFiles { get; }
 
         /// <summary>
         /// Executes the processors and returns the modified content.

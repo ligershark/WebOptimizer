@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -71,7 +70,7 @@ namespace WebOptimizer.Core.Test
             var pipeline = new AssetPipeline();
             var options = new WebOptimizerOptions() { EnableDiskCache = false };
             var asset = new Mock<IAsset>().SetupAllProperties();
-            asset.SetupGet(a => a.SourceFiles).Returns(new HashSet<string>());
+            asset.SetupGet(a => a.SourceFiles).Returns(new List<string>());
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns("/file.css");
             asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>(), options)).Returns("cachekey");
@@ -117,7 +116,7 @@ namespace WebOptimizer.Core.Test
             var pipeline = new AssetPipeline();
             var options = new WebOptimizerOptions() { EnableMemoryCache = false, EnableDiskCache = false };
             var asset = new Mock<IAsset>().SetupAllProperties();
-            asset.SetupGet(a => a.SourceFiles).Returns(new HashSet<string>());
+            asset.SetupGet(a => a.SourceFiles).Returns(new List<string>());
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns("/file.css");
             asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>(), options)).Returns("cachekey");
@@ -153,15 +152,15 @@ namespace WebOptimizer.Core.Test
 
             Assert.Equal(cssContent, result.Body);
         }
-        
+
         [Fact2]
         public async Task AssetBiulder_NonExistentFileRequested()
         {
             var options = new WebOptimizerOptions();
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>(), options)).Throws<FileNotFoundException>();
-            
-            
+
+
             StringValues values;
             var response = new Mock<HttpResponse>().SetupAllProperties();
             response.Setup(r => r.Headers.Keys).Returns(new string[] { });
@@ -169,7 +168,7 @@ namespace WebOptimizer.Core.Test
             context.Setup(s => s.Request.Headers.TryGetValue("Accept-Encoding", out values)).Returns(false);
             context.Setup(c => c.Response).Returns(response.Object);
             context.Setup(c => c.Request.Path).Returns("/nonexist_file.css");
-            
+
             var cache = new Mock<IMemoryCache>();
 
             var store = new Mock<IAssetResponseStore>();

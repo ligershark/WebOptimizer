@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Xunit;
@@ -18,8 +19,9 @@ namespace WebOptimizer.Test
             string route = "route";
             string contentType = "text/css";
             var sourcefiles = new[] { "file1.css" };
+            var logger = new Mock<ILogger<Asset>>();
 
-            var asset = new Asset(route, contentType, sourcefiles);
+            var asset = new Asset(route, contentType, sourcefiles, logger.Object);
 
             Assert.Equal(route, asset.Route);
             Assert.Equal(contentType, asset.ContentType);
@@ -28,19 +30,38 @@ namespace WebOptimizer.Test
         }
 
         [Fact2]
+        public void AssetCreateMultipleSourceFiles_Success()
+        {
+            string route = "route";
+            string contentType = "text/css";
+            var sourcefiles = new[] { "file1.css", "file2.css" };
+            var logger = new Mock<ILogger<Asset>>();
+
+            var asset = new Asset(route, contentType, sourcefiles, logger.Object);
+
+            Assert.Equal(route, asset.Route);
+            Assert.Equal(contentType, asset.ContentType);
+            Assert.Equal(sourcefiles, asset.SourceFiles);
+            Assert.Equal(0, asset.Processors.Count);
+        }
+
+
+        [Fact2]
         public void GenerateCacheKey_Success()
         {
             string route = "route";
             string contentType = "text/css";
             var sourcefiles = new[] { "file1.css" };
+            var logger = new Mock<ILogger<Asset>>();
+
             var context = new Mock<HttpContext>().SetupAllProperties();
             var options = new WebOptimizerOptions() { EnableCaching = true };
             var env = new Mock<IWebHostEnvironment>();
             var cache = new Mock<IMemoryCache>();
             var fileProvider = new PhysicalFileProvider(Path.GetTempPath());
 
-            var asset = new Asset(route, contentType, sourcefiles);
-            asset.Items.Add("PhysicalFiles", new string[0] );
+            var asset = new Asset(route, contentType, sourcefiles, logger.Object);
+            asset.Items.Add("PhysicalFiles", new string[0]);
 
             StringValues ae = "gzip, deflate";
             context.SetupSequence(c => c.Request.Headers.TryGetValue("Accept-Encoding", out ae))
@@ -68,7 +89,8 @@ namespace WebOptimizer.Test
         [Fact2]
         public void AssetToString()
         {
-            var asset = new Asset("/route", "content/type", Enumerable.Empty<string>());
+            var logger = new Mock<ILogger<Asset>>();
+            var asset = new Asset("/route", "content/type", Enumerable.Empty<string>(), logger.Object);
 
             Assert.Equal(asset.Route, asset.ToString());
         }

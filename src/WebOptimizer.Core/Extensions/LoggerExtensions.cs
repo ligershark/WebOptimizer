@@ -29,7 +29,11 @@ namespace WebOptimizer
             logLevel: LogLevel.Information,
             eventId: 1005,
             formatString: "File '{Path}' not found. Passing on to next middleware.");
-        
+        private static Action<ILogger, string, string, Exception> _logSourceFileAlreadyAdded = LoggerMessage.Define<string, string>(
+            logLevel: LogLevel.Information,
+            eventId: 1006,
+            formatString: "Source file route '{SourceFileRoute}' already added as clean route '{SourceFileCleanRoute}'.");
+
         public static void LogRequestForAssetStarted(this ILogger logger, string path) =>
             _logRequestForAssetStarted(logger, path, null);
 
@@ -47,5 +51,8 @@ namespace WebOptimizer
         
         public static void LogFileNotFound(this ILogger logger, string path) =>
             _logFileNotFound(logger, path, null);
+
+        public static void LogSourceFileAlreadyAdded(this ILogger logger, string path, string cleanPath) =>
+            _logSourceFileAlreadyAdded(logger, path, cleanPath, null);
     }
 }

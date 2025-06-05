@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUglify.JavaScript;
 using WebOptimizer.Processors;
@@ -64,6 +65,8 @@ namespace WebOptimizer.Test.Processors
         public void AddJsBundle_DefaultSettings_Success()
         {
             var pipeline = new AssetPipeline();
+            var logger = new Mock<ILogger<Asset>>();
+            pipeline._assetLogger = logger.Object;
             var asset = pipeline.AddJavaScriptBundle("/foo.js", "file1.js", "file2.js");
 
             Assert.Equal("/foo.js", asset.Route);
@@ -76,6 +79,8 @@ namespace WebOptimizer.Test.Processors
         public void AddJsBundle_DefaultSettings_SuccessRelative()
         {
             var pipeline = new AssetPipeline();
+            var logger = new Mock<ILogger<Asset>>();
+            pipeline._assetLogger = logger.Object;
             var asset = pipeline.AddJavaScriptBundle("foo.js", "file1.js", "file2.js");
 
             Assert.Equal("/foo.js", asset.Route);
@@ -90,6 +95,8 @@ namespace WebOptimizer.Test.Processors
         {
             var settings = new JsSettings();
             var pipeline = new AssetPipeline();
+            var logger = new Mock<ILogger<Asset>>();
+            pipeline._assetLogger = logger.Object;
             var asset = pipeline.AddJavaScriptBundle("/foo.js", settings, "file1.js", "file2.js");
 
             Assert.Equal("/foo.js", asset.Route);
@@ -102,6 +109,8 @@ namespace WebOptimizer.Test.Processors
         public void AddJsFiles_DefaultSettings_Success()
         {
             var pipeline = new AssetPipeline();
+            var logger = new Mock<ILogger<Asset>>();
+            pipeline._assetLogger = logger.Object;
             var asset = pipeline.MinifyJsFiles().First();
 
             Assert.Equal("/**/*.js", asset.Route);

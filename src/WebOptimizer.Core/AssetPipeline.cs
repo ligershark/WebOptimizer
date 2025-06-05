@@ -3,13 +3,17 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.Logging;
 
 namespace WebOptimizer
 {
     internal class AssetPipeline : IAssetPipeline
     {
         internal ConcurrentDictionary<string, IAsset> _assets = new ConcurrentDictionary<string, IAsset>(StringComparer.OrdinalIgnoreCase);
-
+        /// <summary>
+        /// For use by the Asset constructor only. Do not use for logging messages inside <see cref="AssetPipeline"/>.
+        /// </summary>
+        internal ILogger<Asset> _assetLogger;
         public IReadOnlyList<IAsset> Assets => _assets.Values.ToList();
 
         public bool TryGetAssetFromRoute(string route, out IAsset asset)
@@ -52,10 +56,10 @@ namespace WebOptimizer
 
                     if (result.HasMatches)
                     {
-                        asset = new Asset(cleanRoute, existing.ContentType, this, new[]
+                        asset = new Asset(cleanRoute, existing.ContentType, new[]
                         {
                             cleanRoute
-                        });
+                        }, _assetLogger);
 
                         foreach (IProcessor processor in existing.Processors)
                         {
@@ -113,7 +117,7 @@ namespace WebOptimizer
 
             route = NormalizeRoute(route);
 
-            IAsset asset = new Asset(route, contentType, this, sourceFiles);
+            IAsset asset = new Asset(route, contentType, sourceFiles, _assetLogger);
             _assets.TryAdd(route, asset);
 
             return asset;
@@ -124,7 +128,7 @@ namespace WebOptimizer
         {
             route = NormalizeRoute(route);
 
-            IAsset asset = new Asset(route, contentType, this, new string[0]);
+            IAsset asset = new Asset(route, contentType, new string[0], _assetLogger);
             _assets.TryAdd(route, asset);
 
             return asset;
@@ -146,7 +150,7 @@ namespace WebOptimizer
 
             foreach (string file in sourceFiles)
             {
-                IAsset asset = new Asset(NormalizeRoute(file), contentType, this, new[] { file });
+                IAsset asset = new Asset(NormalizeRoute(file), contentType, [file], _assetLogger);
                 list.Add(asset);
                 _assets.TryAdd(asset.Route, asset);
             }
@@ -167,8 +171,8 @@ namespace WebOptimizer
             {
                 cleanRoute = cleanRoute.Substring(0, index);
             }
-            
-            if(!cleanRoute.StartsWith("/"))
+
+            if (!cleanRoute.StartsWith("/"))
             {
                 cleanRoute = "/" + cleanRoute;
             }

@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUglify.Helpers;
 using Xunit;
 
@@ -14,9 +16,10 @@ namespace WebOptimizer.Test
         public void AddSingeAsset_Success()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            var asset = new Asset("/route", "text/css", new[] { "file.css" });
+            var logger = new Mock<ILogger<Asset>>();
+            var asset = new Asset("/route", "text/css", new[] { "file.css" }, logger.Object);
             var pipeline = new AssetPipeline();
-
+            pipeline._assetLogger = logger.Object;
             pipeline.AddBundle(asset);
 
             Assert.Equal(1, pipeline.Assets.Count);
@@ -31,8 +34,10 @@ namespace WebOptimizer.Test
         [InlineData(" ~/route ", "/route")]
         public void AddBundle_Success(string inputRoute, string normalizedRoute)
         {
-            var asset = new Asset(inputRoute, "text/css", new[] { "file.css" });
+            var logger = new Mock<ILogger<Asset>>();
+            var asset = new Asset(inputRoute, "text/css", new[] { "file.css" }, logger.Object);
             var pipeline = new AssetPipeline();
+            pipeline._assetLogger = logger.Object;
             pipeline.AddBundle(asset);
             if (!normalizedRoute.StartsWith("/"))
             {
@@ -45,10 +50,11 @@ namespace WebOptimizer.Test
         public void AddTwoAsset_Succes()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            var asset1 = new Asset("/route1", "text/css", new[] { "file.css" });
-            var asset2 = new Asset("/route2", "text/css", new[] { "file.css" });
+            var logger = new Mock<ILogger<Asset>>();
+            var asset1 = new Asset("/route1", "text/css", new[] { "file.css" }, logger.Object);
+            var asset2 = new Asset("/route2", "text/css", new[] { "file.css" }, logger.Object);
             var pipeline = new AssetPipeline();
-
+            pipeline._assetLogger = logger.Object;
             pipeline.AddBundle(new[] { asset1, asset2 });
 
             Assert.Equal(2, pipeline.Assets.Count);
@@ -58,11 +64,12 @@ namespace WebOptimizer.Test
         public void AddTwoSameRoutes_Ignore()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
+            var logger = new Mock<ILogger<Asset>>();
             var route = "/route";
-            var asset1 = new Asset(route, "text/css", new[] { "file.css" });
-            var asset2 = new Asset(route, "text/css", new[] { "file.css" });
+            var asset1 = new Asset(route, "text/css", new[] { "file.css" }, logger.Object);
+            var asset2 = new Asset(route, "text/css", new[] { "file.css" }, logger.Object);
             var pipeline = new AssetPipeline();
-
+            pipeline._assetLogger = logger.Object;
             pipeline.AddBundle(new[] { asset1, asset2 });
 
             Assert.Equal(1, pipeline.Assets.Count);
@@ -83,7 +90,8 @@ namespace WebOptimizer.Test
         public void AddZeroSourceFilesToBundle_Fail()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
-            IAsset asset = new Asset("/file.css", "text/css", new string[0]);
+            var logger = new Mock<ILogger<Asset>>();
+            IAsset asset = new Asset("/file.css", "text/css", Array.Empty<string>(), logger.Object);
             var pipeline = new AssetPipeline();
 
             Assert.Throws<ArgumentException>(() => pipeline.AddBundle(asset));
@@ -102,6 +110,8 @@ namespace WebOptimizer.Test
         public void FromRoute_MixedSlashes_Success(string routeToAdd, string routeToCheck)
         {
             var pipeline = new AssetPipeline();
+            var logger = new Mock<ILogger<Asset>>();
+            pipeline._assetLogger = logger.Object;
             pipeline.AddBundle(routeToAdd, "text/css", "file.css");
 
             Assert.True(pipeline.TryGetAssetFromRoute(routeToCheck, out var a1), routeToCheck);
@@ -120,6 +130,8 @@ namespace WebOptimizer.Test
         public void FromRoute_NotFound(string routeToAdd, string routeToCheck)
         {
             var pipeline = new AssetPipeline();
+            var logger = new Mock<ILogger<Asset>>();
+            pipeline._assetLogger = logger.Object;
             pipeline.AddBundle(routeToAdd, "text/css", "file.css");
 
             Assert.False(pipeline.TryGetAssetFromRoute(routeToCheck, out var a1), routeToCheck);
@@ -133,6 +145,8 @@ namespace WebOptimizer.Test
         public void FromRoute_Globbing_Success(string pattern, string path)
         {
             var pipeline = new AssetPipeline();
+            var logger = new Mock<ILogger<Asset>>();
+            pipeline._assetLogger = logger.Object;
             pipeline.AddFiles("text/css", pattern);
             if (!path.StartsWith("/"))
             {
@@ -150,6 +164,8 @@ namespace WebOptimizer.Test
         public void FromRoute_Globbing_WithItems_Success(string pattern, string path)
         {
             var pipeline = new AssetPipeline();
+            var logger = new Mock<ILogger<Asset>>();
+            pipeline._assetLogger = logger.Object;
             pipeline.AddFiles("text/css", pattern).ForEach(x => x.UseContentRoot());
 
             Assert.True(pipeline.TryGetAssetFromRoute(path, out var a1));
@@ -166,6 +182,8 @@ namespace WebOptimizer.Test
         public void FromRoute_Globbing_WithProcessors_Success(string pattern, string path)
         {
             var pipeline = new AssetPipeline();
+            var logger = new Mock<ILogger<Asset>>();
+            pipeline._assetLogger = logger.Object;
             pipeline.AddFiles("text/css", pattern).MinifyCss();
 
             Assert.True(pipeline.TryGetAssetFromRoute(path, out var a1));
@@ -177,9 +195,11 @@ namespace WebOptimizer.Test
         {
             var pipeline = new AssetPipeline();
             pipeline._assets = new ConcurrentDictionary<string, IAsset>();
+            var logger = new Mock<ILogger<Asset>>();
+            pipeline._assetLogger = logger.Object;
 
-            pipeline._assets.TryAdd("/**/*.less", new Asset("/**/*.less", "text/css; charset=UFT-8", new [] { "**/*.less" }));
-            pipeline._assets.TryAdd("/**/*.css", new Asset("/**/*.css", "text/css; charset=UFT-8", new [] { "**/*.css" }));
+            pipeline._assets.TryAdd("/**/*.less", new Asset("/**/*.less", "text/css; charset=UFT-8", new [] { "**/*.less" }, logger.Object));
+            pipeline._assets.TryAdd("/**/*.css", new Asset("/**/*.css", "text/css; charset=UFT-8", new [] { "**/*.css" }, logger.Object));
 
             Parallel.For(0, 100, iteration =>
             {
