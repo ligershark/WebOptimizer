@@ -14,9 +14,9 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class ServiceExtensions
     {
-        internal static CssBundlingSettings CssBundlingSettings = new CssBundlingSettings();
+        internal static CssBundlingSettings CssBundlingSettings = new();
 
-        internal static CodeBundlingSettings CodeBundlingSettings = new CodeBundlingSettings();
+        internal static CodeBundlingSettings CodeBundlingSettings = new();
 
         /// <summary>
         /// Adds WebOptimizer to the specified <see cref="IServiceCollection"/> and enables CSS and JavaScript minification.
@@ -155,9 +155,8 @@ namespace Microsoft.Extensions.DependencyInjection
         private static void UpdateCssAndCodeBundlingSettings(IServiceCollection services,
             CssBundlingSettings cssBundlingSettings, CodeBundlingSettings codeBundlingSettings)
         {
-            if (cssBundlingSettings == null) throw new ArgumentNullException(nameof(cssBundlingSettings));
-            if (codeBundlingSettings == null) throw new ArgumentNullException(nameof(codeBundlingSettings));
-
+            ArgumentNullException.ThrowIfNull(cssBundlingSettings);
+            ArgumentNullException.ThrowIfNull(codeBundlingSettings);
             CssBundlingSettings = cssBundlingSettings;
             CodeBundlingSettings = codeBundlingSettings;
 

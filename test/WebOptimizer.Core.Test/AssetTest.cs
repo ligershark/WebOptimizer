@@ -26,7 +26,7 @@ namespace WebOptimizer.Test
             Assert.Equal(route, asset.Route);
             Assert.Equal(contentType, asset.ContentType);
             Assert.Equal(sourcefiles, asset.SourceFiles);
-            Assert.Equal(0, asset.Processors.Count);
+            Assert.Empty(asset.Processors);
         }
 
         [Fact2]
@@ -42,7 +42,7 @@ namespace WebOptimizer.Test
             Assert.Equal(route, asset.Route);
             Assert.Equal(contentType, asset.ContentType);
             Assert.Equal(sourcefiles, asset.SourceFiles);
-            Assert.Equal(0, asset.Processors.Count);
+            Assert.Empty(asset.Processors);
         }
 
 
@@ -90,7 +90,7 @@ namespace WebOptimizer.Test
         public void AssetToString()
         {
             var logger = new Mock<ILogger<Asset>>();
-            var asset = new Asset("/route", "content/type", Enumerable.Empty<string>(), logger.Object);
+            var asset = new Asset("/route", "content/type", [], logger.Object);
 
             Assert.Equal(asset.Route, asset.ToString());
         }

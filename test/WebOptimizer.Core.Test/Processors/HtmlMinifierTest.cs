@@ -115,8 +115,8 @@ namespace WebOptimizer.Test.Processors
 
             Assert.Equal("/**/*.html", asset.Route);
             Assert.Equal("text/html; charset=UTF-8", asset.ContentType);
-            Assert.True(1 == asset.SourceFiles.Count);
-            Assert.True(1 == asset.Processors.Count);
+            Assert.Single(asset.SourceFiles);
+            Assert.Single(asset.Processors);
         }
     }
 }

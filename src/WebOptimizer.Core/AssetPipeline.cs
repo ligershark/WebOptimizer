@@ -9,7 +9,7 @@ namespace WebOptimizer
 {
     internal class AssetPipeline : IAssetPipeline
     {
-        internal ConcurrentDictionary<string, IAsset> _assets = new ConcurrentDictionary<string, IAsset>(StringComparer.OrdinalIgnoreCase);
+        internal ConcurrentDictionary<string, IAsset> _assets = new(StringComparer.OrdinalIgnoreCase);
         /// <summary>
         /// For use by the Asset constructor only. Do not use for logging messages inside <see cref="AssetPipeline"/>.
         /// </summary>
@@ -56,10 +56,9 @@ namespace WebOptimizer
 
                     if (result.HasMatches)
                     {
-                        asset = new Asset(cleanRoute, existing.ContentType, new[]
-                        {
+                        asset = new Asset(cleanRoute, existing.ContentType, [
                             cleanRoute
-                        }, _assetLogger);
+                        ], _assetLogger);
 
                         foreach (IProcessor processor in existing.Processors)
                         {
@@ -128,7 +127,7 @@ namespace WebOptimizer
         {
             route = NormalizeRoute(route);
 
-            IAsset asset = new Asset(route, contentType, new string[0], _assetLogger);
+            IAsset asset = new Asset(route, contentType, Array.Empty<string>(), _assetLogger);
             _assets.TryAdd(route, asset);
 
             return asset;
@@ -165,7 +164,7 @@ namespace WebOptimizer
                 ? "/" + route.Trim().TrimStart('~', '/')
                 : trimmedRoute;
 
-            int index = cleanRoute.IndexOfAny(new[] { '?', '#' });
+            int index = cleanRoute.IndexOfAny(['?', '#']);
 
             if (index > -1)
             {

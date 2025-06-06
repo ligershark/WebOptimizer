@@ -58,7 +58,7 @@ namespace WebOptimizer
                 string routePath = UrlPathUtils.MakeAbsolute(appPath, config.Asset.Route.TrimStart('/'));
 
                 // prevent query string from causing error
-                string[] pathAndQuery = urlValue.Split(new[] { '?' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                string[] pathAndQuery = urlValue.Split(['?'], 2, StringSplitOptions.RemoveEmptyEntries);
                 string pathOnly = pathAndQuery[0];
                 string queryOnly = pathAndQuery.Length == 2 ? ("?" + pathAndQuery[1]) : string.Empty;
 

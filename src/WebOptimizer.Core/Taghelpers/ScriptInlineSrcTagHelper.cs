@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -15,7 +14,7 @@ namespace WebOptimizer.Taghelpers
     [HtmlTargetElement("script", Attributes = "inline")]
     public class ScriptInlineSrcTagHelper : BaseTagHelper
     {
-        private IAssetBuilder _builder;
+        private readonly IAssetBuilder _builder;
 
         /// <summary>
         /// Tag helper for inlining content

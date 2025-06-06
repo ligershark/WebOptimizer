@@ -24,7 +24,7 @@ namespace WebOptimizer.Utils
 
         public static bool TryNormalize(string path, out string normalizedPath)
         {
-            List<string> normalized = new List<string>();
+            List<string> normalized = [];
 
             foreach (StringSegment segment in new StringTokenizer(path, ['/']))
             {
@@ -123,7 +123,7 @@ namespace WebOptimizer.Utils
             if (path.EndsWith("/"))
                 return path;
 
-            StringTokenizer segments = new StringTokenizer(path, new[] { '/' });
+            StringTokenizer segments = new StringTokenizer(path, ['/']);
 
             string directory = string.Join('/', segments.SkipLast(1)) + "/";
 
@@ -144,7 +144,7 @@ namespace WebOptimizer.Utils
             if (path.EndsWith("/"))
                 throw new ArgumentException("Path is a directory");
 
-            StringTokenizer segments = new StringTokenizer(path, new[] { '/' });
+            StringTokenizer segments = new StringTokenizer(path, ['/']);
 
             return segments.Last().Value;
         }
