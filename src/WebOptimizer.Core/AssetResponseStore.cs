@@ -13,7 +13,7 @@ namespace WebOptimizer
     {
         private readonly ILogger<AssetResponseStore> _logger;
         private readonly IWebHostEnvironment _env;
-        private readonly WebOptimizerOptions _options = new WebOptimizerOptions();
+        private readonly WebOptimizerOptions _options = new();
 
         public AssetResponseStore(ILogger<AssetResponseStore> logger, IWebHostEnvironment env, IConfigureOptions<WebOptimizerOptions> options)
         {

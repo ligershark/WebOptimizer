@@ -53,8 +53,7 @@ namespace WebOptimizer.Core.Sample2
             const string scriptsPath2 = "Scripts2";
 
             var currentDirectory = Directory.GetCurrentDirectory();
-            app.UseWebOptimizer(HostingEnvironment, new[]
-            {
+            app.UseWebOptimizer(HostingEnvironment, [
                 new FileProviderOptions
                 {
                     RequestPath = "/" + scriptsPath1,
@@ -70,7 +69,7 @@ namespace WebOptimizer.Core.Sample2
                     RequestPath = "/EmbeddedResourcesScripts",
                     FileProvider = new EmbeddedFileProvider(Lib.AssemblyTools.GetCurrentAssembly()),
                 }
-            });
+            ]);
 
             app.UseStaticFiles();
 

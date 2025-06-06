@@ -14,9 +14,9 @@ namespace WebOptimizer
     /// <seealso cref="WebOptimizer.IAssetBuilder" />
     internal class AssetBuilder : IAssetBuilder
     {
-        private IMemoryCache _cache;
-        private ILogger<AssetBuilder> _logger;
-        private IWebHostEnvironment _env;
+        private readonly IMemoryCache _cache;
+        private readonly ILogger<AssetBuilder> _logger;
+        private readonly IWebHostEnvironment _env;
         private readonly IAssetResponseStore _assetResponseCache;
 
         /// <summary>

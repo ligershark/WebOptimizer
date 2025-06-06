@@ -73,8 +73,8 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns(route);
-            asset.SetupGet(a => a.SourceFiles).Returns(new List<string>(new[] { "file.css" }));
-            asset.SetupGet(a => a.ExcludeFiles).Returns(new List<string>());
+            asset.SetupGet(a => a.SourceFiles).Returns([..new[] { "file.css" }]);
+            asset.SetupGet(a => a.ExcludeFiles).Returns([]);
             asset.SetupGet(a => a.Items).Returns(new Dictionary<string, object> { { "fileprovider", fileProvider.Object } });
             asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>(), It.IsAny<IWebOptimizerOptions>()))
                 .Returns(cacheKey);
@@ -97,7 +97,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 "unique");
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("href", route) };
 
-            var tagHelperOutput = new TagHelperOutput("link", attributes, (useCachedResult, encoder) => Task.Factory.StartNew<TagHelperContent>(
+            var tagHelperOutput = new TagHelperOutput("link", attributes, (_, _) => Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             linkTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
             var hrefAttr = tagHelperOutput.Attributes.First(x => x.Name == "href");
@@ -164,7 +164,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var hrefValue = $"{pathBase}/lib/bootstrap/dist/css/bootstrap.min.css";
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("href", hrefValue) };
 
-            var tagHelperOutput = new TagHelperOutput("link", attributes, (useCachedResult, encoder) => Task.Factory.StartNew<TagHelperContent>(
+            var tagHelperOutput = new TagHelperOutput("link", attributes, (_, _) => Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             linkTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
             var hrefAttr = tagHelperOutput.Attributes.First(x => x.Name == "href");
@@ -219,8 +219,8 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns(route);
-            asset.SetupGet(a => a.SourceFiles).Returns(new List<string>(new[] { "file1.css", "file2.css" }));
-            asset.SetupGet(a => a.ExcludeFiles).Returns(new List<string>());
+            asset.SetupGet(a => a.SourceFiles).Returns(new List<string>(["file1.css", "file2.css"]));
+            asset.SetupGet(a => a.ExcludeFiles).Returns([]);
             asset.SetupGet(a => a.Items).Returns(new Dictionary<string, object> { { "fileprovider", fileProvider.Object } });
             var assetObject = asset.Object;
             var assetPipeline = new Mock<IAssetPipeline>();
@@ -241,7 +241,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 "unique");
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("href", route) };
 
-            var tagHelperOutput = new TagHelperOutput("link", attributes, (useCachedResult, encoder) => Task.Factory.StartNew<TagHelperContent>(
+            var tagHelperOutput = new TagHelperOutput("link", attributes, (_, _) => Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             linkTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
             string[] linkTags = tagHelperOutput.PostElement.GetContent().Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
@@ -298,7 +298,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 "unique");
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("href", absoluteUrl) };
 
-            var tagHelperOutput = new TagHelperOutput("link", attributes, (useCachedResult, encoder) => Task.Factory.StartNew<TagHelperContent>(
+            var tagHelperOutput = new TagHelperOutput("link", attributes, (_, _) => Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             linkTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
             var hrefValue = tagHelperOutput.Attributes.First(x => x.Name == "href").Value;
@@ -353,12 +353,12 @@ namespace WebOptimizer.Core.Test.TagHelpers
 
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("href", route) };
 
-            var tagHelperOutput = new TagHelperOutput("scripts", attributes, (useCachedResult, encoder) => Task.Factory.StartNew<TagHelperContent>(
+            var tagHelperOutput = new TagHelperOutput("scripts", attributes, (_, _) => Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             linkTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
             object hrefValue = tagHelperOutput.Attributes.First(x => x.Name == "href").Value;
             Assert.IsType(route.GetType(), hrefValue);
-            Assert.Contains(route.ToString(), hrefValue.ToString());
+            Assert.Contains(route.ToString()!, hrefValue.ToString());
         }
 
         [Fact2]
@@ -406,7 +406,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var relativeUrl = "/test.css";
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("href", relativeUrl) };
 
-            var tagHelperOutput = new TagHelperOutput("link", attributes, (useCachedResult, encoder) => Task.Factory.StartNew<TagHelperContent>(
+            var tagHelperOutput = new TagHelperOutput("link", attributes, (_, _) => Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             linkTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
             var hrefValue = tagHelperOutput.Attributes.First(x => x.Name == "href").Value;

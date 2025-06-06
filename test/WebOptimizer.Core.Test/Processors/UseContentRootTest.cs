@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -13,11 +12,11 @@ namespace WebOptimizer.Test.Processors
         {
             var minifier = new UseContentRoot();
             var logger = new Mock<ILogger<Asset>>();
-            var asset = new Asset("", "", new[] { "" }, logger.Object);
+            var asset = new Asset("", "", [""], logger.Object);
 
-            Assert.Equal(0, asset.Items.Count);
+            Assert.Empty(asset.Items);
             asset.UseContentRoot();
-            Assert.Equal(1, asset.Items.Count);
+            Assert.Single(asset.Items);
         }
 
         [Fact2]
@@ -25,11 +24,11 @@ namespace WebOptimizer.Test.Processors
         {
             var minifier = new UseContentRoot();
             var logger = new Mock<ILogger<Asset>>();
-            var asset = new Asset("", "", new[] { "" }, logger.Object);
+            var asset = new Asset("", "", [""], logger.Object);
 
-            Assert.Equal(0, asset.Items.Count);
+            Assert.Empty(asset.Items);
             asset.UseFileProvider(null);
-            Assert.Equal(1, asset.Items.Count);
+            Assert.Single(asset.Items);
         }
     }
 }

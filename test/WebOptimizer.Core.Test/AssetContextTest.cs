@@ -22,7 +22,7 @@ namespace WebOptimizer.Test
 
             Assert.Equal(asset, assetContext.Asset);
             Assert.Equal(httpContext, assetContext.HttpContext);
-            Assert.Equal(0, assetContext.Content.Count);
+            Assert.Empty(assetContext.Content);
         }
 
         [Fact2]

@@ -23,7 +23,7 @@ namespace WebOptimizer
     {
         private readonly ILogger<Asset> _logger;
         internal const string PhysicalFilesKey = "PhysicalFiles";
-        private readonly object _sync = new object();
+        private readonly object _sync = new();
 
         public Asset(string route, string contentType, IEnumerable<string> sourceFiles, ILogger<Asset> logger)
         {
@@ -31,20 +31,19 @@ namespace WebOptimizer
             Route = route ?? throw new ArgumentNullException(nameof(route));
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             SourceFiles = sourceFiles?.ToList() ?? throw new ArgumentNullException(nameof(sourceFiles));
-            Processors = new List<IProcessor>();
             Items = new ConcurrentDictionary<string, object>();
             _logger = logger;
         }
 
         public string Route { get; private set; }
 
-        public IList<string> ExcludeFiles { get; } = new List<string>();
+        public IList<string> ExcludeFiles { get; } = [];
 
         public IList<string> SourceFiles { get; }
 
         public string ContentType { get; private set; }
 
-        public IList<IProcessor> Processors { get; }
+        public IList<IProcessor> Processors { get; } = [];
 
         public IDictionary<string, object> Items { get; }
 
@@ -143,7 +142,7 @@ namespace WebOptimizer
         {
             IFileInfo file = fileProvider.GetFileInfo(sourceFile);
 
-            using (Stream fs = file.CreateReadStream())
+            await using (Stream fs = file.CreateReadStream())
             {
                 byte[] bytes = await fs.AsBytesAsync();
 

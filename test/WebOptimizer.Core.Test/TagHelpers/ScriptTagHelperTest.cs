@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
@@ -66,8 +65,8 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/javascript");
             asset.SetupGet(a => a.Route).Returns(route);
-            asset.SetupGet(a => a.SourceFiles).Returns(new List<string>(new []{"file.js"}));
-            asset.SetupGet(a => a.ExcludeFiles).Returns(new List<string>());
+            asset.SetupGet(a => a.SourceFiles).Returns([..new[] { "file.js" }]);
+            asset.SetupGet(a => a.ExcludeFiles).Returns([]);
             asset.SetupGet(a => a.Items).Returns(new Dictionary<string, object>{ {"fileprovider", fileProvider.Object}});
             asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>(), It.IsAny<IWebOptimizerOptions>()))
                 .Returns(cacheKey);
@@ -91,7 +90,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 "unique");
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("src", route) };
             
-            var tagHelperOutput = new TagHelperOutput("script", attributes, (useCachedResult, encoder) =>  Task.Factory.StartNew<TagHelperContent>(
+            var tagHelperOutput = new TagHelperOutput("script", attributes, (_, _) =>  Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             
             scriptTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
@@ -159,7 +158,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var srcValue = $"{pathBase}/lib/bootstrap/dist/js/bootstrap.min.js";
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("src", srcValue) };
             
-            var tagHelperOutput = new TagHelperOutput("script", attributes, (useCachedResult, encoder) =>  Task.Factory.StartNew<TagHelperContent>(
+            var tagHelperOutput = new TagHelperOutput("script", attributes, (_, _) =>  Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             
             scriptTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
@@ -215,8 +214,8 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/javascript");
             asset.SetupGet(a => a.Route).Returns(route);
-            asset.SetupGet(a => a.SourceFiles).Returns(new List<string>(new []{"file1.js", "file2.js"}));
-            asset.SetupGet(a => a.ExcludeFiles).Returns(new List<string>());
+            asset.SetupGet(a => a.SourceFiles).Returns(new List<string>(["file1.js", "file2.js"]));
+            asset.SetupGet(a => a.ExcludeFiles).Returns([]);
             asset.SetupGet(a => a.Items).Returns(new Dictionary<string, object>{ {"fileprovider", fileProvider.Object}});
             var assetObject = asset.Object;
             var assetPipeline = new Mock<IAssetPipeline>();
@@ -237,7 +236,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 "unique");
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("src", route) };
             
-            var tagHelperOutput = new TagHelperOutput("scripts", attributes, (useCachedResult, encoder) =>  Task.Factory.StartNew<TagHelperContent>(
+            var tagHelperOutput = new TagHelperOutput("scripts", attributes, (_, _) =>  Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             scriptTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
             string[] scriptTags = tagHelperOutput.PostElement.GetContent().Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
@@ -293,7 +292,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 "unique");
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("src", absoluteUrl) };
             
-            var tagHelperOutput = new TagHelperOutput("scripts", attributes, (useCachedResult, encoder) =>  Task.Factory.StartNew<TagHelperContent>(
+            var tagHelperOutput = new TagHelperOutput("scripts", attributes, (_, _) =>  Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             scriptTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
             var srcValue = tagHelperOutput.Attributes.First(x => x.Name == "src").Value;
@@ -345,7 +344,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var relativeUrl = "/test.js";
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("src", relativeUrl) };
             
-            var tagHelperOutput = new TagHelperOutput("scripts", attributes, (useCachedResult, encoder) =>  Task.Factory.StartNew<TagHelperContent>(
+            var tagHelperOutput = new TagHelperOutput("scripts", attributes, (_, _) =>  Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             scriptTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
             var srcValue = tagHelperOutput.Attributes.First(x => x.Name == "src").Value;
@@ -399,7 +398,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
 
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("src", srcAttribute) };
 
-            var tagHelperOutput = new TagHelperOutput("scripts", attributes, (useCachedResult, encoder) => Task.Factory.StartNew<TagHelperContent>(
+            var tagHelperOutput = new TagHelperOutput("scripts", attributes, (_, _) => Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             scriptTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
             object srcValue = tagHelperOutput.Attributes.First(x => x.Name == "src").Value;

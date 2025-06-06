@@ -78,7 +78,7 @@ namespace WebOptimizer
             string routeBasePath = UrlPathUtils.GetDirectory(config.Asset.Route);
 
             // prevent query string from causing error
-            string[] pathAndQuery = urlValue.Split(new[] { '?' }, 2, StringSplitOptions.RemoveEmptyEntries);
+            string[] pathAndQuery = urlValue.Split(['?'], 2, StringSplitOptions.RemoveEmptyEntries);
             string pathOnly = pathAndQuery[0];
             string queryOnly = pathAndQuery.Length == 2 ? pathAndQuery[1] : string.Empty;
 
@@ -174,7 +174,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         /// <summary>
         /// Adds a fingerprint to local url() references.
-        /// NOTE: Make sure to call Concatenate() before this method
+        /// NOTE: Make sure to call Concatinate() before this method
         /// </summary>
         public static IEnumerable<IAsset> InlineImages(this IEnumerable<IAsset> assets, int maxFileSize = 5120)
         {

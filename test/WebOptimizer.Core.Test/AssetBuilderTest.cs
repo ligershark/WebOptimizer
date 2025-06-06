@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -32,7 +31,7 @@ namespace WebOptimizer.Core.Test
 
             StringValues values;
             var response = new Mock<HttpResponse>().SetupAllProperties();
-            response.Setup(r => r.Headers.Keys).Returns(new string[] { });
+            response.Setup(r => r.Headers.Keys).Returns([]);
             var context = new Mock<HttpContext>().SetupAllProperties();
             context.Setup(s => s.Request.Headers.TryGetValue("Accept-Encoding", out values)).Returns(false);
             context.Setup(c => c.Response).Returns(response.Object);
@@ -70,7 +69,7 @@ namespace WebOptimizer.Core.Test
             var pipeline = new AssetPipeline();
             var options = new WebOptimizerOptions() { EnableDiskCache = false };
             var asset = new Mock<IAsset>().SetupAllProperties();
-            asset.SetupGet(a => a.SourceFiles).Returns(new List<string>());
+            asset.SetupGet(a => a.SourceFiles).Returns([]);
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns("/file.css");
             asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>(), options)).Returns("cachekey");
@@ -79,7 +78,7 @@ namespace WebOptimizer.Core.Test
 
             StringValues values;
             var response = new Mock<HttpResponse>().SetupAllProperties();
-            response.Setup(r => r.Headers.Keys).Returns(new string[] { });
+            response.Setup(r => r.Headers.Keys).Returns([]);
             var context = new Mock<HttpContext>().SetupAllProperties();
             context.Setup(s => s.Request.Headers.TryGetValue("Accept-Encoding", out values)).Returns(false);
             context.Setup(c => c.Response).Returns(response.Object);
@@ -116,7 +115,7 @@ namespace WebOptimizer.Core.Test
             var pipeline = new AssetPipeline();
             var options = new WebOptimizerOptions() { EnableMemoryCache = false, EnableDiskCache = false };
             var asset = new Mock<IAsset>().SetupAllProperties();
-            asset.SetupGet(a => a.SourceFiles).Returns(new List<string>());
+            asset.SetupGet(a => a.SourceFiles).Returns([]);
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns("/file.css");
             asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>(), options)).Returns("cachekey");
@@ -125,7 +124,7 @@ namespace WebOptimizer.Core.Test
 
             StringValues values;
             var response = new Mock<HttpResponse>().SetupAllProperties();
-            response.Setup(r => r.Headers.Keys).Returns(new string[] { });
+            response.Setup(r => r.Headers.Keys).Returns([]);
             var context = new Mock<HttpContext>().SetupAllProperties();
             context.Setup(s => s.Request.Headers.TryGetValue("Accept-Encoding", out values)).Returns(false);
             context.Setup(c => c.Response).Returns(response.Object);
@@ -163,7 +162,7 @@ namespace WebOptimizer.Core.Test
 
             StringValues values;
             var response = new Mock<HttpResponse>().SetupAllProperties();
-            response.Setup(r => r.Headers.Keys).Returns(new string[] { });
+            response.Setup(r => r.Headers.Keys).Returns([]);
             var context = new Mock<HttpContext>().SetupAllProperties();
             context.Setup(s => s.Request.Headers.TryGetValue("Accept-Encoding", out values)).Returns(false);
             context.Setup(c => c.Response).Returns(response.Object);

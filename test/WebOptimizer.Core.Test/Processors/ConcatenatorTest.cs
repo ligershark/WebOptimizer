@@ -24,7 +24,7 @@ namespace WebOptimizer.Test.Processors
 
             await processor.ExecuteAsync(context.Object);
 
-            Assert.Equal(1, context.Object.Content.Count);
+            Assert.Single(context.Object.Content);
             Assert.Equal("content\r\ncontent2\r\n", context.Object.Content.Values.First().AsString());
         }
 
@@ -38,7 +38,7 @@ namespace WebOptimizer.Test.Processors
 
             await processor.ExecuteAsync(context.Object);
 
-            Assert.Equal(1, context.Object.Content.Count);
+            Assert.Single(context.Object.Content);
             Assert.Equal(string.Empty, context.Object.Content.Values.First().AsString());
         }
 
@@ -47,11 +47,10 @@ namespace WebOptimizer.Test.Processors
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
             var logger = new Mock<ILogger<Asset>>();
-            var asset1 = new Asset("/file1", "text/css", new[] { "file.css" }, logger.Object);
-            var asset2 = new Asset("/file2", "text/css", new[] { "file.css" }, logger.Object);
-            var pipeline = new AssetPipeline();
-            pipeline._assetLogger = logger.Object;
-            var assets = pipeline.AddBundle(new[] { asset1, asset2 });
+            var asset1 = new Asset("/file1", "text/css", ["file.css"], logger.Object);
+            var asset2 = new Asset("/file2", "text/css", ["file.css"], logger.Object);
+            var pipeline = new AssetPipeline { _assetLogger = logger.Object };
+            var assets = pipeline.AddBundle([asset1, asset2]);
 
             assets = assets.Concatenate();
 
@@ -59,7 +58,7 @@ namespace WebOptimizer.Test.Processors
 
             foreach (var asset in assets)
             {
-                Assert.Equal(1, asset.Processors.Count);
+                Assert.Single(asset.Processors);
                 Assert.True(asset.Processors.First() is Concatenator);
             }
         }
