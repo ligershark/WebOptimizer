@@ -5,12 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using WebOptimizer;
-using Microsoft.AspNetCore.Diagnostics;
 
 namespace WebOptimizer
 {
-    internal class Concatenator : Processor
+    internal partial class Concatenator : Processor
     {
+        [GeneratedRegex(@"(?i:.min.(css|js|html)$)")]
+        private static partial Regex MinifiedFileRegex();
+
+        private static readonly Regex _minifiedFileRegex = MinifiedFileRegex();
         public override Task ExecuteAsync(IAssetContext context)
         {
             var sb = new StringBuilder();
@@ -23,8 +26,7 @@ namespace WebOptimizer
             // Use Guid as key and append .min if all the included files seem to be minified
             var newKey = Guid.NewGuid().ToString();
 
-            Regex regex = new Regex(@"(?i:.min.(css|js|html)$)");            
-            if (context.Content.Keys.All(k => regex.IsMatch(k)))
+            if (context.Content.Keys.All(k => _minifiedFileRegex.IsMatch(k)))
             {
                 newKey += ".min";
             }
