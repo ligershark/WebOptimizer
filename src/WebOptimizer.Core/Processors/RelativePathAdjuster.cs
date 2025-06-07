@@ -7,9 +7,12 @@ using WebOptimizer.Utils;
 
 namespace WebOptimizer
 {
-    internal class RelativePathAdjuster : Processor
+    internal partial class RelativePathAdjuster : Processor
     {
-        private static readonly Regex _rxUrl = new Regex(@"(url\s*\(\s*)([""']?)([^:)]+)(\2\s*\))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        [GeneratedRegex(@"(url\s*\(\s*)([""']?)([^:)]+)(\2\s*\))", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+        private static partial Regex RxUrl();
+
+        private static readonly Regex _rxUrl = RxUrl();
         private static readonly string _protocol = "file:///";
 
         public override Task ExecuteAsync(IAssetContext config)
