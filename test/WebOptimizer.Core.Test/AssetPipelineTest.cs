@@ -45,7 +45,7 @@ namespace WebOptimizer.Test
         }
 
         [Fact2]
-        public void AddTwoAsset_Succes()
+        public void AddTwoAsset_Success()
         {
             var env = new HostingEnvironment { EnvironmentName = "Development" };
             var logger = new Mock<ILogger<Asset>>();
