@@ -153,7 +153,7 @@ namespace WebOptimizer.Core.Test
         }
 
         [Fact2]
-        public async Task AssetBiulder_NonExistentFileRequested()
+        public async Task AssetBuilder_NonExistentFileRequested()
         {
             var options = new WebOptimizerOptions();
             var asset = new Mock<IAsset>().SetupAllProperties();
