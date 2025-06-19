@@ -1,114 +1,112 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
-namespace WebOptimizer.Taghelpers
+namespace WebOptimizer.Taghelpers;
+
+/// <summary>
+/// A TagHelper for hooking JavaScript bundles up to the HTML page.
+/// </summary>
+/// <remarks>
+/// Initializes a new instance of the <see cref="ScriptTagHelper"/> class.
+/// </remarks>
+[HtmlTargetElement("script")]
+public class ScriptTagHelper(
+    IWebHostEnvironment env,
+    IMemoryCache cache,
+    IAssetPipeline pipeline,
+    IOptionsMonitor<WebOptimizerOptions> options)
+    : BaseTagHelper(env, cache, pipeline, options)
 {
+
     /// <summary>
-    /// A TagHelper for hooking JavaScript bundles up to the HTML page.
+    /// For HttpContext Access
     /// </summary>
-    [HtmlTargetElement("script")]
-    public class ScriptTagHelper : BaseTagHelper
+    [HtmlAttributeNotBound]
+    [ViewContext]
+    public ViewContext CurrentViewContext { get; set; } = default!;
+
+    /// <summary>
+    /// Synchronously executes the TagHelper
+    /// </summary>
+    public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ScriptTagHelper"/> class.
-        /// </summary>
-        public ScriptTagHelper(IWebHostEnvironment env, IMemoryCache cache, IAssetPipeline pipeline, IOptionsMonitor<WebOptimizerOptions> options)
-            : base(env, cache, pipeline, options)
-        { }
-
-          /// <summary>
-        /// For HttpContext Access
-        /// </summary>
-        [HtmlAttributeNotBound]
-        [ViewContext]
-        public ViewContext CurrentViewContext { get; set; }
-        
-        /// <summary>
-        /// Synchronously executes the TagHelper
-        /// </summary>
-        public override void Process(TagHelperContext context, TagHelperOutput output)
+        if (string.IsNullOrEmpty(output.TagName))
         {
-            if (string.IsNullOrEmpty(output.TagName))
+            return;
+        }
+
+        string? src = LinkTagHelper.GetValue("src", output, out bool encoded );
+
+        if (string.IsNullOrEmpty(src))
+        {
+            return;
+        }
+
+        string? pathBase = null;
+
+        if (CurrentViewContext.HttpContext.Request.PathBase.HasValue)
+        {
+            pathBase = CurrentViewContext.HttpContext.Request.PathBase.Value;
+        }
+
+        if (pathBase is not null && src.StartsWith(pathBase))
+        {
+            src = src[pathBase.Length..];
+        }
+
+        if (Pipeline.TryGetAssetFromRoute(src, out var asset) && !output.Attributes.ContainsName("inline"))
+        {
+            if (Options.EnableTagHelperBundling == true)
             {
-                return;
-            }
-
-            string src = LinkTagHelper.GetValue("src", output, out bool encoded );
-
-            if (string.IsNullOrEmpty(src))
-                return;
-
-            string pathBase = null;
-                
-            if (CurrentViewContext.HttpContext.Request.PathBase.HasValue)
-            {
-                pathBase = CurrentViewContext.HttpContext.Request.PathBase.Value;
-            }
-
-            if (pathBase != null && src.StartsWith(pathBase))
-            {
-                src = src.Substring(pathBase.Length);
-            }               
-
-            if (Pipeline.TryGetAssetFromRoute(src, out IAsset asset) && !output.Attributes.ContainsName("inline"))
-            {
-                if (Options.EnableTagHelperBundling == true)
-                {
-                    src = AddCdn(AddPathBase(GenerateHash(asset)));
-                    output.Attributes.SetAttribute("src", src);
-                }
-                else
-                {
-                    WriteIndividualTags(output, asset);
-                }
+                src = AddCdn(AddPathBase(GenerateHash(asset)));
+                output.Attributes.SetAttribute("src", src);
             }
             else
             {
-                if (!Uri.TryCreate(src, UriKind.Absolute, out Uri _))
-                {
-                    src = AddCdn(AddPathBase(src));
-                    object value = encoded ? new HtmlString(src) : src;
-                    output.Attributes.SetAttribute("src", value);
-                }
+                WriteIndividualTags(output, asset);
             }
         }
-
-        private void WriteIndividualTags(TagHelperOutput output, IAsset asset)
+        else
         {
-            output.SuppressOutput();
-
-            var attrs = new List<string>();
-
-            foreach (TagHelperAttribute item in output.Attributes.Where(a => !a.Name.Equals("src", StringComparison.OrdinalIgnoreCase)))
+            if (!Uri.TryCreate(src, UriKind.Absolute, out var _))
             {
-                string attr = item.Name;
+                src = AddCdn(AddPathBase(src));
+                object value = encoded ? new HtmlString(src) : src;
+                output.Attributes.SetAttribute("src", value);
+            }
+        }
+    }
 
-                if (item.ValueStyle != HtmlAttributeValueStyle.Minimized)
-                {
-                    string quote = GetQuote(item.ValueStyle);
-                    attr += "=" + quote + item.Value + quote;
-                }
+    private void WriteIndividualTags(TagHelperOutput output, IAsset asset)
+    {
+        output.SuppressOutput();
 
-                attrs.Add(attr);
+        var attrs = new List<string>();
+
+        foreach (var item in output.Attributes.Where(a => !a.Name.Equals("src", StringComparison.OrdinalIgnoreCase)))
+        {
+            string attr = item.Name;
+
+            if (item.ValueStyle != HtmlAttributeValueStyle.Minimized)
+            {
+                string quote = GetQuote(item.ValueStyle);
+                attr += $"={quote}{item.Value}{quote}";
             }
 
-            IEnumerable<string> sourceFiles = Asset.ExpandGlobs(asset, HostingEnvironment);
+            attrs.Add(attr);
+        }
 
-            foreach (string file in sourceFiles)
-            {
-                string src = AddCdn(AddPathBase(AddFileVersionToPath(file, asset)));
-                output.PostElement.AppendHtml($"<script src=\"{src}\" {string.Join(" ", attrs)}></script>" + Environment.NewLine);
-            }
+        var sourceFiles = Asset.ExpandGlobs(asset, HostingEnvironment);
+
+        foreach (string file in sourceFiles)
+        {
+            string src = AddCdn(AddPathBase(AddFileVersionToPath(file, asset)));
+            output.PostElement.AppendHtml($"<script src=\"{src}\" {string.Join(" ", attrs)}></script>{Environment.NewLine}");
         }
     }
 }

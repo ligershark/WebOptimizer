@@ -11,7 +11,7 @@ namespace WebOptimizer
     /// <summary>
     /// A class for building assets.
     /// </summary>
-    /// <seealso cref="WebOptimizer.IAssetBuilder" />
+    /// <seealso cref="IAssetBuilder" />
     internal class AssetBuilder : IAssetBuilder
     {
         private readonly IMemoryCache _cache;
