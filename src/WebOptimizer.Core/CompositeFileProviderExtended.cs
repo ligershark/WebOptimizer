@@ -1,67 +1,56 @@
-﻿using System;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.FileProviders;
+﻿using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 
-namespace WebOptimizer
+namespace WebOptimizer;
+
+/// <summary>
+/// Composite file provider that allows serving static files from multiple sources.
+/// Implements the <see cref="IFileProvider" />
+/// </summary>
+/// <seealso cref="IFileProvider" />
+internal class CompositeFileProviderExtended(IFileProvider webRootFileProvider, FileProviderOptions[] fileProviderOptions) : IFileProvider
 {
-    public class FileProviderOptions
+    private readonly IFileProvider _webRootFileProvider = webRootFileProvider ?? throw new ArgumentNullException(nameof(webRootFileProvider));
+
+    public IDirectoryContents GetDirectoryContents(string subPath)
     {
-        public PathString RequestPath { get; set; }
-        public IFileProvider FileProvider { get; set; }
+        var provider = GetFileProvider(subPath, out string outPath);
+
+        return provider.GetDirectoryContents(outPath);
     }
 
-    internal class CompositeFileProviderExtended : IFileProvider
+    public IFileInfo GetFileInfo(string subPath)
     {
-        private readonly IFileProvider _webRootFileProvider;
-        private readonly FileProviderOptions[] _fileProviderOptions;
+        var provider = GetFileProvider(subPath, out string outPath);
 
-        public CompositeFileProviderExtended(IFileProvider webRootFileProvider, FileProviderOptions[] fileProviderOptions)
+        return provider.GetFileInfo(outPath);
+    }
+
+    public IChangeToken Watch(string filter)
+    {
+        var provider = GetFileProvider(filter, out string outPath);
+
+        return provider.Watch(outPath);
+    }
+
+    internal IFileProvider GetFileProvider(string path, out string outPath)
+    {
+        outPath = path;
+
+        var fileProviders = fileProviderOptions;
+        if (fileProviders is not null)
         {
-            _webRootFileProvider = webRootFileProvider ?? throw new ArgumentNullException(nameof(webRootFileProvider));
-            _fileProviderOptions = fileProviderOptions;
-        }
-
-        public IDirectoryContents GetDirectoryContents(string subPath)
-        {
-            IFileProvider provider = GetFileProvider(subPath, out string outPath);
-
-            return provider.GetDirectoryContents(outPath);
-        }
-
-        public IFileInfo GetFileInfo(string subPath)
-        {
-            IFileProvider provider = GetFileProvider(subPath, out string outPath);
-
-            return provider.GetFileInfo(outPath);
-        }
-
-        public IChangeToken Watch(string filter)
-        {
-            IFileProvider provider = GetFileProvider(filter, out string outPath);
-
-            return provider.Watch(outPath);
-        }
-
-        internal IFileProvider GetFileProvider(string path, out string outPath)
-        {
-            outPath = path;
-
-            FileProviderOptions[] fileProviders = _fileProviderOptions;
-            if (fileProviders != null)
+            foreach (var item in fileProviders)
             {
-                foreach (var item in fileProviders)
+                if (path.StartsWith(item.RequestPath, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (path.StartsWith(item.RequestPath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        outPath = path.Substring(item.RequestPath.Value.Length, path.Length - item.RequestPath.Value.Length);
+                    outPath = path[(item.RequestPath.Value?.Length ?? 0)..];
 
-                        return item.FileProvider;
-                    }
+                    return item.FileProvider;
                 }
             }
-
-            return _webRootFileProvider;
         }
+
+        return _webRootFileProvider;
     }
 }

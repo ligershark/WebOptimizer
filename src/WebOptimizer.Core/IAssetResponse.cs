@@ -1,25 +1,22 @@
-﻿using System.Collections.Generic;
+﻿namespace WebOptimizer;
 
-namespace WebOptimizer
+/// <summary>
+/// The response from building an asset.
+/// </summary>
+public interface IAssetResponse
 {
     /// <summary>
-    /// The response from building an asset.
+    /// Gets the content of the response.
     /// </summary>
-    public interface IAssetResponse
-    {
-        /// <summary>
-        /// Gets the cache key.
-        /// </summary>
-        string CacheKey { get; }
+    byte[] Body { get; }
 
-        /// <summary>
-        /// Gets the content of the response.
-        /// </summary>
-        byte[] Body { get; }
+    /// <summary>
+    /// Gets the cache key.
+    /// </summary>
+    string CacheKey { get; }
 
-        /// <summary>
-        /// Gets the HTTP headers.
-        /// </summary>
-        Dictionary<string, string> Headers { get; }
-    }
+    /// <summary>
+    /// Gets the HTTP headers.
+    /// </summary>
+    Dictionary<string, string> Headers { get; }
 }

@@ -1,26 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace WebOptimizer;
 
-namespace WebOptimizer
+[Serializable]
+internal class AssetResponse(byte[]? body = null, string? cacheKey = null) : IAssetResponse
 {
-    [Serializable]
-    internal class AssetResponse : IAssetResponse
-    {
-        public AssetResponse()
-        {
-
-        }
-        public AssetResponse(byte[] body, string cacheKey)
-        {
-            Body = body;
-            CacheKey = cacheKey;
-            Headers = new Dictionary<string, string>();
-        }
-
-        public Dictionary<string, string> Headers { get; }
-
-        public byte[] Body { get; set; }
-
-        public string CacheKey { get; }
-    }
+    public byte[] Body { get; set; } = body;
+    public string CacheKey { get; } = cacheKey;
+    public Dictionary<string, string> Headers { get; } = [];
 }

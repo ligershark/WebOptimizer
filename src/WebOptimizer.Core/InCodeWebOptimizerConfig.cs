@@ -1,20 +1,11 @@
-﻿using System;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 
-namespace WebOptimizer
+namespace WebOptimizer;
+
+internal class InCodeWebOptimizerConfig(Action<WebOptimizerOptions> configure) : IConfigureOptions<WebOptimizerOptions>
 {
-    internal class InCodeWebOptimizerConfig : IConfigureOptions<WebOptimizerOptions>
+    public void Configure(WebOptimizerOptions options)
     {
-        private readonly Action<WebOptimizerOptions> _configure;
-
-        public InCodeWebOptimizerConfig(Action<WebOptimizerOptions> configure)
-        {
-            _configure = configure;
-        }
-        
-        public void Configure(WebOptimizerOptions options)
-        {
-            _configure(options);
-        }
+        configure(options);
     }
 }

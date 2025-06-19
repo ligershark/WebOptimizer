@@ -1,25 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 
-namespace WebOptimizer
+namespace WebOptimizer;
+
+/// <summary>
+/// Represents the context used to perform processing on <see cref="IAsset"/> instances. Implements
+/// the <see cref="IAssetContext"/>
+/// </summary>
+/// <param name="httpContext">The HTTP context.</param>
+/// <param name="asset">The asset.</param>
+/// <param name="options">The options.</param>
+/// <seealso cref="IAssetContext"/>
+internal class AssetContext(HttpContext httpContext, IAsset asset, IWebOptimizerOptions options) : IAssetContext
 {
-    internal class AssetContext : IAssetContext
-    {
-        public AssetContext(HttpContext httpContext, IAsset asset, IWebOptimizerOptions options)
-        {
-            Content = new Dictionary<string, byte[]>();
-            HttpContext = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
-            Asset = asset ?? throw new ArgumentNullException(nameof(asset));
-            Options = options ?? throw new ArgumentNullException(nameof(options));
-        }
+    /// <summary>
+    /// Gets the transform.
+    /// </summary>
+    /// <value>The asset.</value>
+    public IAsset Asset { get; } = asset ?? throw new ArgumentNullException(nameof(asset));
 
-        public IDictionary<string, byte[]> Content { get; set; }
+    /// <summary>
+    /// Gets or sets the content of the response.
+    /// </summary>
+    /// <value>The content.</value>
+    public IDictionary<string, byte[]> Content { get; set; } = new Dictionary<string, byte[]>();
 
-        public HttpContext HttpContext { get; }
+    /// <summary>
+    /// Gets the HTTP context.
+    /// </summary>
+    /// <value>The HTTP context.</value>
+    public HttpContext HttpContext { get; } = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
 
-        public IAsset Asset { get; }
-
-        public IWebOptimizerOptions Options { get; }
-    }
+    /// <summary>
+    /// Gets the global options for WebOptimizer.
+    /// </summary>
+    /// <value>The options.</value>
+    public IWebOptimizerOptions Options { get; } = options ?? throw new ArgumentNullException(nameof(options));
 }
