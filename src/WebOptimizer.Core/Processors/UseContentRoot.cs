@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
 using WebOptimizer;
@@ -39,6 +36,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Uses the content root folder (usually the project root) instead of the wwwroot.
         /// </summary>
+        /// <param name="asset">The asset.</param>
+        /// <returns>IAsset.</returns>
         public static IAsset UseContentRoot(this IAsset asset)
         {
             asset.Items["usecontentroot"] = true;
@@ -47,8 +46,11 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Uses the specified <see cref="IFileProvider"/> to locate the source files.
+        /// Uses the specified <see cref="IFileProvider" /> to locate the source files.
         /// </summary>
+        /// <param name="asset">The asset.</param>
+        /// <param name="fileProvider">The file provider.</param>
+        /// <returns>IAsset.</returns>
         public static IAsset UseFileProvider(this IAsset asset, IFileProvider fileProvider)
         {
             asset.Items["fileprovider"] = fileProvider;
@@ -56,14 +58,14 @@ namespace Microsoft.Extensions.DependencyInjection
             return asset;
         }
 
-        internal static IFileProvider GetCustomFileProvider(this IAsset asset, IWebHostEnvironment env)
+        internal static IFileProvider? GetCustomFileProvider(this IAsset asset, IWebHostEnvironment env)
         {
-            if (asset?.Items == null)
+            if (asset?.Items is null)
             {
                 return null;
             }
 
-            if (asset.Items.TryGetValue("usecontentroot", out object value) && value is bool useContentRoot)
+            if (asset.Items.TryGetValue("usecontentroot", out object? value) && value is bool useContentRoot && useContentRoot)
             {
                 return env.ContentRootFileProvider;
             }

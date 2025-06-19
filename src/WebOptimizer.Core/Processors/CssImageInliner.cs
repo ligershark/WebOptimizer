@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using WebOptimizer;
 using WebOptimizer.Utils;
@@ -27,12 +28,12 @@ namespace WebOptimizer
         public override async Task ExecuteAsync(IAssetContext config)
         {
             var content = new Dictionary<string, byte[]>();
-            var env = (IWebHostEnvironment)config.HttpContext.RequestServices.GetService(typeof(IWebHostEnvironment));
+            var env = (IWebHostEnvironment)config.HttpContext.RequestServices.GetRequiredService(typeof(IWebHostEnvironment));
             IFileProvider fileProvider = config.Asset.GetAssetFileProvider(env);
 
             foreach (string key in config.Content.Keys)
             {
-                IFileInfo input = fileProvider.GetFileInfo(key);
+                _ = fileProvider.GetFileInfo(key);
 
                 content[key] = await InlineAsync(config, key, fileProvider);
             }
@@ -50,7 +51,7 @@ namespace WebOptimizer
             foreach (Match match in _rxUrl.Matches(content))
             {
                 sb.Append(content, lastIndex, match.Index - lastIndex);
-                sb.Append(await ReplaceMatch(config, key, fileProvider, match));
+                sb.Append(await ReplaceMatchAsync(config, fileProvider, match));
                 lastIndex = match.Index + match.Length;
             }
 
@@ -59,21 +60,27 @@ namespace WebOptimizer
             return sb.ToString().AsByteArray();
         }
 
-        private static async Task<string> ReplaceMatch(IAssetContext config, string key, IFileProvider fileProvider, Match match)
+        private static async Task<string> ReplaceMatchAsync(IAssetContext config, IFileProvider fileProvider, Match match)
         {
             // no fingerprint on inline data
             if (match.Value.StartsWith("data:"))
+            {
                 return match.Value;
+            }
 
             string urlValue = match.Groups[3].Value;
 
             // no fingerprint on absolute urls
             if (Uri.IsWellFormedUriString(urlValue, UriKind.Absolute))
+            {
                 return match.Value;
+            }
 
             // no fingerprint if other host
             if (urlValue.StartsWith("//"))
+            {
                 return match.Value;
+            }
 
             string routeBasePath = UrlPathUtils.GetDirectory(config.Asset.Route);
 
@@ -84,72 +91,65 @@ namespace WebOptimizer
 
             // get filepath of included file
             if (!UrlPathUtils.TryMakeAbsolute(routeBasePath, pathOnly, out string filePath))
+            {
                 // path to included file is invalid
                 return match.Value;
+            }
 
             // get FileInfo of included file
             IFileInfo linkedFileInfo = fileProvider.GetFileInfo(filePath);
 
             // no fingerprint if file is not found
             if (!linkedFileInfo.Exists)
+            {
                 return match.Value;
+            }
 
             if (linkedFileInfo.Length > _maxFileSize &&
                 (!queryOnly.Contains("&inline") && !queryOnly.Contains("?inline")))
+            {
                 return match.Value;
+            }
 
-            string mimeType = GetMimeTypeFromFileExtension(linkedFileInfo.Name);
+            string? mimeType = GetMimeTypeFromFileExtension(linkedFileInfo.Name);
 
             if (string.IsNullOrEmpty(mimeType))
-                return match.Value;
-
-            using (Stream fs = linkedFileInfo.CreateReadStream())
             {
-                string base64 = Convert.ToBase64String(await fs.AsBytesAsync());
-                string dataUri = $"data:{mimeType};base64,{base64}";
-
-                string replaced =
-                    match.Groups[1].Value +
-                    match.Groups[2].Value +
-                    dataUri +
-                    match.Groups[4].Value;
-
-                return replaced;
+                return match.Value;
             }
+
+            using Stream fs = linkedFileInfo.CreateReadStream();
+            string base64 = Convert.ToBase64String(await fs.AsBytesAsync());
+            string? dataUri = $"data:{mimeType};base64,{base64}";
+
+            string replaced =
+                match.Groups[1].Value +
+                match.Groups[2].Value +
+                dataUri +
+                match.Groups[4].Value;
+
+            return replaced;
         }
 
-        private static string GetMimeTypeFromFileExtension(string file)
+        private static string? GetMimeTypeFromFileExtension(string file)
         {
             string ext = Path.GetExtension(file).TrimStart('.');
 
-            switch (ext)
+            return ext switch
             {
-                case "jpg":
-                case "jpeg":
-                    return "image/jpeg";
-                case "gif":
-                    return "image/gif";
-                case "png":
-                    return "image/png";
-                case "webp":
-                    return "image/webp";
-                case "svg":
-                    return "image/svg+xml";
-                case "ttf":
-                    return "application/x-font-ttf";
-                case "otf":
-                    return "application/x-font-opentype";
-                case "woff":
-                    return "application/font-woff";
-                case "woff2":
-                    return "application/font-woff2";
-                case "eot":
-                    return "application/vnd.ms-fontobject";
-                case "sfnt":
-                    return "application/font-sfnt";
-            }
-
-            return null;
+                "jpg" or "jpeg" => "image/jpeg",
+                "gif" => "image/gif",
+                "png" => "image/png",
+                "webp" => "image/webp",
+                "svg" => "image/svg+xml",
+                "ttf" => "application/x-font-ttf",
+                "otf" => "application/x-font-opentype",
+                "woff" => "application/font-woff",
+                "woff2" => "application/font-woff2",
+                "eot" => "application/vnd.ms-fontobject",
+                "sfnt" => "application/font-sfnt",
+                _ => null,
+            };
         }
     }
 }

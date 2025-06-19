@@ -1,19 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using NUglify;
+﻿using NUglify;
 using NUglify.Css;
 using WebOptimizer;
 
 namespace WebOptimizer
 {
-    internal class CssMinifier : Processor
+    internal class CssMinifier(CssSettings settings) : Processor
     {
-        public CssMinifier(CssSettings settings)
-        {
-            Settings = settings;
-        }
-
-        public CssSettings Settings { get; set; }
+        public CssSettings Settings { get; set; } = settings;
 
         public override Task ExecuteAsync(IAssetContext config)
         {

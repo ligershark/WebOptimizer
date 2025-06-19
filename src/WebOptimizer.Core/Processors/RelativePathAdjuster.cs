@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 using WebOptimizer;
 using WebOptimizer.Utils;
 
@@ -63,7 +60,7 @@ namespace WebOptimizer
                 // prevent query string from causing error
                 string[] pathAndQuery = urlValue.Split(['?'], 2, StringSplitOptions.RemoveEmptyEntries);
                 string pathOnly = pathAndQuery[0];
-                string queryOnly = pathAndQuery.Length == 2 ? ("?" + pathAndQuery[1]) : string.Empty;
+                string queryOnly = pathAndQuery.Length == 2 ? $"?{pathAndQuery[1]}" : string.Empty;
 
                 // get filepath of included file
                 string filePath;
@@ -123,6 +120,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adjusts the relative paths in CSS documents.
         /// </summary>
+        /// <param name="bundle">The bundle.</param>
+        /// <returns>IAsset.</returns>
         public static IAsset AdjustRelativePaths(this IAsset bundle)
         {
             var minifier = new RelativePathAdjuster();
@@ -134,6 +133,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adjusts the relative paths in CSS documents.
         /// </summary>
+        /// <param name="assets">The assets.</param>
+        /// <returns>IEnumerable&lt;IAsset&gt;.</returns>
         public static IEnumerable<IAsset> AdjustRelativePaths(this IEnumerable<IAsset> assets)
         {
             return assets.AddProcessor(asset => asset.AdjustRelativePaths());

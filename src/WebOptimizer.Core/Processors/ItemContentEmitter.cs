@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using WebOptimizer;
+﻿using WebOptimizer;
 using WebOptimizer.Processors;
 
 namespace WebOptimizer.Processors
@@ -13,12 +9,12 @@ namespace WebOptimizer.Processors
         {
             var asset = context.Asset;
             var items = asset.Items;
-            if (!items.ContainsKey("Content"))
+            if (!items.TryGetValue("Content", out object? value))
                 return Task.CompletedTask;
 
             context.Content = new Dictionary<string, byte[]>
             {
-                { "Content", ((string)items["Content"]).AsByteArray() }
+                { "Content", ((string)value).AsByteArray() }
             };
 
             return Task.CompletedTask;
@@ -35,9 +31,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Changes the Asset to only emit to Response what is stored in
         /// asset.Items["Content"]
         /// and nothing else
-        /// 
+        ///
         /// Useful for Generated Content
-        /// 
+        ///
         /// Used by JavaScriptMinifier.AddJavaScriptBundle to emit sourcemaps into a separate Asset
         /// when generating minified code
         /// </summary>
@@ -53,9 +49,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Changes the Asset to only emit to Response what is stored in
         /// asset.Items["Content"]
         /// and nothing else
-        /// 
+        ///
         /// Useful for Generated Content
-        /// 
+        ///
         /// Used by JavaScriptMinifier.AddJavaScriptBundle to emit sourcemaps into a separate Asset
         /// when generating minified code
         /// </summary>

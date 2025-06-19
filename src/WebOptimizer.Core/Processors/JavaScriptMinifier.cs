@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using NUglify;
 using NUglify.JavaScript;
 using WebOptimizer;
@@ -10,14 +6,9 @@ using WebOptimizer.Processors;
 
 namespace WebOptimizer
 {
-    internal class JavaScriptMinifier : Processor
+    internal class JavaScriptMinifier(JsSettings settings) : Processor
     {
-        public JavaScriptMinifier(JsSettings settings)
-        {
-            Settings = settings;
-        }
-
-        public JsSettings Settings { get; set; }
+        public JsSettings Settings { get; set; } = settings;
 
         public override Task ExecuteAsync(IAssetContext config)
         {
@@ -38,25 +29,23 @@ namespace WebOptimizer
                 try
                 {
                     UglifyResult result;
-                    string sourceMapContent = null;
+                    string? sourceMapContent = null;
 
                     // If .AddJavascriptBundle setup the SourceMap Asset, it will be assigned here, we need to fill it
                     var sourceMapAsset = Settings.PipelineSourceMap;
-                    if (sourceMapAsset != null)
+                    if (sourceMapAsset is not null)
                     {
                         // Setup the side-effects writing of the SourceMap file
                         var sb = new StringBuilder();
                         using (var sw = new StringWriter(sb))
                         {
-                            using (var sourceMap = new V3SourceMap(sw))
-                            {
-                                // Causes the side-effect writing of the SourceMap to our StringWriter...
-                                Settings.CodeSettings.SymbolsMap = sourceMap;
-                                sourceMap.MakePathsRelative = false;
-                                sourceMap.StartPackage(config.Asset.Route, sourceMapAsset.Route);
+                            using var sourceMap = new V3SourceMap(sw);
+                            // Causes the side-effect writing of the SourceMap to our StringWriter...
+                            Settings.CodeSettings.SymbolsMap = sourceMap;
+                            sourceMap.MakePathsRelative = false;
+                            sourceMap.StartPackage(config.Asset.Route, sourceMapAsset.Route);
 
-                                result = Uglify.Js(input, Settings.CodeSettings);
-                            }
+                            result = Uglify.Js(input, Settings.CodeSettings);
                             // These Dispose steps cause the actual flush of the content to the StringBuilder
                         }
                         sourceMapContent = sb.ToString();
@@ -74,17 +63,17 @@ namespace WebOptimizer
                     }
                     else
                     {
-                        if (sourceMapContent != null)
+                        if (sourceMapContent is not null)
                         {
                             // Successful minification, and source map generation succeeded, write out to its separate Asset/Route
-                            sourceMapAsset.Items["Content"] = sourceMapContent;
+                            sourceMapAsset!.Items["Content"] = sourceMapContent;
                         }
                     }
                 }
                 catch
                 {
                     //If there's an error minifying, then use the original uminified value
-                    minified = input + "/* Exception caught attempting to minify */";
+                    minified = $"{input}/* Exception caught attempting to minify */";
                 }
 
                 content[key] = minified.AsByteArray();

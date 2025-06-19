@@ -1,28 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using WebOptimizer;
+﻿using WebOptimizer;
 
 namespace WebOptimizer
 {
-    internal class EnforceFileExtensions : Processor
+    internal class EnforceFileExtensions(IEnumerable<string> extensions) : Processor
     {
-        private IEnumerable<string> _extensions;
-
-        public EnforceFileExtensions(IEnumerable<string> extensions)
-        {
-            _extensions = extensions;
-        }
-
         public override Task ExecuteAsync(IAssetContext context)
         {
             foreach (string file in context.Content.Keys)
             {
                 string ext = Path.GetExtension(file);
 
-                if (!_extensions.Any(e => e.Equals(ext, StringComparison.OrdinalIgnoreCase)))
+                if (!extensions.Any(e => e.Equals(ext, StringComparison.OrdinalIgnoreCase)))
                 {
                     throw new NotSupportedException($"The file extension \"{ext}\" is not valid for this asset");
                 }

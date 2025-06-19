@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using WebOptimizer;
 using WebOptimizer.Utils;
@@ -21,7 +19,7 @@ namespace WebOptimizer
         public override Task ExecuteAsync(IAssetContext config)
         {
             var content = new Dictionary<string, byte[]>();
-            var env = (IWebHostEnvironment)config.HttpContext.RequestServices.GetService(typeof(IWebHostEnvironment));
+            var env = (IWebHostEnvironment)config.HttpContext.RequestServices.GetRequiredService(typeof(IWebHostEnvironment));
 
             IFileProvider fileProvider = config.Asset.GetAssetFileProvider(env);
 
@@ -75,7 +73,7 @@ namespace WebOptimizer
                     return match.Value;
 
                 string hash = GenerateHash(linkedFileInfo.LastModified.Ticks.ToString());
-                string withHash = pathOnly + $"?v={hash}";
+                string withHash = $"{pathOnly}?v={hash}";
 
                 if (!string.IsNullOrEmpty(queryOnly))
                 {
@@ -94,12 +92,9 @@ namespace WebOptimizer
 
         private static string GenerateHash(string content)
         {
-            using (var algo = SHA1.Create())
-            {
-                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(content);
-                byte[] hash = algo.ComputeHash(buffer);
-                return WebEncoders.Base64UrlEncode(hash);
-            }
+            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(content);
+            byte[] hash = SHA256.HashData(buffer);
+            return WebEncoders.Base64UrlEncode(hash);
         }
     }
 }

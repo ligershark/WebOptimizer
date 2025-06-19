@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using WebOptimizer;
 
@@ -14,6 +10,7 @@ namespace WebOptimizer
         private static partial Regex MinifiedFileRegex();
 
         private static readonly Regex _minifiedFileRegex = MinifiedFileRegex();
+
         public override Task ExecuteAsync(IAssetContext context)
         {
             var sb = new StringBuilder();
@@ -26,10 +23,11 @@ namespace WebOptimizer
             // Use Guid as key and append .min if all the included files seem to be minified
             var newKey = Guid.NewGuid().ToString();
 
-            if (context.Content.Keys.All(k => _minifiedFileRegex.IsMatch(k)))
+            if (context.Content.Keys.All(_minifiedFileRegex.IsMatch))
             {
                 newKey += ".min";
             }
+
             context.Content = new Dictionary<string, byte[]>
             {
                 { newKey, sb.ToString().AsByteArray() }
