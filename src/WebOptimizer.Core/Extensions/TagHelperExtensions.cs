@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using WebOptimizer.TagHelpersDynamic;
 
 namespace WebOptimizer.Extensions
 {
     /// <summary>
-    /// 
+    /// Extensions for tag helpers to handle bundling and minification
     /// </summary>
     public static class TagHelperExtensions
     {

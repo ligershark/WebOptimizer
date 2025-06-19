@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WebOptimizer;
+using WebOptimizer.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
