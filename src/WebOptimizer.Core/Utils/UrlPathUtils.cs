@@ -1,152 +1,205 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Primitives;
+﻿using Microsoft.Extensions.Primitives;
 
-namespace WebOptimizer.Utils
+namespace WebOptimizer.Utils;
+
+/// <summary>
+/// Utility class for manipulating URL paths.
+/// </summary>
+public static class UrlPathUtils
 {
-    public static class UrlPathUtils
+    /// <summary>
+    /// Gets the directory.
+    /// </summary>
+    /// <param name="path">The path.</param>
+    /// <returns>System.String.</returns>
+    public static string GetDirectory(string path)
     {
-        public static bool IsAbsolutePath(string path)
+        if (string.IsNullOrEmpty(path))
         {
-            return path.StartsWith("/");
+            return path;
         }
 
-        public static string Normalize(string path)
+        if (path.EndsWith('/'))
         {
-            if (!TryNormalize(path, out string normalized))
-                throw new ArgumentException("Malformed path", path);
-
-            return normalized;
+            return path;
         }
 
-        public static bool TryNormalize(string path, out string normalizedPath)
+        var segments = new StringTokenizer(path, ['/']);
+
+        string directory = string.Join('/', segments.SkipLast(1)) + "/";
+
+        return directory == "/" && !path.StartsWith('/')
+            ? ""
+            : (path.StartsWith('/') && directory.StartsWith('/')) || !path.StartsWith('/') ? directory : $"/{directory}";
+    }
+
+    /// <summary>
+    /// Gets the name of the file.
+    /// </summary>
+    /// <param name="path">The path.</param>
+    /// <returns>System.String.</returns>
+    /// <exception cref="ArgumentException">Path is empty</exception>
+    /// <exception cref="ArgumentException">Path is a directory</exception>
+    public static string? GetFileName(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
         {
-            List<string> normalized = [];
+            throw new ArgumentException("Path is empty");
+        }
 
-            foreach (StringSegment segment in new StringTokenizer(path, ['/']))
-            {
-                if (segment.HasValue)
-                {
-                    switch (segment.Value)
-                    {
-                        case ".":
-                            break;
+        if (path.EndsWith('/'))
+        {
+            throw new ArgumentException("Path is a directory");
+        }
 
-                        case "..":
-                            if (normalized.Count == 1 && normalized[0] == string.Empty)
-                            {
-                                normalizedPath = default;
-                                return false;
-                            }
-                            else if (normalized.Count == 0)
-                            {
-                                normalized.Add("..");
-                            }
-                            else if (normalized[normalized.Count - 1] == "..")
-                            {
-                                normalized.Add("..");
-                            }
-                            else
-                            {
-                                normalized.RemoveAt(normalized.Count - 1);
-                            }
-                            break;
+        var segments = new StringTokenizer(path, ['/']);
 
-                        default:
-                            normalized.Add(segment.Value);
-                            break;
-                    }
-                }
-            }
+        return segments.Last().Value;
+    }
 
-            normalizedPath = string.Join('/', normalized);
+    /// <summary>
+    /// Determines whether [is absolute path] [the specified path].
+    /// </summary>
+    /// <param name="path">The path.</param>
+    /// <returns><c>true</c> if [is absolute path] [the specified path]; otherwise, <c>false</c>.</returns>
+    public static bool IsAbsolutePath(string path)
+    {
+        return path.StartsWith('/');
+    }
+
+    /// <summary>
+    /// Makes the absolute.
+    /// </summary>
+    /// <param name="basePath">The base path.</param>
+    /// <param name="path">The path.</param>
+    /// <returns>System.String.</returns>
+    /// <exception cref="ArgumentException">Neither basePath nor path are absolute</exception>
+    public static string? MakeAbsolute(string basePath, string path)
+    {
+        return IsAbsolutePath(basePath) || IsAbsolutePath(path)
+            ? IsAbsolutePath(path) ? path : Normalize($"{basePath}{(basePath.EndsWith('/') ? string.Empty : "/")}{path}")
+            : throw new ArgumentException("Neither basePath nor path are absolute");
+    }
+
+    /// <summary>
+    /// Makes the absolute path from include.
+    /// </summary>
+    /// <param name="appPath">The application path.</param>
+    /// <param name="contentPath">The content path.</param>
+    /// <param name="includePath">The include path.</param>
+    /// <returns>System.String.</returns>
+    public static string? MakeAbsolutePathFromInclude(string appPath, string contentPath, string includePath)
+    {
+        string contentAbsolutePath = MakeAbsolute(appPath, contentPath)!;
+        string contentDirectoryPath = GetDirectory(contentAbsolutePath);
+
+        return MakeAbsolute(contentDirectoryPath, includePath);
+    }
+
+    /// <summary>
+    /// Normalizes the specified path.
+    /// </summary>
+    /// <param name="path">The path.</param>
+    /// <returns>System.String.</returns>
+    /// <exception cref="ArgumentException">Malformed path</exception>
+    public static string? Normalize(string path)
+    {
+        return TryNormalize(path, out string? normalized) ? normalized : throw new ArgumentException("Malformed path", path);
+    }
+
+    /// <summary>
+    /// Tries the make absolute.
+    /// </summary>
+    /// <param name="basePath">The base path.</param>
+    /// <param name="path">The path.</param>
+    /// <param name="absolutePath">The absolute path.</param>
+    /// <returns><c>true</c> if successful, <c>false</c> otherwise.</returns>
+    public static bool TryMakeAbsolute(string basePath, string path, out string? absolutePath)
+    {
+        if (!IsAbsolutePath(basePath) && !IsAbsolutePath(path))
+        {
+            absolutePath = default;
+            return false;
+        }
+
+        if (IsAbsolutePath(path))
+        {
+            absolutePath = path;
             return true;
         }
 
-        public static string MakeAbsolute(string basePath, string path)
+        return TryNormalize($"{basePath}{(basePath.EndsWith('/') ? string.Empty : "/")}{path}", out absolutePath);
+    }
+
+    /// <summary>
+    /// Tries the make absolute path from include.
+    /// </summary>
+    /// <param name="appPath">The application path.</param>
+    /// <param name="contentPath">The content path.</param>
+    /// <param name="includePath">The include path.</param>
+    /// <param name="absolutePath">The absolute path.</param>
+    /// <returns><c>true</c> if successful, <c>false</c> otherwise.</returns>
+    public static bool TryMakeAbsolutePathFromInclude(string appPath, string contentPath, string includePath, out string? absolutePath)
+    {
+        if (!TryMakeAbsolute(appPath, contentPath, out string? contentAbsolutePath))
         {
-            if (!IsAbsolutePath(basePath) && !IsAbsolutePath(path))
-                throw new ArgumentException("Neither basePath nor path are absolute");
-
-            if (IsAbsolutePath(path))
-                return path;
-
-            return Normalize(basePath + (basePath.EndsWith("/") ? string.Empty : "/") + path);
+            absolutePath = default;
+            return false;
         }
 
-        public static bool TryMakeAbsolute(string basePath, string path, out string absolutePath)
+        string contentDirectoryPath = GetDirectory(contentAbsolutePath!);
+
+        return TryMakeAbsolute(contentDirectoryPath, includePath, out absolutePath);
+    }
+
+    /// <summary>
+    /// Tries the normalize.
+    /// </summary>
+    /// <param name="path">The path.</param>
+    /// <param name="normalizedPath">The normalized path.</param>
+    /// <returns><c>true</c> if successful, <c>false</c> otherwise.</returns>
+    public static bool TryNormalize(string path, out string? normalizedPath)
+    {
+        List<string> normalized = [];
+
+        foreach (var segment in new StringTokenizer(path, ['/']))
         {
-            if (!IsAbsolutePath(basePath) && !IsAbsolutePath(path))
+            if (segment.HasValue)
             {
-                absolutePath = default;
-                return false;
+                switch (segment.Value)
+                {
+                    case ".":
+                        break;
+
+                    case "..":
+                        if (normalized.Count == 1 && normalized[0] == string.Empty)
+                        {
+                            normalizedPath = default;
+                            return false;
+                        }
+                        else if (normalized.Count == 0)
+                        {
+                            normalized.Add("..");
+                        }
+                        else if (normalized[^1] == "..")
+                        {
+                            normalized.Add("..");
+                        }
+                        else
+                        {
+                            normalized.RemoveAt(normalized.Count - 1);
+                        }
+
+                        break;
+
+                    default:
+                        normalized.Add(segment.Value);
+                        break;
+                }
             }
-
-            if (IsAbsolutePath(path))
-            {
-                absolutePath = path;
-                return true;
-            }
-
-            return TryNormalize(basePath + (basePath.EndsWith("/") ? string.Empty : "/") + path, out absolutePath);
         }
 
-        public static string MakeAbsolutePathFromInclude(string appPath, string contentPath, string includePath)
-        {
-            string contentAbsolutePath = MakeAbsolute(appPath, contentPath);
-            string contentDirectoryPath = GetDirectory(contentAbsolutePath);
-
-            return MakeAbsolute(contentDirectoryPath, includePath);
-        }
-
-        public static bool TryMakeAbsolutePathFromInclude(string appPath, string contentPath, string includePath, out string absolutePath)
-        {
-            if (!TryMakeAbsolute(appPath, contentPath, out string contentAbsolutePath))
-            {
-                absolutePath = default;
-                return false;
-            }
-
-            string contentDirectoryPath = GetDirectory(contentAbsolutePath);
-
-            return TryMakeAbsolute(contentDirectoryPath, includePath, out absolutePath);
-        }
-
-        public static string GetDirectory(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-                return path;
-
-            if (path.EndsWith("/"))
-                return path;
-
-            StringTokenizer segments = new StringTokenizer(path, ['/']);
-
-            string directory = string.Join('/', segments.SkipLast(1)) + "/";
-
-            if (directory == "/" && !path.StartsWith("/"))
-                return "";
-
-            if ((path.StartsWith("/") && directory.StartsWith("/")) || !path.StartsWith("/"))
-                return directory;
-
-            return "/" + directory;
-        }
-
-        public static string GetFileName(string path)
-        {
-            if (string.IsNullOrWhiteSpace(path))
-                throw new ArgumentException("Path is empty");
-
-            if (path.EndsWith("/"))
-                throw new ArgumentException("Path is a directory");
-
-            StringTokenizer segments = new StringTokenizer(path, ['/']);
-
-            return segments.Last().Value;
-        }
+        normalizedPath = string.Join('/', normalized);
+        return true;
     }
 }
