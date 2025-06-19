@@ -22,10 +22,10 @@ internal class AssetResponseStore : IAssetResponseStore
     public async Task AddAsync(string bucket, string cachekey, AssetResponse assetResponse)
     {
         string name = CleanName(bucket);
-        _ = Directory.CreateDirectory(_options.CacheDirectory);
+        _ = Directory.CreateDirectory(_options.CacheDirectory!);
 
         // First delete old cached files
-        var oldCachedFiles = Directory.EnumerateFiles(_options.CacheDirectory, $"{name}__*.cache");
+        var oldCachedFiles = Directory.EnumerateFiles(_options.CacheDirectory!, $"{name}__*.cache");
         foreach (string oldFile in oldCachedFiles)
         {
             await DeleteFileAsync(oldFile).ConfigureAwait(false);
@@ -116,7 +116,7 @@ internal class AssetResponseStore : IAssetResponseStore
     {
         // cachekey is Base64 encoded which uses / as one of the characters. So for Linux we need to
         // clean both the bucket and the cachekey.
-        return Path.Combine(_options.CacheDirectory, CleanName($"{bucket}__{cachekey}.cache"));
+        return Path.Combine(_options.CacheDirectory!, CleanName($"{bucket}__{cachekey}.cache"));
     }
 
     private static async Task TryAsync(int attempts, Func<Task> callback)

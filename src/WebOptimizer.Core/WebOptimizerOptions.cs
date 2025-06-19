@@ -24,12 +24,12 @@ public class WebOptimizerOptions : IWebOptimizerOptions
     /// <code>true</code>
     /// .
     /// </summary>
-    public required string CacheDirectory { get; set; }
+    public string? CacheDirectory { get; set; }
 
     /// <summary>
     /// Gets the CDN url used for TagHelpers.
     /// </summary>
-    public required string CdnUrl { get; set; }
+    public string? CdnUrl { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether server-side caching is enabled. Default is
