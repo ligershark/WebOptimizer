@@ -1,15 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net9.0</TargetFrameworks>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\WebOptimizer.Core.xml</DocumentationFile>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <PackageTags>bundle, minify, optimize, asp.net core</PackageTags>
-    <Version>3.0.0</Version>
     <Authors>LigerShark</Authors>
     <Company>LigerShark</Company>
-    <Description>A runtime bundler and minifier for ASP.NET Core</Description>
     <Copyright>Copyright © LigerShark</Copyright>
+    <Description>A runtime bundler and minifier for ASP.NET Core</Description>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\WebOptimizer.Core.xml</DocumentationFile>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IncludeSymbols>true</IncludeSymbols>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
     <PackageId>LigerShark.WebOptimizer.Core</PackageId>
     <Product>LigerShark.WebOptimizer.Core</Product>
     <PackageIcon>logo.png</PackageIcon>
@@ -17,11 +18,12 @@
     <PackageProjectUrl>https://github.com/ligershark/WebOptimizer</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>bundle, minify, optimize, asp.net core</PackageTags>
     <RepositoryUrl>https://github.com/ligershark/WebOptimizer</RepositoryUrl>
     <RootNamespace>WebOptimizer</RootNamespace>
-    <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <LangVersion>latest</LangVersion>
+    <TargetFrameworks>net9.0</TargetFrameworks>
+    <Version>3.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
