@@ -55,5 +55,5 @@ public interface IAssetPipeline
     /// </summary>
     /// <param name="route">The route to find the asset by.</param>
     /// <param name="asset">The asset matching the route.</param>
-    bool TryGetAssetFromRoute(string route, [NotNullWhen(true)] out IAsset? asset);
+    bool TryGetAssetFromRoute(string? route, [NotNullWhen(true)] out IAsset? asset);
 }

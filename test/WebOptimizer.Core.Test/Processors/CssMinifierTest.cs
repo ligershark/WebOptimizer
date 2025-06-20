@@ -77,8 +77,8 @@ namespace WebOptimizer.Test.Processors
         [Fact2]
         public void AddCssBundle_DefaultSettings_Success()
         {
-            var pipeline = new AssetPipeline();
             var logger = new Mock<ILogger<Asset>>();
+            var pipeline = new AssetPipeline(logger.Object);
             pipeline._assetLogger = logger.Object;
             var asset = pipeline.AddCssBundle("/foo.css", "file1.css", "file2.css");
 
@@ -91,8 +91,8 @@ namespace WebOptimizer.Test.Processors
         [Fact2]
         public void AddCssBundle_DefaultSettings_SuccessRelative()
         {
-            var pipeline = new AssetPipeline();
             var logger = new Mock<ILogger<Asset>>();
+            var pipeline = new AssetPipeline(logger.Object);
             pipeline._assetLogger = logger.Object;
             var asset = pipeline.AddCssBundle("foo.css", "file1.css", "file2.css");
 
@@ -106,8 +106,8 @@ namespace WebOptimizer.Test.Processors
         public void AddCssBundle_CustomSettings_Success()
         {
             var settings = new CssSettings();
-            var pipeline = new AssetPipeline();
             var logger = new Mock<ILogger<Asset>>();
+            var pipeline = new AssetPipeline(logger.Object);
             pipeline._assetLogger = logger.Object;
             var asset = pipeline.AddCssBundle("/foo.css", settings, "file1.css", "file2.css");
 
@@ -120,8 +120,8 @@ namespace WebOptimizer.Test.Processors
         [Fact2]
         public void AddCssFiles_DefaultSettings_Success()
         {
-            var pipeline = new AssetPipeline();
             var logger = new Mock<ILogger<Asset>>();
+            var pipeline = new AssetPipeline(logger.Object);
             pipeline._assetLogger = logger.Object;
             var asset = pipeline.MinifyCssFiles().First();
 

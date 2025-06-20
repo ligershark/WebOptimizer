@@ -50,15 +50,15 @@ public class LinkTagHelper(
             return;
         }
 
-        string href = GetValue("href", output, out bool encoded);
+        string? href = GetValue("href", output, out bool encoded);
         string? pathBase = CurrentViewContext.HttpContext?.Request?.PathBase.Value;
 
-        if (!string.IsNullOrEmpty(pathBase) && href.StartsWith(pathBase))
+        if (!string.IsNullOrEmpty(pathBase) && href?.StartsWith(pathBase) == true)
         {
             href = href[pathBase.Length..];
         }
 
-        if (Pipeline.TryGetAssetFromRoute(href, out IAsset asset))
+        if (Pipeline.TryGetAssetFromRoute(href, out var asset))
         {
             if (Options.EnableTagHelperBundling == true)
             {
@@ -74,11 +74,11 @@ public class LinkTagHelper(
         {
             if (!Uri.TryCreate(href, UriKind.Absolute, out var _))
             {
-                string unmodifiedHref = href;
+                string? unmodifiedHref = href;
                 href = AddCdn(AddPathBase(href));
                 if (href != unmodifiedHref)
                 {
-                    object value = encoded ? new HtmlString(href) : href;
+                    object? value = encoded ? new HtmlString(href) : href;
                     output.Attributes.SetAttribute("href", value);
                 }
             }
@@ -91,7 +91,7 @@ public class LinkTagHelper(
 
         var attrs = new List<string>();
 
-        foreach (TagHelperAttribute item in output.Attributes.Where(a => !a.Name.Equals("href", StringComparison.OrdinalIgnoreCase)))
+        foreach (var item in output.Attributes.Where(a => !a.Name.Equals("href", StringComparison.OrdinalIgnoreCase)))
         {
             StringBuilder sb = new();
             sb.Append(item.Name);
@@ -105,7 +105,7 @@ public class LinkTagHelper(
             attrs.Add(sb.ToString());
         }
 
-        IEnumerable<string> sourceFiles = Asset.ExpandGlobs(asset, HostingEnvironment);
+        var sourceFiles = Asset.ExpandGlobs(asset, HostingEnvironment);
 
         foreach (string file in sourceFiles)
         {
@@ -117,7 +117,7 @@ public class LinkTagHelper(
                 fileToAdd = Path.ChangeExtension(file, "css");
             }
 
-            string href = AddCdn(AddPathBase(AddFileVersionToPath(fileToAdd, asset)));
+            string? href = AddCdn(AddPathBase(AddFileVersionToPath(fileToAdd, asset)));
             output.PostElement.AppendHtml($"<link href=\"{href}\" {string.Join(" ", attrs)} />{Environment.NewLine}");
         }
     }

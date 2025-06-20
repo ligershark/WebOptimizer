@@ -49,7 +49,7 @@ namespace WebOptimizer.Test.Processors
             var logger = new Mock<ILogger<Asset>>();
             var asset1 = new Asset("/file1", "text/css", ["file.css"], logger.Object);
             var asset2 = new Asset("/file2", "text/css", ["file.css"], logger.Object);
-            var pipeline = new AssetPipeline { _assetLogger = logger.Object };
+            var pipeline = new AssetPipeline(logger.Object);
             var assets = pipeline.AddBundle([asset1, asset2]);
 
             assets = assets.Concatenate();

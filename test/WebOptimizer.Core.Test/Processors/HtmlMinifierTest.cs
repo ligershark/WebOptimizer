@@ -79,9 +79,8 @@ namespace WebOptimizer.Test.Processors
         [Fact2]
         public void AddHtmlBundle_DefaultSettings_Success()
         {
-            var pipeline = new AssetPipeline();
             var logger = new Mock<ILogger<Asset>>();
-            pipeline._assetLogger = logger.Object;
+            var pipeline = new AssetPipeline(logger.Object);
             var asset = pipeline.AddHtmlBundle("/foo.html", "file1.html", "file2.html");
 
             Assert.Equal("/foo.html", asset.Route);
@@ -94,9 +93,8 @@ namespace WebOptimizer.Test.Processors
         public void AddHtmlBundle_CustomSettings_Success()
         {
             var settings = new HtmlSettings();
-            var pipeline = new AssetPipeline();
             var logger = new Mock<ILogger<Asset>>();
-            pipeline._assetLogger = logger.Object;
+            var pipeline = new AssetPipeline(logger.Object);
             var asset = pipeline.AddHtmlBundle("/foo.html", settings, "file1.css", "file2.css");
 
             Assert.Equal("/foo.html", asset.Route);
@@ -108,9 +106,8 @@ namespace WebOptimizer.Test.Processors
         [Fact2]
         public void AddHtmlFiles_DefaultSettings_Success()
         {
-            var pipeline = new AssetPipeline();
             var logger = new Mock<ILogger<Asset>>();
-            pipeline._assetLogger = logger.Object;
+            var pipeline = new AssetPipeline(logger.Object);
             var asset = pipeline.MinifyHtmlFiles().First();
 
             Assert.Equal("/**/*.html", asset.Route);

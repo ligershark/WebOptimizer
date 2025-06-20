@@ -76,7 +76,7 @@ public class ScriptTagHelper(
             if (!Uri.TryCreate(src, UriKind.Absolute, out var _))
             {
                 src = AddCdn(AddPathBase(src));
-                object value = encoded ? new HtmlString(src) : src;
+                object? value = encoded ? new HtmlString(src) : src;
                 output.Attributes.SetAttribute("src", value);
             }
         }
@@ -105,7 +105,7 @@ public class ScriptTagHelper(
 
         foreach (string file in sourceFiles)
         {
-            string src = AddCdn(AddPathBase(AddFileVersionToPath(file, asset)));
+            string? src = AddCdn(AddPathBase(AddFileVersionToPath(file, asset)));
             output.PostElement.AppendHtml($"<script src=\"{src}\" {string.Join(" ", attrs)}></script>{Environment.NewLine}");
         }
     }

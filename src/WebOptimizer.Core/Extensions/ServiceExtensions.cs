@@ -1,12 +1,10 @@
-﻿using System;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WebOptimizer;
-using WebOptimizer.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -27,11 +25,12 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="cssBundlingSettings"></param>
         /// <param name="codeBundlingSettings"></param>
         /// <param name="assetPipeline">The web optimization pipeline</param>
-        public static IServiceCollection AddWebOptimizer(this IServiceCollection services,
+        public static IServiceCollection AddWebOptimizer(
+            this IServiceCollection services,
             IWebHostEnvironment env,
             CssBundlingSettings cssBundlingSettings,
             CodeBundlingSettings codeBundlingSettings,
-            Action<IAssetPipeline> assetPipeline = null)
+            Action<IAssetPipeline>? assetPipeline = null)
         {
             UpdateCssAndCodeBundlingSettings(services, cssBundlingSettings, codeBundlingSettings);
 
@@ -47,12 +46,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="codeBundlingSettings"></param>
         /// <param name="configureWebOptimizer">WebOptimizer settings</param>
         /// <param name="assetPipeline">The web optimization pipeline</param>
-        public static IServiceCollection AddWebOptimizer(this IServiceCollection services,
+        public static IServiceCollection AddWebOptimizer(
+            this IServiceCollection services,
             IWebHostEnvironment env,
             CssBundlingSettings cssBundlingSettings,
             CodeBundlingSettings codeBundlingSettings,
             Action<WebOptimizerOptions> configureWebOptimizer,
-            Action<IAssetPipeline> assetPipeline = null)
+            Action<IAssetPipeline>? assetPipeline = null)
         {
             UpdateCssAndCodeBundlingSettings(services, cssBundlingSettings, codeBundlingSettings);
 
@@ -114,24 +114,18 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection RegisterComponents(this IServiceCollection services,
             Action<IAssetPipeline> assetPipeline, ServiceDescriptor configureOptions)
         {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(assetPipeline);
 
-            if (assetPipeline == null)
-            {
-                throw new ArgumentNullException(nameof(assetPipeline));
-            }
-
-            var pipeline = new AssetPipeline();
+            var assetLogger = services.AddLogging().BuildServiceProvider().GetRequiredService<ILogger<Asset>>();
+            var pipeline = new AssetPipeline(assetLogger);
             assetPipeline(pipeline);
 
             services.TryAddSingleton<IMemoryCache, MemoryCache>();
             services.TryAddSingleton<IAssetResponseStore, AssetResponseStore>();
             services.TryAddSingleton<IAssetPipeline>(factory =>
             {
-                pipeline._assetLogger = factory.GetService<ILogger<Asset>>();
+                pipeline._assetLogger = factory.GetRequiredService<ILogger<Asset>>();
                 return pipeline;
             });
             services.TryAddSingleton<IAssetBuilder, AssetBuilder>();

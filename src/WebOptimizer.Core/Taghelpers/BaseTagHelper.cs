@@ -72,7 +72,7 @@ public abstract class BaseTagHelper(IWebHostEnvironment env, IMemoryCache cache,
     /// <param name="fileName">Name of the file.</param>
     /// <param name="asset">The asset.</param>
     /// <returns>System.String.</returns>
-    protected string AddFileVersionToPath(string fileName, IAsset asset)
+    protected string? AddFileVersionToPath(string fileName, IAsset asset)
     {
         _fileProvider ??= new FileVersionProvider(
                 asset.GetFileProvider(HostingEnvironment),
@@ -87,10 +87,10 @@ public abstract class BaseTagHelper(IWebHostEnvironment env, IMemoryCache cache,
     /// </summary>
     /// <param name="url">The URL.</param>
     /// <returns>System.String.</returns>
-    protected string AddPathBase(string url)
+    protected string? AddPathBase(string? url)
     {
-        Microsoft.AspNetCore.Http.PathString pathBase = ViewContext.HttpContext.Request.PathBase;
-        return string.IsNullOrEmpty(pathBase) ? url : pathBase + (url.StartsWith('/') ? url : ($"/{url}"));
+        var pathBase = ViewContext.HttpContext.Request.PathBase;
+        return string.IsNullOrEmpty(pathBase) ? url : pathBase + (url?.StartsWith('/') == true ? url : ($"/{url}"));
     }
 
     /// <summary>
@@ -129,6 +129,6 @@ public abstract class BaseTagHelper(IWebHostEnvironment env, IMemoryCache cache,
     /// </summary>
     /// <param name="url">The URL.</param>
     /// <returns>System.String.</returns>
-    protected string AddCdn(string url) =>
-        string.IsNullOrEmpty(Options.CdnUrl) ? url : $"{Options.CdnUrl}{(url.StartsWith('/') ? url : $"/{url}")}";
+    protected string? AddCdn(string? url) =>
+        string.IsNullOrEmpty(Options.CdnUrl) ? url : $"{Options.CdnUrl}{(url?.StartsWith('/') == true ? url : $"/{url}")}";
 }

@@ -19,8 +19,8 @@ namespace WebOptimizer.Core.Test
         public async Task AssetBuilder_NoMemoryCache()
         {
             byte[] cssContent = "*{color:red}".AsByteArray();
-
-            var pipeline = new AssetPipeline();
+            var assetLogger = new Mock<ILogger<Asset>>().SetupAllProperties();
+            var pipeline = new AssetPipeline(assetLogger.Object);
             var options = new WebOptimizerOptions() { EnableMemoryCache = false };
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/css");
@@ -41,7 +41,7 @@ namespace WebOptimizer.Core.Test
             var env = new Mock<IWebHostEnvironment>().SetupAllProperties();
             env.Setup(e => e.ContentRootPath).Returns(@"D:\Project\");
 
-            object bytes;
+            object? bytes;
             var cache = new Mock<IMemoryCache>();
             cache.Setup(c => c.TryGetValue(It.IsAny<string>(), out bytes)).Throws<InvalidOperationException>();
 
@@ -58,7 +58,7 @@ namespace WebOptimizer.Core.Test
 
             var result = await builder.BuildAsync(asset.Object, context.Object, options).ConfigureAwait(false);
 
-            Assert.Equal(cssContent, result.Body);
+            Assert.Equal(cssContent, result!.Body);
         }
 
         [Fact2]
@@ -66,7 +66,8 @@ namespace WebOptimizer.Core.Test
         {
             byte[] cssContent = "*{color:red}".AsByteArray();
 
-            var pipeline = new AssetPipeline();
+            var assetLogger = new Mock<ILogger<Asset>>().SetupAllProperties();
+            var pipeline = new AssetPipeline(assetLogger.Object);
             var options = new WebOptimizerOptions() { EnableDiskCache = false };
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.SourceFiles).Returns([]);
@@ -92,7 +93,7 @@ namespace WebOptimizer.Core.Test
             mco.SetupGet(o => o.Value).Returns(new MemoryCacheOptions());
             var cache = new MemoryCache(mco.Object);
 
-            AssetResponse ar;
+            AssetResponse? ar;
             var store = new Mock<IAssetResponseStore>();
             store.Setup(s => s.TryGet(It.IsAny<string>(), It.IsAny<string>(), out ar)).Throws<InvalidOperationException>();
 
@@ -104,7 +105,7 @@ namespace WebOptimizer.Core.Test
 
             var result = await builder.BuildAsync(asset.Object, context.Object, options).ConfigureAwait(false);
 
-            Assert.Equal(cssContent, result.Body);
+            Assert.Equal(cssContent, result!.Body);
         }
 
         [Fact2]
@@ -112,7 +113,8 @@ namespace WebOptimizer.Core.Test
         {
             byte[] cssContent = "*{color:red}".AsByteArray();
 
-            var pipeline = new AssetPipeline();
+            var assetLogger = new Mock<ILogger<Asset>>().SetupAllProperties();
+            var pipeline = new AssetPipeline(assetLogger.Object);
             var options = new WebOptimizerOptions() { EnableMemoryCache = false, EnableDiskCache = false };
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.SourceFiles).Returns([]);
@@ -134,10 +136,10 @@ namespace WebOptimizer.Core.Test
             var env = new Mock<IWebHostEnvironment>().SetupAllProperties();
             env.Setup(e => e.ContentRootPath).Returns(@"D:\Project\");
 
-            object bytes;
+            object? bytes;
             var cache = new Mock<IMemoryCache>();
             cache.Setup(c => c.TryGetValue(It.IsAny<string>(), out bytes)).Throws<InvalidOperationException>();
-            AssetResponse ar;
+            AssetResponse? ar;
             var store = new Mock<IAssetResponseStore>();
             store.Setup(s => s.TryGet(It.IsAny<string>(), It.IsAny<string>(), out ar)).Throws<InvalidOperationException>();
 
@@ -149,7 +151,7 @@ namespace WebOptimizer.Core.Test
 
             var result = await builder.BuildAsync(asset.Object, context.Object, options).ConfigureAwait(false);
 
-            Assert.Equal(cssContent, result.Body);
+            Assert.Equal(cssContent, result!.Body);
         }
 
         [Fact2]

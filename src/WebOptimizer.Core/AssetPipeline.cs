@@ -5,12 +5,12 @@ using Microsoft.Extensions.Logging;
 
 namespace WebOptimizer;
 
-internal class AssetPipeline : IAssetPipeline
+internal class AssetPipeline(ILogger<Asset> assetLogger) : IAssetPipeline
 {
     /// <summary>
     /// For use by the Asset constructor only. Do not use for logging messages inside <see cref="AssetPipeline"/>.
     /// </summary>
-    internal ILogger<Asset> _assetLogger;
+    internal ILogger<Asset> _assetLogger = assetLogger ?? throw new ArgumentNullException(nameof(assetLogger));
 
     internal ConcurrentDictionary<string, IAsset> _assets = new(StringComparer.OrdinalIgnoreCase);
 
@@ -86,7 +86,7 @@ internal class AssetPipeline : IAssetPipeline
         return asset;
     }
 
-    public IEnumerable<IAsset> AddFiles(string contentType, params string[] sourceFiles)
+    public IEnumerable<IAsset> AddFiles(string? contentType, params string[] sourceFiles)
     {
         if (string.IsNullOrEmpty(contentType))
         {
@@ -111,7 +111,7 @@ internal class AssetPipeline : IAssetPipeline
         return list;
     }
 
-    public bool TryGetAssetFromRoute(string route, [NotNullWhen(true)] out IAsset? asset)
+    public bool TryGetAssetFromRoute(string? route, [NotNullWhen(true)] out IAsset? asset)
     {
         asset = null;
 
@@ -151,9 +151,11 @@ internal class AssetPipeline : IAssetPipeline
 
                 if (result.HasMatches)
                 {
-                    asset = new Asset(cleanRoute, existing.ContentType, [
-                        cleanRoute
-                    ], _assetLogger);
+                    asset = new Asset(
+                        cleanRoute,
+                        existing.ContentType,
+                        [cleanRoute],
+                        _assetLogger);
 
                     foreach (var processor in existing.Processors)
                     {
