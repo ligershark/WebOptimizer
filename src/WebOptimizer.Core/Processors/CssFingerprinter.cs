@@ -21,7 +21,7 @@ namespace WebOptimizer
             var content = new Dictionary<string, byte[]>();
             var env = (IWebHostEnvironment)config.HttpContext.RequestServices.GetRequiredService(typeof(IWebHostEnvironment));
 
-            IFileProvider fileProvider = config.Asset.GetAssetFileProvider(env);
+            var fileProvider = config.Asset.GetAssetFileProvider(env);
 
             foreach (string key in config.Content.Keys)
             {
@@ -67,17 +67,17 @@ namespace WebOptimizer
                 string queryOnly = pathAndQuery.Length == 2 ? pathAndQuery[1] : string.Empty;
 
                 // get filepath of included file
-                if (!UrlPathUtils.TryMakeAbsolute(routeBasePath, pathOnly, out string filePath))
+                if (!UrlPathUtils.TryMakeAbsolute(routeBasePath, pathOnly, out string? filePath))
                 {
                     // path to included file is invalid
                     return match.Value;
                 }
 
                 // get FileInfo of included file
-                IFileInfo linkedFileInfo = fileProvider.GetFileInfo(filePath);
+                var linkedFileInfo = filePath is null ? null : fileProvider.GetFileInfo(filePath);
 
                 // no fingerprint if file is not found
-                if (!linkedFileInfo.Exists)
+                if (linkedFileInfo is null || !linkedFileInfo.Exists)
                 {
                     return match.Value;
                 }

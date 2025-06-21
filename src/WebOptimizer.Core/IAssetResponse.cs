@@ -8,12 +8,12 @@ public interface IAssetResponse
     /// <summary>
     /// Gets the content of the response.
     /// </summary>
-    byte[] Body { get; }
+    byte[]? Body { get; }
 
     /// <summary>
     /// Gets the cache key.
     /// </summary>
-    string CacheKey { get; }
+    string? CacheKey { get; }
 
     /// <summary>
     /// Gets the HTTP headers.

@@ -18,12 +18,12 @@ public interface IWebOptimizerOptions
     /// <code>true</code>
     /// .
     /// </summary>
-    string CacheDirectory { get; set; }
+    string? CacheDirectory { get; set; }
 
     /// <summary>
     /// Gets the CDN url used for TagHelpers.
     /// </summary>
-    string CdnUrl { get; }
+    string? CdnUrl { get; }
 
     /// <summary>
     /// Gets or sets a value indicating whether server-side caching is enabled. Default is

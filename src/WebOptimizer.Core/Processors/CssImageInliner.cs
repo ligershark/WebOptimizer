@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -90,17 +86,17 @@ namespace WebOptimizer
             string queryOnly = pathAndQuery.Length == 2 ? pathAndQuery[1] : string.Empty;
 
             // get filepath of included file
-            if (!UrlPathUtils.TryMakeAbsolute(routeBasePath, pathOnly, out string filePath))
+            if (!UrlPathUtils.TryMakeAbsolute(routeBasePath, pathOnly, out string? filePath))
             {
                 // path to included file is invalid
                 return match.Value;
             }
 
             // get FileInfo of included file
-            IFileInfo linkedFileInfo = fileProvider.GetFileInfo(filePath);
+            var linkedFileInfo = filePath is null ? null : fileProvider.GetFileInfo(filePath);
 
             // no fingerprint if file is not found
-            if (!linkedFileInfo.Exists)
+            if (linkedFileInfo is null || !linkedFileInfo.Exists)
             {
                 return match.Value;
             }
@@ -118,7 +114,7 @@ namespace WebOptimizer
                 return match.Value;
             }
 
-            using Stream fs = linkedFileInfo.CreateReadStream();
+            using var fs = linkedFileInfo.CreateReadStream();
             string base64 = Convert.ToBase64String(await fs.AsBytesAsync());
             string? dataUri = $"data:{mimeType};base64,{base64}";
 
