@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Moq;
+using WebOptimizer.Core.Test.Mocks;
 using Xunit;
 
 namespace WebOptimizer.Test;

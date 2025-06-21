@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUglify.Helpers;
+using WebOptimizer.Core.Test.Mocks;
 using WebOptimizer.Test;
 using Xunit;
 
