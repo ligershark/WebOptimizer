@@ -67,13 +67,13 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var optionsMonitor = new Mock<OptionsMonitor<WebOptimizerOptions>>(optionsFactory.Object, sources, optionsMonitorCache.Object);
             optionsMonitor.Setup(x => x.Get(It.IsAny<string>())).Returns(options);
 
-            var route = "/testbundle";
-            var cacheKey = "abc123";
+            string route = "/testbundle";
+            string cacheKey = "abc123";
 
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns(route);
-            asset.SetupGet(a => a.SourceFiles).Returns([..new[] { "file.css" }]);
+            asset.SetupGet(a => a.SourceFiles).Returns(["file.css"]);
             asset.SetupGet(a => a.ExcludeFiles).Returns([]);
             asset.SetupGet(a => a.Items).Returns(new Dictionary<string, object> { { "fileprovider", fileProvider.Object } });
             asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>(), It.IsAny<IWebOptimizerOptions>()))
@@ -144,7 +144,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var optionsMonitor = new Mock<OptionsMonitor<WebOptimizerOptions>>(optionsFactory.Object, sources, optionsMonitorCache.Object);
             optionsMonitor.Setup(x => x.Get(It.IsAny<string>())).Returns(options);
 
-            IAsset asset;
+            IAsset? asset;
             var assetPipeline = new Mock<IAssetPipeline>();
             assetPipeline.Setup(ap => ap.TryGetAssetFromRoute(It.IsAny<string>(), out asset)).Returns(false);
 
@@ -161,7 +161,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 new TagHelperAttributeList(),
                 new Dictionary<object, object>(),
                 "unique");
-            var hrefValue = $"{pathBase}/lib/bootstrap/dist/css/bootstrap.min.css";
+            string hrefValue = $"{pathBase}/lib/bootstrap/dist/css/bootstrap.min.css";
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("href", hrefValue) };
 
             var tagHelperOutput = new TagHelperOutput("link", attributes, (_, _) => Task.Factory.StartNew<TagHelperContent>(
@@ -185,9 +185,9 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var env = new Mock<IWebHostEnvironment>();
             env.Setup(e => e.WebRootFileProvider).Returns(fileProvider.Object);
             var cache = new Mock<IMemoryCache>();
-            object cacheValue = "/file1.css?v=abc123";
+            object? cacheValue = "/file1.css?v=abc123";
             cache.Setup(c => c.TryGetValue("file1.css", out cacheValue)).Returns(true);
-            object cacheValue2 = "/file2.css?v=def456";
+            object? cacheValue2 = "/file2.css?v=def456";
             cache.Setup(c => c.TryGetValue("file2.css", out cacheValue2)).Returns(true);
             var context = new Mock<HttpContext>().SetupAllProperties();
             StringValues ae = "gzip, deflate";
@@ -215,7 +215,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var optionsMonitor = new Mock<OptionsMonitor<WebOptimizerOptions>>(optionsFactory.Object, sources, optionsMonitorCache.Object);
             optionsMonitor.Setup(x => x.Get(It.IsAny<string>())).Returns(options);
 
-            var route = "/testbundle";
+            string route = "/testbundle";
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/css");
             asset.SetupGet(a => a.Route).Returns(route);
@@ -281,7 +281,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 .Returns(true);
             context.Setup(c => c.RequestServices.GetService(typeof(IWebHostEnvironment)))
                 .Returns(env.Object);
-            var pathBase = "/myApp";
+            string pathBase = "/myApp";
             context.SetupGet(c => c.Request.PathBase).Returns(pathBase);
 
             var viewContext = new ViewContext
@@ -301,7 +301,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var tagHelperOutput = new TagHelperOutput("link", attributes, (_, _) => Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             linkTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
-            var hrefValue = tagHelperOutput.Attributes.First(x => x.Name == "href").Value;
+            object hrefValue = tagHelperOutput.Attributes.First(x => x.Name == "href").Value;
             Assert.Equal(absoluteUrl, hrefValue);
         }
 
@@ -335,7 +335,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 .Returns(true);
             context.Setup(c => c.RequestServices.GetService(typeof(IWebHostEnvironment)))
                 .Returns(env.Object);
-            var pathBase = "/myApp";
+            string pathBase = "/myApp";
             context.SetupGet(c => c.Request.PathBase).Returns(pathBase);
 
             var viewContext = new ViewContext
@@ -388,7 +388,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 .Returns(true);
             context.Setup(c => c.RequestServices.GetService(typeof(IWebHostEnvironment)))
                 .Returns(env.Object);
-            var pathBase = "/myApp";
+            string pathBase = "/myApp";
             context.SetupGet(c => c.Request.PathBase).Returns(pathBase);
 
             var viewContext = new ViewContext
@@ -403,13 +403,13 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 new TagHelperAttributeList(),
                 new Dictionary<object, object>(),
                 "unique");
-            var relativeUrl = "/test.css";
+            string relativeUrl = "/test.css";
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("href", relativeUrl) };
 
             var tagHelperOutput = new TagHelperOutput("link", attributes, (_, _) => Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             linkTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
-            var hrefValue = tagHelperOutput.Attributes.First(x => x.Name == "href").Value;
+            object hrefValue = tagHelperOutput.Attributes.First(x => x.Name == "href").Value;
             Assert.Equal($"{options.CdnUrl}{pathBase}{relativeUrl}", hrefValue);
         }
     }

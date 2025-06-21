@@ -29,6 +29,7 @@ public class AssetPipelineTest
         {
             normalizedRoute = $"/{normalizedRoute}";
         }
+
         Assert.Equal(normalizedRoute, pipeline.Assets[0].Route);
     }
 

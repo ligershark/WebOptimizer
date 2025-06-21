@@ -35,7 +35,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var cache = new Mock<IMemoryCache>();
             var context = new Mock<HttpContext>().SetupAllProperties();
             StringValues ae = "gzip, deflate";
-            
+
             context.SetupSequence(c => c.Request.Headers.TryGetValue("Accept-Encoding", out ae))
                 .Returns(false)
                 .Returns(true);
@@ -44,7 +44,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             context.Setup(c => c.RequestServices.GetService(typeof(IMemoryCache)))
                 .Returns(cache.Object);
             context.SetupGet(c => c.Request.PathBase).Returns(pathBase);
-            
+
             var options = new WebOptimizerOptions
             {
                 EnableTagHelperBundling = true,
@@ -52,28 +52,27 @@ namespace WebOptimizer.Core.Test.TagHelpers
             };
             var optionsFactory = new Mock<IOptionsFactory<WebOptimizerOptions>>();
             optionsFactory.Setup(x => x.Create(It.IsAny<string>())).Returns(options);
-            
+
             var sources = new List<IOptionsChangeTokenSource<WebOptimizerOptions>>();
             var optionsMonitorCache = new Mock<IOptionsMonitorCache<WebOptimizerOptions>>();
-            
+
             var optionsMonitor = new Mock<OptionsMonitor<WebOptimizerOptions>>(optionsFactory.Object, sources, optionsMonitorCache.Object);
             optionsMonitor.Setup(x => x.Get(It.IsAny<string>())).Returns(options);
-
-            var route = "/testbundle";
-            var cacheKey = "abc123";
-            
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/javascript");
+
+            string route = "/testbundle";
             asset.SetupGet(a => a.Route).Returns(route);
-            asset.SetupGet(a => a.SourceFiles).Returns([..new[] { "file.js" }]);
+            asset.SetupGet(a => a.SourceFiles).Returns(["file.js"]);
             asset.SetupGet(a => a.ExcludeFiles).Returns([]);
-            asset.SetupGet(a => a.Items).Returns(new Dictionary<string, object>{ {"fileprovider", fileProvider.Object}});
+            asset.SetupGet(a => a.Items).Returns(new Dictionary<string, object> { { "fileprovider", fileProvider.Object } });
+            string cacheKey = "abc123";
             asset.Setup(a => a.GenerateCacheKey(It.IsAny<HttpContext>(), It.IsAny<IWebOptimizerOptions>()))
                 .Returns(cacheKey);
             var assetObject = asset.Object;
             var assetPipeline = new Mock<IAssetPipeline>();
             assetPipeline.Setup(ap => ap.TryGetAssetFromRoute(route, out assetObject)).Returns(true);
-            
+
             var scriptTagHelper =
                 new ScriptTagHelper(env.Object, cache.Object, assetPipeline.Object, optionsMonitor.Object);
             var viewContext = new ViewContext
@@ -89,15 +88,15 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 new Dictionary<object, object>(),
                 "unique");
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("src", route) };
-            
+
             var tagHelperOutput = new TagHelperOutput("script", attributes, (_, _) =>  Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
-            
+
             scriptTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
             var srcAttr = tagHelperOutput.Attributes.First(x => x.Name == "src");
             Assert.Equal($"{options.CdnUrl}{pathBase}{route}?v={cacheKey}", srcAttr.Value.ToString());
         }
-        
+
         [Theory2]
         [InlineData("https://my-cdn.com", "")]
         [InlineData("https://my-cdn.com", "/myapp")]
@@ -114,7 +113,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var cache = new Mock<IMemoryCache>();
             var context = new Mock<HttpContext>().SetupAllProperties();
             StringValues ae = "gzip, deflate";
-            
+
             context.SetupSequence(c => c.Request.Headers.TryGetValue("Accept-Encoding", out ae))
                 .Returns(false)
                 .Returns(true);
@@ -123,7 +122,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             context.Setup(c => c.RequestServices.GetService(typeof(IMemoryCache)))
                 .Returns(cache.Object);
             context.SetupGet(c => c.Request.PathBase).Returns(pathBase);
-            
+
             var options = new WebOptimizerOptions
             {
                 EnableTagHelperBundling = true,
@@ -131,16 +130,16 @@ namespace WebOptimizer.Core.Test.TagHelpers
             };
             var optionsFactory = new Mock<IOptionsFactory<WebOptimizerOptions>>();
             optionsFactory.Setup(x => x.Create(It.IsAny<string>())).Returns(options);
-            
+
             var sources = new List<IOptionsChangeTokenSource<WebOptimizerOptions>>();
             var optionsMonitorCache = new Mock<IOptionsMonitorCache<WebOptimizerOptions>>();
-            
+
             var optionsMonitor = new Mock<OptionsMonitor<WebOptimizerOptions>>(optionsFactory.Object, sources, optionsMonitorCache.Object);
             optionsMonitor.Setup(x => x.Get(It.IsAny<string>())).Returns(options);
-            IAsset asset;
+            IAsset? asset;
             var assetPipeline = new Mock<IAssetPipeline>();
             assetPipeline.Setup(ap => ap.TryGetAssetFromRoute(It.IsAny<string>(), out asset)).Returns(false);
-            
+
             var scriptTagHelper =
                 new ScriptTagHelper(env.Object, cache.Object, assetPipeline.Object, optionsMonitor.Object);
             var viewContext = new ViewContext
@@ -155,17 +154,17 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 new TagHelperAttributeList(),
                 new Dictionary<object, object>(),
                 "unique");
-            var srcValue = $"{pathBase}/lib/bootstrap/dist/js/bootstrap.min.js";
+            string srcValue = $"{pathBase}/lib/bootstrap/dist/js/bootstrap.min.js";
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("src", srcValue) };
-            
+
             var tagHelperOutput = new TagHelperOutput("script", attributes, (_, _) =>  Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
-            
+
             scriptTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
             var srcAttr = tagHelperOutput.Attributes.First(x => x.Name == "src");
             Assert.Equal($"{options.CdnUrl}{srcValue}", srcAttr.Value.ToString());
         }
-        
+
         [Theory2]
         [InlineData("https://my-cdn.com", "")]
         [InlineData("https://my-cdn.com", "/myapp")]
@@ -180,13 +179,13 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var env = new Mock<IWebHostEnvironment>();
             env.Setup(e => e.WebRootFileProvider).Returns(fileProvider.Object);
             var cache = new Mock<IMemoryCache>();
-            object cacheValue = "/file1.js?v=abc123";
+            object? cacheValue = "/file1.js?v=abc123";
             cache.Setup(c => c.TryGetValue("file1.js", out cacheValue)).Returns(true);
-            object cacheValue2 = "/file2.js?v=def456";
+            object? cacheValue2 = "/file2.js?v=def456";
             cache.Setup(c => c.TryGetValue("file2.js", out cacheValue2)).Returns(true);
             var context = new Mock<HttpContext>().SetupAllProperties();
             StringValues ae = "gzip, deflate";
-            
+
             context.SetupSequence(c => c.Request.Headers.TryGetValue("Accept-Encoding", out ae))
                 .Returns(false)
                 .Returns(true);
@@ -195,7 +194,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             context.Setup(c => c.RequestServices.GetService(typeof(IMemoryCache)))
                 .Returns(cache.Object);
             context.SetupGet(c => c.Request.PathBase).Returns(pathBase);
-            
+
             var options = new WebOptimizerOptions
             {
                 EnableTagHelperBundling = false,
@@ -203,14 +202,14 @@ namespace WebOptimizer.Core.Test.TagHelpers
             };
             var optionsFactory = new Mock<IOptionsFactory<WebOptimizerOptions>>();
             optionsFactory.Setup(x => x.Create(It.IsAny<string>())).Returns(options);
-            
+
             var sources = new List<IOptionsChangeTokenSource<WebOptimizerOptions>>();
             var optionsMonitorCache = new Mock<IOptionsMonitorCache<WebOptimizerOptions>>();
-            
+
             var optionsMonitor = new Mock<OptionsMonitor<WebOptimizerOptions>>(optionsFactory.Object, sources, optionsMonitorCache.Object);
             optionsMonitor.Setup(x => x.Get(It.IsAny<string>())).Returns(options);
 
-            var route = "/testbundle";
+            string route = "/testbundle";
             var asset = new Mock<IAsset>().SetupAllProperties();
             asset.SetupGet(a => a.ContentType).Returns("text/javascript");
             asset.SetupGet(a => a.Route).Returns(route);
@@ -220,7 +219,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var assetObject = asset.Object;
             var assetPipeline = new Mock<IAssetPipeline>();
             assetPipeline.Setup(ap => ap.TryGetAssetFromRoute(route, out assetObject)).Returns(true);
-            
+
             var scriptTagHelper = new ScriptTagHelper(env.Object, cache.Object, assetPipeline.Object, optionsMonitor.Object);
             var viewContext = new ViewContext
             {
@@ -235,7 +234,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 new Dictionary<object, object>(),
                 "unique");
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("src", route) };
-            
+
             var tagHelperOutput = new TagHelperOutput("scripts", attributes, (_, _) =>  Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             scriptTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
@@ -257,7 +256,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             fileProvider.Setup(fp => fp.GetFileInfo(It.IsAny<string>())).Returns(fileInfo.Object);
             var env = new Mock<IWebHostEnvironment>();
             env.Setup(e => e.WebRootFileProvider).Returns(fileProvider.Object);
-            
+
             var options = new WebOptimizerOptions
             {
                 CdnUrl = "https://mycdn.com"
@@ -269,15 +268,15 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var scriptTagHelper = new ScriptTagHelper(env.Object, new Mock<IMemoryCache>().Object, new Mock<IAssetPipeline>().Object, optionsMonitor.Object);
             var context = new Mock<HttpContext>().SetupAllProperties();
             StringValues ae = "gzip, deflate";
-            
+
             context.SetupSequence(c => c.Request.Headers.TryGetValue("Accept-Encoding", out ae))
                 .Returns(false)
                 .Returns(true);
             context.Setup(c => c.RequestServices.GetService(typeof(IWebHostEnvironment)))
                 .Returns(env.Object);
-            var pathBase = "/myApp";
+            string pathBase = "/myApp";
             context.SetupGet(c => c.Request.PathBase).Returns(pathBase);
-            
+
             var viewContext = new ViewContext
             {
                 HttpContext = context.Object
@@ -291,14 +290,14 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 new Dictionary<object, object>(),
                 "unique");
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("src", absoluteUrl) };
-            
+
             var tagHelperOutput = new TagHelperOutput("scripts", attributes, (_, _) =>  Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             scriptTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
-            var srcValue = tagHelperOutput.Attributes.First(x => x.Name == "src").Value;
+            object srcValue = tagHelperOutput.Attributes.First(x => x.Name == "src").Value;
             Assert.Equal(absoluteUrl, srcValue);
         }
-        
+
         [Fact2]
         public void RelativeUrl_RouteIsNotAsset_DoesAddCdnAndPath()
         {
@@ -308,7 +307,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
             fileProvider.Setup(fp => fp.GetFileInfo(It.IsAny<string>())).Returns(fileInfo.Object);
             var env = new Mock<IWebHostEnvironment>();
             env.Setup(e => e.WebRootFileProvider).Returns(fileProvider.Object);
-            
+
             var options = new WebOptimizerOptions
             {
                 CdnUrl = "https://mycdn.com"
@@ -320,15 +319,15 @@ namespace WebOptimizer.Core.Test.TagHelpers
             var scriptTagHelper = new ScriptTagHelper(env.Object, new Mock<IMemoryCache>().Object, new Mock<IAssetPipeline>().Object, optionsMonitor.Object);
             var context = new Mock<HttpContext>().SetupAllProperties();
             StringValues ae = "gzip, deflate";
-            
+
             context.SetupSequence(c => c.Request.Headers.TryGetValue("Accept-Encoding", out ae))
                 .Returns(false)
                 .Returns(true);
             context.Setup(c => c.RequestServices.GetService(typeof(IWebHostEnvironment)))
                 .Returns(env.Object);
-            var pathBase = "/myApp";
+            string pathBase = "/myApp";
             context.SetupGet(c => c.Request.PathBase).Returns(pathBase);
-            
+
             var viewContext = new ViewContext
             {
                 HttpContext = context.Object
@@ -341,13 +340,13 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 new TagHelperAttributeList(),
                 new Dictionary<object, object>(),
                 "unique");
-            var relativeUrl = "/test.js";
+            string relativeUrl = "/test.js";
             var attributes = new TagHelperAttributeList { new TagHelperAttribute("src", relativeUrl) };
-            
+
             var tagHelperOutput = new TagHelperOutput("scripts", attributes, (_, _) =>  Task.Factory.StartNew<TagHelperContent>(
                 () => new DefaultTagHelperContent()));
             scriptTagHelper.Process(tagHelperContext.Object, tagHelperOutput);
-            var srcValue = tagHelperOutput.Attributes.First(x => x.Name == "src").Value;
+            object srcValue = tagHelperOutput.Attributes.First(x => x.Name == "src").Value;
             Assert.Equal($"{options.CdnUrl}{pathBase}{relativeUrl}", srcValue);
         }
 
@@ -378,7 +377,7 @@ namespace WebOptimizer.Core.Test.TagHelpers
                 .Returns(true);
             context.Setup(c => c.RequestServices.GetService(typeof(IWebHostEnvironment)))
                 .Returns(env.Object);
-            var pathBase = "/myApp";
+            string pathBase = "/myApp";
             context.SetupGet(c => c.Request.PathBase).Returns(pathBase);
 
             var viewContext = new ViewContext
