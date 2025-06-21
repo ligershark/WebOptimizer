@@ -10,7 +10,9 @@ namespace WebOptimizer.Processors
             var asset = context.Asset;
             var items = asset.Items;
             if (!items.TryGetValue("Content", out object? value))
+            {
                 return Task.CompletedTask;
+            }
 
             context.Content = new Dictionary<string, byte[]>
             {

@@ -12,7 +12,11 @@ namespace WebOptimizer
 
         public override Task ExecuteAsync(IAssetContext config)
         {
-            if (!Settings.CodeSettings.MinifyCode) return Task.CompletedTask;
+            if (!Settings.CodeSettings.MinifyCode)
+            {
+                return Task.CompletedTask;
+            }
+
             var content = new Dictionary<string, byte[]>();
 
             foreach (string key in config.Content.Keys)

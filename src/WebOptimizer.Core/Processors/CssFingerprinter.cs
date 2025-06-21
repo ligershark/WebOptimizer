@@ -41,17 +41,23 @@ namespace WebOptimizer
             {
                 // no fingerprint on inline data
                 if (match.Value.StartsWith("data:"))
+                {
                     return match.Value;
+                }
 
                 string urlValue = match.Groups[3].Value;
 
                 // no fingerprint on absolute urls
                 if (Uri.IsWellFormedUriString(urlValue, UriKind.Absolute))
+                {
                     return match.Value;
+                }
 
                 // no fingerprint if other host
                 if (urlValue.StartsWith("//"))
+                {
                     return match.Value;
+                }
 
                 string routeBasePath = UrlPathUtils.GetDirectory(config.Asset.Route);
 
@@ -62,15 +68,19 @@ namespace WebOptimizer
 
                 // get filepath of included file
                 if (!UrlPathUtils.TryMakeAbsolute(routeBasePath, pathOnly, out string filePath))
+                {
                     // path to included file is invalid
                     return match.Value;
+                }
 
                 // get FileInfo of included file
                 IFileInfo linkedFileInfo = fileProvider.GetFileInfo(filePath);
 
                 // no fingerprint if file is not found
                 if (!linkedFileInfo.Exists)
+                {
                     return match.Value;
+                }
 
                 string hash = GenerateHash(linkedFileInfo.LastModified.Ticks.ToString());
                 string withHash = $"{pathOnly}?v={hash}";

@@ -34,21 +34,29 @@ namespace WebOptimizer
             {
                 // no change on inline data
                 if (match.Value.StartsWith("data:"))
+                {
                     return match.Value;
+                }
 
                 string urlValue = match.Groups[3].Value;
 
                 // no change on absolute urls
                 if (Uri.IsWellFormedUriString(urlValue, UriKind.Absolute))
+                {
                     return match.Value;
+                }
 
                 // no change if other host
                 if (urlValue.StartsWith("//"))
+                {
                     return match.Value;
+                }
 
                 // no change, if absolute path
                 if (UrlPathUtils.IsAbsolutePath(urlValue))
+                {
                     return match.Value;
+                }
 
                 // get absolute path of content file
                 string appPath = (config.HttpContext?.Request?.PathBase.HasValue ?? false)
@@ -71,8 +79,10 @@ namespace WebOptimizer
                 else
                 {
                     if (!UrlPathUtils.TryMakeAbsolutePathFromInclude(appPath, key, pathOnly, out filePath))
+                    {
                         // path to included file is invalid
                         return match.Value;
+                    }
                 }
 
                 string relativePath = MakeRelative(routePath, filePath);
@@ -91,7 +101,9 @@ namespace WebOptimizer
         private static string MakeRelative(string baseFile, string file)
         {
             if (string.IsNullOrEmpty(file))
+            {
                 return file;
+            }
 
             // The file:// protocol is to make it work on Linux.
             // See https://github.com/madskristensen/BundlerMinifier/commit/01fe7a050eda073f8949caa90eedc4c23e04d0ce
