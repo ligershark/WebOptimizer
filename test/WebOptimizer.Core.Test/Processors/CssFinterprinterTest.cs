@@ -15,15 +15,15 @@ namespace WebOptimizer.Core.Test.Processors;
 public class CssFinterprinterTest
 {
     [Theory2]
-    [InlineData("url(/css/img/foo.png)", "url(/css/img/foo.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI)")]
-    [InlineData("url(/css/img/foo.png?1=1)", "url(/css/img/foo.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI&1=1)")]
-    [InlineData("url('/css/img/foo.png')", "url('/css/img/foo.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI')")]
+    [InlineData("url(/css/img/foo.png)", "url(/css/img/foo.png?v=UOMNppUf6ogNVsHJDWz1gBbnvcYv5db8bif3J4YbRus)")]
+    [InlineData("url(/css/img/foo.png?1=1)", "url(/css/img/foo.png?v=UOMNppUf6ogNVsHJDWz1gBbnvcYv5db8bif3J4YbRus&1=1)")]
+    [InlineData("url('/css/img/foo.png')", "url('/css/img/foo.png?v=UOMNppUf6ogNVsHJDWz1gBbnvcYv5db8bif3J4YbRus')")]
     [InlineData("url('/img/doesntexist.png')", "url('/img/doesntexist.png')")]
     [InlineData("url(http://example.com/foo.png)", "url(http://example.com/foo.png)")]
     [InlineData("url(//example.com/foo.png)", "url(//example.com/foo.png)")]
-    [InlineData("url(img/foo.png)", "url(img/foo.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI)")]
-    [InlineData("url(../img/foo2.png)", "url(../img/foo2.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI)")]
-    [InlineData("url(../img/foo2.png?1=1)", "url(../img/foo2.png?v=Ai9EHcgOXDloih8M5cRTS07P-FI&1=1)")]
+    [InlineData("url(img/foo.png)", "url(img/foo.png?v=UOMNppUf6ogNVsHJDWz1gBbnvcYv5db8bif3J4YbRus)")]
+    [InlineData("url(../img/foo2.png)", "url(../img/foo2.png?v=UOMNppUf6ogNVsHJDWz1gBbnvcYv5db8bif3J4YbRus)")]
+    [InlineData("url(../img/foo2.png?1=1)", "url(../img/foo2.png?v=UOMNppUf6ogNVsHJDWz1gBbnvcYv5db8bif3J4YbRus&1=1)")]
     [InlineData("url(../img/doesntexist.png)", "url(../img/doesntexist.png)")]
     [InlineData("url(../../img/doesntexist.png)", "url(../../img/doesntexist.png)")]
     public async Task CssFingerprint_Success(string url, string newUrl)

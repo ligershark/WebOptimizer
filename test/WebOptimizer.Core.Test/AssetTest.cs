@@ -1,5 +1,5 @@
-﻿using System.IO;
-using System.Linq;
+﻿using System;
+using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -61,7 +61,7 @@ namespace WebOptimizer.Test
             var fileProvider = new PhysicalFileProvider(Path.GetTempPath());
 
             var asset = new Asset(route, contentType, sourcefiles, logger.Object);
-            asset.Items.Add("PhysicalFiles", new string[0]);
+            asset.Items.Add("PhysicalFiles", Array.Empty<string>());
 
             StringValues ae = "gzip, deflate";
             context.SetupSequence(c => c.Request.Headers.TryGetValue("Accept-Encoding", out ae))
@@ -79,11 +79,11 @@ namespace WebOptimizer.Test
 
             // Check non-gzip value
             string key = asset.GenerateCacheKey(context.Object, options);
-            Assert.Equal("_BZuuBNh_zEXnNPIPaO_4Ii4UdM", key);
+            Assert.Equal("ioTkBsCKyVlPRyIkBlmPdZjhXFX4BEsEgT4oyd7nCXY", key);
 
             // Check gzip value
             string gzipKey = asset.GenerateCacheKey(context.Object, options);
-            Assert.Equal("SvH6WGVAapgMXiPenaOGnKS_oMI", gzipKey);
+            Assert.Equal("ohBCDBt7xsmLL5fnMs_sJeEY5tlO7b6VvXmOWU002G8", gzipKey);
         }
 
         [Fact2]
