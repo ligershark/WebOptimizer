@@ -6,14 +6,41 @@ using Microsoft.Extensions.FileProviders;
 using WebOptimizer;
 using WebOptimizer.Utils;
 
+namespace Microsoft.Extensions.DependencyInjection
+{
+    /// <summary>
+    /// Extension methods for <see cref="IAssetPipeline"/>.
+    /// </summary>
+    public static partial class AssetPipelineExtensions
+    {
+        /// <summary>
+        /// Inlines url() references as base64 encoded strings if the image size is below <paramref name="maxFileSize"/>.
+        /// </summary>
+        public static IAsset InlineImages(this IAsset bundle, int maxFileSize = 5120)
+        {
+            var minifier = new CssImageInliner(maxFileSize);
+            bundle.Processors.Add(minifier);
+
+            return bundle;
+        }
+
+        /// <summary>
+        /// Adds a fingerprint to local url() references.
+        /// NOTE: Make sure to call Concatinate() before this method
+        /// </summary>
+        public static IEnumerable<IAsset> InlineImages(this IEnumerable<IAsset> assets, int maxFileSize = 5120)
+        {
+            return assets.AddProcessor(asset => asset.InlineImages(maxFileSize));
+        }
+    }
+}
+
 namespace WebOptimizer
 {
     internal partial class CssImageInliner : Processor
     {
-        [GeneratedRegex(@"(url\s*\(\s*)([""']?)([^:)]+)(\2\s*\))", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
-        private static partial Regex UrlRegex();
-
         private static readonly Regex _rxUrl = UrlRegex();
+
         private static int _maxFileSize;
 
         public CssImageInliner(int maxFileSize)
@@ -25,7 +52,7 @@ namespace WebOptimizer
         {
             var content = new Dictionary<string, byte[]>();
             var env = (IWebHostEnvironment)config.HttpContext.RequestServices.GetRequiredService(typeof(IWebHostEnvironment));
-            IFileProvider fileProvider = config.Asset.GetAssetFileProvider(env);
+            var fileProvider = config.Asset.GetAssetFileProvider(env);
 
             foreach (string key in config.Content.Keys)
             {
@@ -37,6 +64,27 @@ namespace WebOptimizer
             config.Content = content;
         }
 
+        private static string? GetMimeTypeFromFileExtension(string file)
+        {
+            string ext = Path.GetExtension(file).TrimStart('.');
+
+            return ext switch
+            {
+                "jpg" or "jpeg" => "image/jpeg",
+                "gif" => "image/gif",
+                "png" => "image/png",
+                "webp" => "image/webp",
+                "svg" => "image/svg+xml",
+                "ttf" => "application/x-font-ttf",
+                "otf" => "application/x-font-opentype",
+                "woff" => "application/font-woff",
+                "woff2" => "application/font-woff2",
+                "eot" => "application/vnd.ms-fontobject",
+                "sfnt" => "application/font-sfnt",
+                _ => null,
+            };
+        }
+
         private static async Task<byte[]> InlineAsync(IAssetContext config, string key, IFileProvider fileProvider)
         {
             string content = config.Content[key].AsString();
@@ -46,12 +94,12 @@ namespace WebOptimizer
 
             foreach (Match match in _rxUrl.Matches(content))
             {
-                sb.Append(content, lastIndex, match.Index - lastIndex);
-                sb.Append(await ReplaceMatchAsync(config, fileProvider, match));
+                _ = sb.Append(content, lastIndex, match.Index - lastIndex);
+                _ = sb.Append(await ReplaceMatchAsync(config, fileProvider, match));
                 lastIndex = match.Index + match.Length;
             }
 
-            sb.Append(content, lastIndex, content.Length - lastIndex);
+            _ = sb.Append(content, lastIndex, content.Length - lastIndex);
 
             return sb.ToString().AsByteArray();
         }
@@ -102,7 +150,7 @@ namespace WebOptimizer
             }
 
             if (linkedFileInfo.Length > _maxFileSize &&
-                (!queryOnly.Contains("&inline") && !queryOnly.Contains("?inline")))
+                !queryOnly.Contains("&inline") && !queryOnly.Contains("?inline"))
             {
                 return match.Value;
             }
@@ -127,54 +175,7 @@ namespace WebOptimizer
             return replaced;
         }
 
-        private static string? GetMimeTypeFromFileExtension(string file)
-        {
-            string ext = Path.GetExtension(file).TrimStart('.');
-
-            return ext switch
-            {
-                "jpg" or "jpeg" => "image/jpeg",
-                "gif" => "image/gif",
-                "png" => "image/png",
-                "webp" => "image/webp",
-                "svg" => "image/svg+xml",
-                "ttf" => "application/x-font-ttf",
-                "otf" => "application/x-font-opentype",
-                "woff" => "application/font-woff",
-                "woff2" => "application/font-woff2",
-                "eot" => "application/vnd.ms-fontobject",
-                "sfnt" => "application/font-sfnt",
-                _ => null,
-            };
-        }
-    }
-}
-
-namespace Microsoft.Extensions.DependencyInjection
-{
-    /// <summary>
-    /// Extension methods for <see cref="IAssetPipeline"/>.
-    /// </summary>
-    public static partial class AssetPipelineExtensions
-    {
-        /// <summary>
-        /// Inlines url() references as base64 encoded strings if the image size is below <paramref name="maxFileSize"/>.
-        /// </summary>
-        public static IAsset InlineImages(this IAsset bundle, int maxFileSize = 5120)
-        {
-            var minifier = new CssImageInliner(maxFileSize);
-            bundle.Processors.Add(minifier);
-
-            return bundle;
-        }
-
-        /// <summary>
-        /// Adds a fingerprint to local url() references.
-        /// NOTE: Make sure to call Concatinate() before this method
-        /// </summary>
-        public static IEnumerable<IAsset> InlineImages(this IEnumerable<IAsset> assets, int maxFileSize = 5120)
-        {
-            return assets.AddProcessor(asset => asset.InlineImages(maxFileSize));
-        }
+        [GeneratedRegex(@"(url\s*\(\s*)([""']?)([^:)]+)(\2\s*\))", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+        private static partial Regex UrlRegex();
     }
 }
