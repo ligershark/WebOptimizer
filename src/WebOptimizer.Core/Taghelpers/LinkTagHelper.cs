@@ -112,7 +112,10 @@ public class LinkTagHelper(
             string fileToAdd = file;
             if (Path.GetExtension(file) == ".scss")
             {
-                if (Path.GetFileName(file).StartsWith('_')) continue;
+                if (Path.GetFileName(file).StartsWith('_'))
+                {
+                    continue;
+                }
 
                 fileToAdd = Path.ChangeExtension(file, "css");
             }
