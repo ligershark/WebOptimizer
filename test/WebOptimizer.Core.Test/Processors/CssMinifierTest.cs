@@ -8,127 +8,134 @@ using Moq;
 using NUglify.Css;
 using Xunit;
 
-namespace WebOptimizer.Test.Processors
+namespace WebOptimizer.Core.Test.Processors;
+
+public class CssMinifierTest
 {
-    public class CssMinifierTest
+    [Fact2]
+    public void AddCssBundle_CustomSettings_Success()
     {
-        [Fact2]
-        public async Task MinifyCss_DefaultSettings_Success()
+        var settings = new CssSettings();
+        var logger = new Mock<ILogger<Asset>>();
+        var pipeline = new AssetPipeline(logger.Object)
         {
-            var minifier = new CssMinifier(new CssSettings());
-            var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = new Dictionary<string, byte[]> { { "", "body { color: yellow; }".AsByteArray() } };
-            var options = new Mock<WebOptimizerOptions>();
+            _assetLogger = logger.Object
+        };
+        var asset = pipeline.AddCssBundle("/foo.css", settings, "file1.css", "file2.css");
 
-            await minifier.ExecuteAsync(context.Object);
+        Assert.Equal("/foo.css", asset.Route);
+        Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
+        Assert.Equal(2, asset.SourceFiles.Count);
+        Assert.Equal(6, asset.Processors.Count);
+    }
 
-            Assert.Equal("body{color:#ff0}", context.Object.Content.First().Value.AsString());
-            Assert.Equal("", minifier.CacheKey(new DefaultHttpContext(), context.Object));
-        }
-
-        [Theory2]
-        [InlineData("")]
-        [InlineData("   ")]
-        [InlineData("/* comment */")]
-        [InlineData("   /**/ ")]
-        [InlineData("\r\n  \t \r \n")]
-        public async Task MinifyCss_EmptyContent_Success(string input)
+    [Fact2]
+    public void AddCssBundle_DefaultSettings_Success()
+    {
+        var logger = new Mock<ILogger<Asset>>();
+        var pipeline = new AssetPipeline(logger.Object)
         {
-            var minifier = new CssMinifier(new CssSettings());
-            var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = new Dictionary<string, byte[]> { { "", input.AsByteArray() } };
-            var options = new Mock<WebOptimizerOptions>();
+            _assetLogger = logger.Object
+        };
+        var asset = pipeline.AddCssBundle("/foo.css", "file1.css", "file2.css");
 
-            await minifier.ExecuteAsync(context.Object);
+        Assert.Equal("/foo.css", asset.Route);
+        Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
+        Assert.Equal(2, asset.SourceFiles.Count);
+        Assert.Equal(6, asset.Processors.Count);
+    }
 
-            Assert.Equal("", context.Object.Content.First().Value.AsString());
-            Assert.Equal("", minifier.CacheKey(new DefaultHttpContext(), context.Object));
-        }
-
-        [Fact2]
-        public async Task MinifyCss_CustomSettings_Success()
+    [Fact2]
+    public void AddCssBundle_DefaultSettings_SuccessRelative()
+    {
+        var logger = new Mock<ILogger<Asset>>();
+        var pipeline = new AssetPipeline(logger.Object)
         {
-            var settings = new CssSettings { TermSemicolons = true, ColorNames = CssColor.NoSwap };
-            var minifier = new CssMinifier(settings);
-            var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = new Dictionary<string, byte[]> { { "", "body { color: yellow; }".AsByteArray() } };
-            var options = new Mock<WebOptimizerOptions>();
+            _assetLogger = logger.Object
+        };
+        var asset = pipeline.AddCssBundle("foo.css", "file1.css", "file2.css");
 
-            await minifier.ExecuteAsync(context.Object);
+        Assert.Equal("/foo.css", asset.Route);
+        Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
+        Assert.Equal(2, asset.SourceFiles.Count);
+        Assert.Equal(6, asset.Processors.Count);
+    }
 
-            Assert.Equal("body{color:yellow;}", context.Object.Content.First().Value.AsString());
-            Assert.Equal("", minifier.CacheKey(new DefaultHttpContext(), context.Object));
-        }
-
-        [Fact2]
-        public async Task MinifyCss_NullSettings_Success()
+    [Fact2]
+    public void AddCssFiles_DefaultSettings_Success()
+    {
+        var logger = new Mock<ILogger<Asset>>();
+        var pipeline = new AssetPipeline(logger.Object)
         {
-            var minifier = new CssMinifier(null);
-            var context = new Mock<IAssetContext>().SetupAllProperties();
-            context.Object.Content = new Dictionary<string, byte[]> { { "", "body { color: yellow; }".AsByteArray() } };
-            var options = new Mock<WebOptimizerOptions>();
+            _assetLogger = logger.Object
+        };
+        var asset = pipeline.MinifyCssFiles().First();
 
-            await minifier.ExecuteAsync(context.Object);
+        Assert.Equal("/**/*.css", asset.Route);
+        Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
+        _ = Assert.Single(asset.SourceFiles);
+        Assert.Equal(3, asset.Processors.Count);
+    }
 
-            Assert.Equal("body{color:#ff0}", context.Object.Content.First().Value.AsString());
-            Assert.Equal("", minifier.CacheKey(new DefaultHttpContext(), context.Object));
-        }
+    [Fact2]
+    public async Task MinifyCss_CustomSettings_Success()
+    {
+        var settings = new CssSettings { TermSemicolons = true, ColorNames = CssColor.NoSwap };
+        var minifier = new CssMinifier(settings);
+        var context = new Mock<IAssetContext>().SetupAllProperties();
+        context.Object.Content = new Dictionary<string, byte[]> { { "", "body { color: yellow; }".AsByteArray() } };
+        _ = new Mock<WebOptimizerOptions>();
 
-        [Fact2]
-        public void AddCssBundle_DefaultSettings_Success()
-        {
-            var logger = new Mock<ILogger<Asset>>();
-            var pipeline = new AssetPipeline(logger.Object);
-            pipeline._assetLogger = logger.Object;
-            var asset = pipeline.AddCssBundle("/foo.css", "file1.css", "file2.css");
+        await minifier.ExecuteAsync(context.Object);
 
-            Assert.Equal("/foo.css", asset.Route);
-            Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
-            Assert.Equal(2, asset.SourceFiles.Count);
-            Assert.Equal(6, asset.Processors.Count);
-        }
+        Assert.Equal("body{color:yellow;}", context.Object.Content.First().Value.AsString());
+        Assert.Equal("", minifier.CacheKey(new DefaultHttpContext(), context.Object));
+    }
 
-        [Fact2]
-        public void AddCssBundle_DefaultSettings_SuccessRelative()
-        {
-            var logger = new Mock<ILogger<Asset>>();
-            var pipeline = new AssetPipeline(logger.Object);
-            pipeline._assetLogger = logger.Object;
-            var asset = pipeline.AddCssBundle("foo.css", "file1.css", "file2.css");
+    [Fact2]
+    public async Task MinifyCss_DefaultSettings_Success()
+    {
+        var minifier = new CssMinifier(new CssSettings());
+        var context = new Mock<IAssetContext>().SetupAllProperties();
+        context.Object.Content = new Dictionary<string, byte[]> { { "", "body { color: yellow; }".AsByteArray() } };
+        _ = new Mock<WebOptimizerOptions>();
 
-            Assert.Equal("/foo.css", asset.Route);
-            Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
-            Assert.Equal(2, asset.SourceFiles.Count);
-            Assert.Equal(6, asset.Processors.Count);
-        }
+        await minifier.ExecuteAsync(context.Object);
 
-        [Fact2]
-        public void AddCssBundle_CustomSettings_Success()
-        {
-            var settings = new CssSettings();
-            var logger = new Mock<ILogger<Asset>>();
-            var pipeline = new AssetPipeline(logger.Object);
-            pipeline._assetLogger = logger.Object;
-            var asset = pipeline.AddCssBundle("/foo.css", settings, "file1.css", "file2.css");
+        Assert.Equal("body{color:#ff0}", context.Object.Content.First().Value.AsString());
+        Assert.Equal("", minifier.CacheKey(new DefaultHttpContext(), context.Object));
+    }
 
-            Assert.Equal("/foo.css", asset.Route);
-            Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
-            Assert.Equal(2, asset.SourceFiles.Count);
-            Assert.Equal(6, asset.Processors.Count);
-        }
+    [Theory2]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("/* comment */")]
+    [InlineData("   /**/ ")]
+    [InlineData("\r\n  \t \r \n")]
+    public async Task MinifyCss_EmptyContent_Success(string input)
+    {
+        var minifier = new CssMinifier(new CssSettings());
+        var context = new Mock<IAssetContext>().SetupAllProperties();
+        context.Object.Content = new Dictionary<string, byte[]> { { "", input.AsByteArray() } };
+        _ = new Mock<WebOptimizerOptions>();
 
-        [Fact2]
-        public void AddCssFiles_DefaultSettings_Success()
-        {
-            var logger = new Mock<ILogger<Asset>>();
-            var pipeline = new AssetPipeline(logger.Object);
-            pipeline._assetLogger = logger.Object;
-            var asset = pipeline.MinifyCssFiles().First();
+        await minifier.ExecuteAsync(context.Object);
 
-            Assert.Equal("/**/*.css", asset.Route);
-            Assert.Equal("text/css; charset=UTF-8", asset.ContentType);
-            Assert.Single(asset.SourceFiles);
-            Assert.Equal(3, asset.Processors.Count);
-        }
+        Assert.Equal("", context.Object.Content.First().Value.AsString());
+        Assert.Equal("", minifier.CacheKey(new DefaultHttpContext(), context.Object));
+    }
+
+    [Fact2]
+    public async Task MinifyCss_NullSettings_Success()
+    {
+        var minifier = new CssMinifier(null!);
+        var context = new Mock<IAssetContext>().SetupAllProperties();
+        context.Object.Content = new Dictionary<string, byte[]> { { "", "body { color: yellow; }".AsByteArray() } };
+        _ = new Mock<WebOptimizerOptions>();
+
+        await minifier.ExecuteAsync(context.Object);
+
+        Assert.Equal("body{color:#ff0}", context.Object.Content.First().Value.AsString());
+        Assert.Equal("", minifier.CacheKey(new DefaultHttpContext(), context.Object));
     }
 }
