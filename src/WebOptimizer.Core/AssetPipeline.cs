@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace WebOptimizer
 {
@@ -13,7 +14,7 @@ namespace WebOptimizer
         /// <summary>
         /// For use by the Asset constructor only. Do not use for logging messages inside <see cref="AssetPipeline"/>.
         /// </summary>
-        internal ILogger<Asset> _assetLogger;
+        internal ILogger<Asset> _assetLogger = NullLogger<Asset>.Instance;
         public IReadOnlyList<IAsset> Assets => _assets.Values.ToList();
 
         public bool TryGetAssetFromRoute(string route, out IAsset asset)
