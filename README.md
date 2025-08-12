@@ -51,7 +51,7 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         app.UseDeveloperExceptionPage();
     }
 
-    app.UseWebOptimizer();
+    app.UseWebOptimizer(); // WebOptimizer
 
     app.UseStaticFiles();
     app.UseMvc(routes =>
@@ -71,7 +71,7 @@ And finally modify the *ConfigureServices* method by adding a call to `services.
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddMvc();
-    services.AddWebOptimizer();
+    services.AddWebOptimizer(); // WebOptimizer
 }
 ```
 
@@ -83,7 +83,8 @@ Try it by requesting one of your .css or .js files in the browser and see if it 
 
 **Disabling minification:**  
 If you want to disable minification (e.g. in development), the following overload for AddWebOptimizer() can be used:
-```
+
+```csharp
 if (env.IsDevelopment())
 {
     services.AddWebOptimizer(minifyJavaScript:false,minifyCss:false);
