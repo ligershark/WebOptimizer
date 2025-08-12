@@ -207,7 +207,7 @@ First, we need to register the TagHelpers defined in *LigerShark.WebOptimizer.Co
 
 To do that, go to `_ViewImports.cshtml` and register the Tag Helpers by adding `@addTagHelper *, WebOptimizer.Core` to the file.
 
-```text
+```cshtml
 @addTagHelper *, WebOptimizer.Core
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 ```
