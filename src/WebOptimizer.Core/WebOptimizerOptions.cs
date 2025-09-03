@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.Features;
+﻿using System;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace WebOptimizer
@@ -27,6 +28,12 @@ namespace WebOptimizer
         /// Default is <code>true</code>.
         /// </summary>
         public bool? EnableMemoryCache { get; set; } = true;
+
+        /// <summary>
+        /// If <see cref="EnableMemoryCache"/> memory caching is enabled, control how long an entry is stored in memory.
+        /// Default is <code>TimeSpan.FromHours(24)</code>
+        /// </summary>
+        public TimeSpan MemoryCacheTimeToLive { get; set; } = TimeSpan.FromHours(24);
 
         /// <summary>
         /// Gets or sets a value indicating whether disk based caching is enabled.
@@ -63,5 +70,6 @@ namespace WebOptimizer
         /// Enabling compression on HTTPS requests for remotely manipulable content may expose security problems.
         /// </remarks>
         public HttpsCompressionMode HttpsCompression { get; set; } = HttpsCompressionMode.Compress;
+        
     }
 }

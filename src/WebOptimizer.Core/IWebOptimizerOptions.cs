@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.Features;
+﻿using System;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace WebOptimizer
@@ -20,6 +21,12 @@ namespace WebOptimizer
         /// </summary>
         bool? EnableMemoryCache { get; set; }
 
+        /// <summary>
+        /// If <see cref="EnableMemoryCache"/> memory caching is enabled, control how long an entry is stored in memory.
+        /// Default is <code>TimeSpan.FromHours(24)</code>
+        /// </summary>
+        TimeSpan MemoryCacheTimeToLive { get; set; }        
+        
         /// <summary>
         /// Gets or sets a value indicating whether disk based caching is enabled.
         /// Default is <code>false</code> when running in a development environment; 
