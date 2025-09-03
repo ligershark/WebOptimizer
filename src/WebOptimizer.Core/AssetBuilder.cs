@@ -90,7 +90,7 @@ namespace WebOptimizer
             if (options.EnableMemoryCache == true)
             {
                 var cacheOptions = new MemoryCacheEntryOptions();
-                cacheOptions.SetSlidingExpiration(TimeSpan.FromHours(24));
+                cacheOptions.SetSlidingExpiration(AddJitter(options.MemoryCacheTimeToLive));
 
                 foreach (string file in asset.SourceFiles)
                 {
@@ -99,6 +99,12 @@ namespace WebOptimizer
 
                 _cache.Set(cacheKey, value, cacheOptions);
             }
+        }
+        // Add between 0 and 10% to timespan to prevent all cached items expire simultaneously 
+        private TimeSpan AddJitter(TimeSpan span)
+        {
+            var factor = 1.0 + (Random.Shared.NextDouble() / 10.0);
+            return span * factor;
         }
     }
 }
